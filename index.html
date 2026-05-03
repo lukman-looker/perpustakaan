@@ -1,246 +1,519 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>Sistem Perpustakaan</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Perpustakaan - Sistem Manajemen</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * { box-sizing: border-box; }
-    body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-      padding: 20px; 
-      max-width: 600px; 
-      margin: auto; 
-      background-color: #f7f7f7;
-    }
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-    #reader { 
-      width: 100%; 
-      margin: 20px auto; 
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #fff;
-    }
-    .card { 
-      background: #ffffff; 
-      padding: 15px 20px; 
-      margin: 15px 0; 
-      border-radius: 10px; 
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .card h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      color: #007bff;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px dashed #f0f0f0;
-    }
-    .detail-row:last-child { border-bottom: none; }
-    .label { font-weight: 600; color: #555; }
-    .value { color: #222; text-align: right; }
-    .input-group { margin: 15px 0; }
-    label { font-weight: 600; color: #555; }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    button { 
-      width: 100%;
-      padding: 12px; 
-      background: #007bff; 
-      color: white; 
-      border: none; 
-      border-radius: 6px; 
-      font-size: 16px;
-      cursor: pointer; 
-      box-shadow: 0 3px 0 #0056b3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    button:hover { background: #0056b3; }
-  </style>
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
-  <h2><i class="fas fa-book"></i> Sistem Peminjaman Buku</h2>
+<div class="container">
 
-  <div id="reader"></div>
+  <!-- HEADER -->
+  <header>
+    <h1><i class="fas fa-book"></i> Dashboard Perpustakaan</h1>
+    <div class="status">
+      <i class="fas fa-circle"></i> Sistem Aktif
+    </div>
+  </header>
 
-  <!-- DATA ANGGOTA -->
-  <div class="card">
-    <h3><i class="fas fa-user"></i> Data Anggota</h3>
-    <div class="detail-row">
-      <span class="label">Kode Anggota</span>
-      <span class="value" id="kodeAnggota">-</span>
-    </div>
-    <div class="detail-row">
-      <span class="label">Nama Lengkap</span>
-      <span class="value" id="namaAnggota">-</span>
-    </div>
-    <div class="detail-row">
-      <span class="label">Tipe</span>
-      <span class="value" id="tipeAnggota">-</span>
-    </div>
-    <div class="detail-row">
-      <span class="label">Keterangan</span>
-      <span class="value" id="ketAnggota">-</span>
-    </div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('scanner')">
+      <i class="fas fa-qrcode"></i> Scanner
+    </button>
+    <button class="tab-btn" onclick="switchTab('statistik')">
+      <i class="fas fa-chart-bar"></i> Statistik
+    </button>
+    <button class="tab-btn" onclick="switchTab('transaksi')">
+      <i class="fas fa-exchange-alt"></i> Transaksi
+    </button>
+    <button class="tab-btn" onclick="switchTab('overdued')">
+      <i class="fas fa-exclamation-triangle"></i> Overdue
+    </button>
+    <button class="tab-btn" onclick="switchTab('anggota')">
+      <i class="fas fa-users"></i> Anggota
+    </button>
+    <button class="tab-btn" onclick="switchTab('buku')">
+      <i class="fas fa-book-open"></i> Buku
+    </button>
+    <button class="tab-btn" onclick="switchTab('qrgen')">
+      <i class="fas fa-print"></i> Cetak
+    </button>
   </div>
 
-  <!-- DATA BUKU -->
-  <div class="card">
-    <h3><i class="fas fa-book-open"></i> Data Buku</h3>
-    <div class="detail-row">
-      <span class="label">Kode Buku</span>
-      <span class="value" id="kodeBuku">-</span>
+  <!-- ALERTS -->
+  <div id="alertContainer"></div>
+
+  <!-- TAB: SCANNER -->
+  <div id="scanner" class="tab-content active">
+    <div class="scanner-section">
+      <h2><i class="fas fa-qrcode"></i> QR Scanner</h2>
+      <div id="reader"></div>
+
+      <div class="button-group">
+        <button class="btn-danger btn-sm" onclick="toggleScanner()">
+          <i class="fas fa-stop-circle"></i> Hentikan Scanner
+        </button>
+      </div>
     </div>
-    <div class="detail-row">
-      <span class="label">Judul Buku</span>
-      <span class="value" id="judulBuku">-</span>
+
+    <div class="scanner-info">
+      <!-- MEMBER INFO -->
+      <div class="card">
+        <h2><i class="fas fa-user"></i> Data Anggota</h2>
+        <div id="memberInfo">
+          <div class="info-row">
+            <span class="label">Kode</span>
+            <span class="value">-</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Nama</span>
+            <span class="value">-</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Jenis Kelamin</span>
+            <span class="value">-</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Tipe</span>
+            <span class="value">-</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Keterangan</span>
+            <span class="value">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOK INFO -->
+      <div class="card">
+        <h2><i class="fas fa-book-open"></i> Data Buku</h2>
+        <div id="bookInfo">
+          <div class="info-row">
+            <span class="label">Kode Buku</span>
+            <span class="value">-</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Judul Buku</span>
+            <span class="value">-</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Pengarang</span>
+            <span class="value">-</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Stok Tersedia</span>
+            <span class="value">-</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="detail-row">
-      <span class="label">Stok Tersedia</span>
-      <span class="value" id="stokBuku">-</span>
-    </div>
-  </div>
 
-  <!-- FORM -->
-  <div class="input-group">
-    <label for="lamaPinjam"><i class="fas fa-clock"></i> Lama Pinjam (hari):</label>
-    <input type="number" id="lamaPinjam" value="7" min="1">
-  </div>
-
-  <button onclick="prosesPinjam()">
-    <i class="fas fa-check-circle"></i> Proses Peminjaman
-  </button>
-
-  <script>
-    const URL_GAS = "https://script.google.com/macros/s/AKfycbzmxtpqgacdxGgqgaIvHPh9uLwrNsvC-PBQotw4OeQAOgJ_4oLNezQjER1nxhaK4nPH/exec";
-
-    let kodeAnggota = "";
-    let kodeBuku = "";
-
-    // Inisialisasi Scanner
-    const scanner = new Html5Qrcode("reader");
-    scanner.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      qrCodeMessage => {
-        const kode = qrCodeMessage.trim();
-        if (kode.startsWith("S-") || kode.startsWith("G-") || kode.startsWith("O-")) {
-          kodeAnggota = kode;
-          document.getElementById("kodeAnggota").textContent = kodeAnggota;
-          ambilDataAnggota(kode);
-        } else if (kode.startsWith("B-")) {
-          kodeBuku = kode;
-          document.getElementById("kodeBuku").textContent = kodeBuku;
-          ambilDataBuku(kode);
-        }
-      }
-    );
-
-    function ambilDataAnggota(kode) {
-      const data = "action=getAnggota&kode=" + encodeURIComponent(kode);
+    <!-- TRANSACTION FORM -->
+    <div class="card">
+      <h2><i class="fas fa-exchange-alt"></i> Proses Transaksi</h2>
       
-      fetch(URL_GAS, {
-        method: "POST",
-        body: data,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      })
-      .then(res => res.json())
-      .then(response => {
-        console.log(response);
-        if (response.status === "success" && response.data) {
-          document.getElementById("namaAnggota").textContent = response.data.nama;
-          document.getElementById("tipeAnggota").textContent = response.data.tipe;
-          document.getElementById("ketAnggota").textContent = response.data.keterangan;
-        } else {
-          document.getElementById("namaAnggota").textContent = "Tidak ditemukan";
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Gagal ambil data anggota");
-      });
-    }
+      <div class="form-group">
+        <label for="lamaPinjam"><i class="fas fa-calendar"></i> Lama Pinjam (hari)</label>
+        <input type="number" id="lamaPinjam" value="7" min="1" max="30">
+      </div>
 
-    function ambilDataBuku(kode) {
-      const data = "action=getBuku&kode=" + encodeURIComponent(kode);
+      <div class="button-group">
+        <button class="btn-success" onclick="prosesPinjam()">
+          <i class="fas fa-download"></i> PINJAM BUKU
+        </button>
+        <button class="btn-primary" onclick="prosesKembali()">
+          <i class="fas fa-upload"></i> KEMBALI BUKU
+        </button>
+        <button class="btn-secondary" onclick="resetScanner()">
+          <i class="fas fa-redo"></i> Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: STATISTIK -->
+  <div id="statistik" class="tab-content">
+    <div class="card">
+      <h2><i class="fas fa-chart-bar"></i> Statistik Perpustakaan</h2>
+      <div class="stats-grid" id="statsContainer">
+        <div class="stat-card">
+          <div class="stat-label">Total Buku</div>
+          <div class="stat-number" id="statTotalBuku">-</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">Stok Tersedia</div>
+          <div class="stat-number" id="statTersedia">-</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">Sedang Dipinjam</div>
+          <div class="stat-number" id="statDipinjam">-</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-label">Overdue</div>
+          <div class="stat-number" id="statOverdue">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><i class="fas fa-sync"></i> Refresh Data</h2>
+      <button class="btn-primary" onclick="refreshStatistik()">
+        <i class="fas fa-redo"></i> Refresh Statistik
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB: TRANSAKSI -->
+  <div id="transaksi" class="tab-content">
+    <div class="card">
+      <h2><i class="fas fa-exchange-alt"></i> Riwayat Transaksi</h2>
+
+      <div class="filter-section">
+        <div class="filter-group">
+          <label>Filter Status</label>
+          <select id="filterStatus" onchange="filterTransaksi()">
+            <option value="">Semua</option>
+            <option value="DIPINJAM">Dipinjam</option>
+            <option value="KEMBALI">Kembali</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Cari Kode Anggota</label>
+          <input type="text" id="filterAnggota" placeholder="S-001" onchange="filterTransaksi()">
+        </div>
+        <button class="btn-secondary btn-sm" onclick="loadTransaksi()">
+          <i class="fas fa-redo"></i> Reset
+        </button>
+        <button class="btn-primary btn-sm" onclick="exportTransaksi()">
+          <i class="fas fa-download"></i> Export
+        </button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>No Transaksi</th>
+              <th>Tanggal Pinjam</th>
+              <th>Anggota</th>
+              <th>Buku</th>
+              <th>Jatuh Tempo</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="transaksiTable">
+            <tr><td colspan="7" class="text-center">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: OVERDUE -->
+  <div id="overdued" class="tab-content">
+    <div class="card">
+      <h2><i class="fas fa-exclamation-triangle"></i> Daftar Buku Overdue</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>No Transaksi</th>
+              <th>Anggota</th>
+              <th>Buku</th>
+              <th>Jatuh Tempo</th>
+              <th>Hari Terlambat</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="overdueTable">
+            <tr><td colspan="6" class="text-center">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: ANGGOTA -->
+  <div id="anggota" class="tab-content">
+    <div class="card">
+      <h2><i class="fas fa-users"></i> Data Anggota</h2>
       
-      fetch(URL_GAS, {
-        method: "POST",
-        body: data,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      })
-      .then(res => res.json())
-      .then(response => {
-        console.log(response);
-        if (response.status === "success" && response.data) {
-          document.getElementById("judulBuku").textContent = response.data.judul;
-          document.getElementById("stokBuku").textContent = response.data.stok;
-        } else {
-          document.getElementById("judulBuku").textContent = "Tidak ditemukan";
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Gagal ambil data buku");
-      });
-    }
+      <button class="btn-primary" onclick="openAddAnggotaModal()">
+        <i class="fas fa-plus-circle"></i> Tambah Anggota
+      </button>
 
-    function prosesPinjam() {
-      const lama = document.getElementById("lamaPinjam").value;
-      if (!kodeAnggota || !kodeBuku) {
-        alert("⚠️ Silakan scan kode anggota dan buku terlebih dahulu");
-        return;
-      }
-      const data = "action=pinjamBuku&kodeAnggota=" + encodeURIComponent(kodeAnggota) + 
-                   "&kodeBuku=" + encodeURIComponent(kodeBuku) + 
-                   "&lamaPinjam=" + parseInt(lama);
+      <div class="table-container mt-20">
+        <table>
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Nama</th>
+              <th>Jenis Kelamin</th>
+              <th>Tipe</th>
+              <th>Keterangan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="anggotaTable">
+            <tr><td colspan="6" class="text-center">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-      fetch(URL_GAS, {
-        method: "POST",
-        body: data,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
-      })
-      .then(res => res.json())
-      .then(response => {
-        if (response.status === "success") {
-          alert("✅ " + response.data.message);
-          location.reload();
-        } else {
-          alert("❌ Error: " + response.message);
-        }
-      })
-      .catch(err => alert("❌ Error: " + err));
-    }
-  </script>
+  <!-- TAB: BUKU -->
+  <div id="buku" class="tab-content">
+    <div class="card">
+      <h2><i class="fas fa-book-open"></i> Data Buku</h2>
+      
+      <button class="btn-primary" onclick="openAddBukuModal()">
+        <i class="fas fa-plus-circle"></i> Tambah Buku
+      </button>
 
+      <div class="table-container mt-20">
+        <table>
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Judul</th>
+              <th>Pengarang</th>
+              <th>Kategori</th>
+              <th>Stok</th>
+              <th>Rak</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="bukuTable">
+            <tr><td colspan="7" class="text-center">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: CETAK -->
+  <div id="qrgen" class="tab-content">
+    <!-- PRINT ANGGOTA SECTION -->
+    <div class="card">
+      <h2><i class="fas fa-print"></i> Cetak Kartu Anggota</h2>
+      
+      <div class="form-group">
+        <label>Pilih Metode Cetak</label>
+        <div class="button-group">
+          <button class="btn-primary" onclick="switchPrintMode('member-search')">
+            <i class="fas fa-search"></i> Cari Anggota
+          </button>
+          <button class="btn-success" onclick="switchPrintMode('member-bulk')">
+            <i class="fas fa-print"></i> Cetak Semua Anggota
+          </button>
+        </div>
+      </div>
+
+      <!-- SEARCH MODE -->
+      <div id="member-search-mode" style="display: none;">
+        <div class="filter-section">
+          <div class="filter-group">
+            <label>Cari Kode atau Nama Anggota</label>
+            <input type="text" id="memberSearchInput" placeholder="Contoh: S-1A-001 atau Adam">
+          </div>
+          <button class="btn-primary btn-sm" onclick="searchMember()">
+            <i class="fas fa-search"></i> Cari
+          </button>
+        </div>
+        <div id="memberSearchResults"></div>
+      </div>
+
+      <!-- BULK MODE -->
+      <div id="member-bulk-mode" style="display: none;">
+        <div class="button-group">
+          <button class="btn-success" onclick="bulkPrintMembers()">
+            <i class="fas fa-print"></i> Cetak Semua Anggota
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRINT BUKU SECTION -->
+    <div class="card">
+      <h2><i class="fas fa-print"></i> Cetak Label Buku</h2>
+      
+      <div class="form-group">
+        <label>Pilih Metode Cetak</label>
+        <div class="button-group">
+          <button class="btn-primary" onclick="switchPrintMode('book-search')">
+            <i class="fas fa-search"></i> Cari Buku
+          </button>
+          <button class="btn-success" onclick="switchPrintMode('book-bulk')">
+            <i class="fas fa-print"></i> Cetak Semua Buku
+          </button>
+        </div>
+      </div>
+
+      <!-- SEARCH MODE -->
+      <div id="book-search-mode" style="display: none;">
+        <div class="filter-section">
+          <div class="filter-group">
+            <label>Cari Kode atau Judul Buku</label>
+            <input type="text" id="bookSearchInput" placeholder="Contoh: DA-1A-001 atau Pawai">
+          </div>
+          <button class="btn-primary btn-sm" onclick="searchBook()">
+            <i class="fas fa-search"></i> Cari
+          </button>
+        </div>
+        <div id="bookSearchResults"></div>
+      </div>
+
+      <!-- BULK MODE -->
+      <div id="book-bulk-mode" style="display: none;">
+        <div class="button-group">
+          <button class="btn-success" onclick="bulkPrintBooks()">
+            <i class="fas fa-print"></i> Cetak Semua Buku
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: ADD/EDIT ANGGOTA -->
+<div id="anggotaModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Tambah/Edit Anggota</h2>
+      <button class="modal-close" onclick="closeModal('anggotaModal')"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <form id="anggotaForm" onsubmit="saveAnggota(event)">
+      <div class="form-group">
+        <label>Kode</label>
+        <input type="text" id="formKodeAnggota" required>
+      </div>
+      <div class="form-group">
+        <label>Nama</label>
+        <input type="text" id="formNamaAnggota" required>
+      </div>
+      <div class="form-group">
+        <label>Jenis Kelamin</label>
+        <select id="formJenisKelamin" required>
+          <option value="">Pilih Jenis Kelamin</option>
+          <option value="Laki-Laki">Laki-Laki</option>
+          <option value="Perempuan">Perempuan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipe</label>
+        <select id="formTipeAnggota" required>
+          <option value="">Pilih Tipe</option>
+          <option value="Siswa">Siswa</option>
+          <option value="Gukar">Gukar</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Keterangan</label>
+        <textarea id="formKeteranganAnggota" rows="2"></textarea>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Simpan
+        </button>
+        <button type="button" class="btn-secondary" onclick="closeModal('anggotaModal')">
+          <i class="fas fa-times"></i> Batal
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ADD/EDIT BUKU -->
+<div id="bukuModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Tambah/Edit Buku</h2>
+      <button class="modal-close" onclick="closeModal('bukuModal')"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <form id="bukuForm" onsubmit="saveBuku(event)">
+      <div class="form-group">
+        <label>Kode Buku</label>
+        <input type="text" id="formKodeBuku" required>
+      </div>
+      <div class="form-group">
+        <label>Kode Rak</label>
+        <input type="text" id="formKodeRak">
+      </div>
+      <div class="form-group">
+        <label>Judul Buku</label>
+        <input type="text" id="formJudulBuku" required>
+      </div>
+      <div class="form-group">
+        <label>Pengarang</label>
+        <input type="text" id="formPengarang">
+      </div>
+      <div class="form-group">
+        <label>Penerbit</label>
+        <input type="text" id="formPenerbit">
+      </div>
+      <div class="form-group">
+        <label>Tahun Terbit</label>
+        <input type="number" id="formTahunTerbit">
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <input type="text" id="formKategori">
+      </div>
+      <div class="form-group">
+        <label>Stok</label>
+        <input type="number" id="formStok" required>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Simpan
+        </button>
+        <button type="button" class="btn-secondary" onclick="closeModal('bukuModal')">
+          <i class="fas fa-times"></i> Batal
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: RETURN BOOK -->
+<div id="returnModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Kembalikan Buku</h2>
+      <button class="modal-close" onclick="closeModal('returnModal')"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div id="returnInfo" style="margin-bottom: 20px; padding: 16px; background: #f0f0f0; border-radius: 8px;">
+      <!-- Data will be filled here -->
+    </div>
+
+    <div class="button-group">
+      <button class="btn-success" onclick="confirmReturn()">
+        <i class="fas fa-check"></i> Konfirmasi Kembali
+      </button>
+      <button class="btn-secondary" onclick="closeModal('returnModal')">
+        <i class="fas fa-times"></i> Batal
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="assets/js/script.js"></script>
 </body>
 </html>
