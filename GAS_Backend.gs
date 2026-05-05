@@ -1,4 +1,3 @@
-
 const SHEET_ANGGOTA = "ANGGOTA";
 const SHEET_BANK_BUKU = "BANK BUKU";
 const SHEET_TRANSAKSI = "TRANSAKSI";
@@ -129,7 +128,9 @@ function getAllDataFromSheet(sheetName) {
   return data.map(row => {
     const obj = {};
     headers.forEach((header, index) => {
-      obj[header] = row[index];
+      const value = row[index];
+      // Trim string values to prevent whitespace issues
+      obj[header] = typeof value === 'string' ? value.trim() : value;
     });
     return obj;
   });
@@ -145,7 +146,7 @@ function findRowByColumnValue(sheetName, columnIndex, value) {
   if (lastRow <= 1) return -1;
   
   const data = sheet.getRange(2, columnIndex, lastRow - 1, 1).getValues();
-  const foundIndex = data.findIndex(row => row[0] == value);
+  const foundIndex = data.findIndex(row => String(row[0]).trim() === String(value).trim());
   
   return foundIndex !== -1 ? foundIndex + 2 : -1;
 }

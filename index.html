@@ -15,7 +15,7 @@
 
   <!-- HEADER -->
   <header>
-    <h1><i class="fas fa-book"></i> Dashboard Perpustakaan</h1>
+    <h1><i class="fas fa-book"></i> Dashboard Perpustakaan SD Muhammadiyah 1 Sedati</h1>
     <div class="status">
       <i class="fas fa-circle"></i> Sistem Aktif
     </div>
@@ -45,9 +45,6 @@
       <i class="fas fa-print"></i> Cetak
     </button>
   </div>
-
-  <!-- ALERTS -->
-  <div id="alertContainer"></div>
 
   <!-- TAB: SCANNER -->
   <div id="scanner" class="tab-content active">
@@ -246,14 +243,20 @@
     <div class="card">
       <h2><i class="fas fa-users"></i> Data Anggota</h2>
       
-      <button class="btn-primary" onclick="openAddAnggotaModal()">
-        <i class="fas fa-plus-circle"></i> Tambah Anggota
-      </button>
+      <div class="button-group">
+        <button class="btn-primary" onclick="openAddAnggotaModal()">
+          <i class="fas fa-plus-circle"></i> Tambah Anggota
+        </button>
+        <button class="btn-warning" onclick="selectivePrintMembers()">
+          <i class="fas fa-print"></i> Cetak yang Dipilih
+        </button>
+      </div>
 
       <div class="table-container mt-20">
         <table>
           <thead>
             <tr>
+              <th><input type="checkbox" id="selectAllMembers" onchange="toggleSelectAllMembers(this.checked)"></th>
               <th>Kode</th>
               <th>Nama</th>
               <th>Jenis Kelamin</th>
@@ -263,7 +266,7 @@
             </tr>
           </thead>
           <tbody id="anggotaTable">
-            <tr><td colspan="6" class="text-center">Memuat data...</td></tr>
+            <tr><td colspan="7" class="text-center">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -275,14 +278,20 @@
     <div class="card">
       <h2><i class="fas fa-book-open"></i> Data Buku</h2>
       
-      <button class="btn-primary" onclick="openAddBukuModal()">
-        <i class="fas fa-plus-circle"></i> Tambah Buku
-      </button>
+      <div class="button-group">
+        <button class="btn-primary" onclick="openAddBukuModal()">
+          <i class="fas fa-plus-circle"></i> Tambah Buku
+        </button>
+        <button class="btn-warning" onclick="selectivePrintBooks()">
+          <i class="fas fa-print"></i> Cetak yang Dipilih
+        </button>
+      </div>
 
       <div class="table-container mt-20">
         <table>
           <thead>
             <tr>
+              <th><input type="checkbox" id="selectAllBooks" onchange="toggleSelectAllBooks(this.checked)"></th>
               <th>Kode</th>
               <th>Judul</th>
               <th>Pengarang</th>
@@ -293,7 +302,7 @@
             </tr>
           </thead>
           <tbody id="bukuTable">
-            <tr><td colspan="7" class="text-center">Memuat data...</td></tr>
+            <tr><td colspan="8" class="text-center">Memuat data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -312,7 +321,10 @@
           <button class="btn-primary" onclick="switchPrintMode('member-search')">
             <i class="fas fa-search"></i> Cari Anggota
           </button>
-          <button class="btn-success" onclick="switchPrintMode('member-bulk')">
+          <button class="btn-warning" onclick="switchToSelectiveMode('member')">
+            <i class="fas fa-checkbox"></i> Cetak Pilihan
+          </button>
+          <button class="btn-success" onclick="confirmBulkPrintMembers()">
             <i class="fas fa-print"></i> Cetak Semua Anggota
           </button>
         </div>
@@ -331,15 +343,6 @@
         </div>
         <div id="memberSearchResults"></div>
       </div>
-
-      <!-- BULK MODE -->
-      <div id="member-bulk-mode" style="display: none;">
-        <div class="button-group">
-          <button class="btn-success" onclick="bulkPrintMembers()">
-            <i class="fas fa-print"></i> Cetak Semua Anggota
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- PRINT BUKU SECTION -->
@@ -352,7 +355,10 @@
           <button class="btn-primary" onclick="switchPrintMode('book-search')">
             <i class="fas fa-search"></i> Cari Buku
           </button>
-          <button class="btn-success" onclick="switchPrintMode('book-bulk')">
+          <button class="btn-warning" onclick="switchToSelectiveMode('book')">
+            <i class="fas fa-checkbox"></i> Cetak Pilihan
+          </button>
+          <button class="btn-success" onclick="confirmBulkPrintBooks()">
             <i class="fas fa-print"></i> Cetak Semua Buku
           </button>
         </div>
@@ -371,15 +377,6 @@
         </div>
         <div id="bookSearchResults"></div>
       </div>
-
-      <!-- BULK MODE -->
-      <div id="book-bulk-mode" style="display: none;">
-        <div class="button-group">
-          <button class="btn-success" onclick="bulkPrintBooks()">
-            <i class="fas fa-print"></i> Cetak Semua Buku
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -396,7 +393,7 @@
     <form id="anggotaForm" onsubmit="saveAnggota(event)">
       <div class="form-group">
         <label>Kode</label>
-        <input type="text" id="formKodeAnggota" required>
+        <input type="text" id="formKodeAnggota">
       </div>
       <div class="form-group">
         <label>Nama</label>
@@ -447,7 +444,7 @@
     <form id="bukuForm" onsubmit="saveBuku(event)">
       <div class="form-group">
         <label>Kode Buku</label>
-        <input type="text" id="formKodeBuku" required>
+        <input type="text" id="formKodeBuku">
       </div>
       <div class="form-group">
         <label>Kode Rak</label>
@@ -513,6 +510,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="config.js"></script>
 <script src="assets/js/script.js"></script>
 </body>

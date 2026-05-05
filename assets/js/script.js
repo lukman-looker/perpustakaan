@@ -17,6 +17,76 @@ let allMembers = [];
 let allBooks = [];
 let scanner = null;
 let scannerActive = true;
+let isLoading = false;
+let selectivePrintMode = null; // 'member' atau 'book'
+let selectedForPrint = {
+  members: [],
+  books: []
+};
+
+// =============================================================================
+// UI STATE & NOTIFICATION HELPERS
+// =============================================================================
+
+function showLoading(message = 'Memproses...') {
+  isLoading = true;
+  Swal.fire({
+    title: message,
+    didOpen: (modal) => {
+      Swal.showLoading();
+    },
+    allowOutsideClick: false,
+    allowEscapeKey: false
+  });
+}
+
+function hideLoading() {
+  isLoading = false;
+  Swal.close();
+}
+
+function showAlert(message, type = 'info', autoClose = true, timer = 2000) {
+  const config = {
+    title: type === 'success' ? '✓ Berhasil' : type === 'error' ? '✗ Error' : type === 'warning' ? '⚠ Perhatian' : 'ℹ Info',
+    text: message,
+    icon: type,
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timerProgressBar: autoClose,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer);
+      toast.addEventListener('mouseleave', Swal.resumeTimer);
+    }
+  };
+  
+  if (autoClose) {
+    config.timer = timer;
+  } else {
+    config.showConfirmButton = true;
+  }
+  
+  Swal.fire(config);
+}
+
+function showConfirm(message, onConfirm, onCancel = null) {
+  Swal.fire({
+    title: 'Konfirmasi',
+    text: message,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, Lanjutkan',
+    cancelButtonText: 'Batal',
+    confirmButtonColor: '#667eea',
+    cancelButtonColor: '#6b7280'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      if (onConfirm) onConfirm();
+    } else if (result.isDismissed && onCancel) {
+      onCancel();
+    }
+  });
+}
 
 // =============================================================================
 // INITIALIZATION
@@ -156,12 +226,13 @@ function displayAnggotaTable(members) {
   const tbody = document.getElementById('anggotaTable');
   
   if (!members || members.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data anggota</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center">Tidak ada data anggota</td></tr>';
     return;
   }
 
   tbody.innerHTML = members.map(m => `
     <tr>
+      <td><input type="checkbox" class="member-checkbox" value="${m['KODE']}" onchange="updateMemberSelection()"></td>
       <td>${m['KODE'] || '-'}</td>
       <td>${m['NAMA'] || '-'}</td>
       <td>${m['JENIS KELAMIN'] || '-'}</td>
@@ -178,6 +249,7 @@ function displayAnggotaTable(members) {
 
 function openAddAnggotaModal() {
   document.getElementById('formKodeAnggota').value = '';
+  document.getElementById('formKodeAnggota').removeAttribute('readonly');
   document.getElementById('formNamaAnggota').value = '';
   document.getElementById('formJenisKelamin').value = '';
   document.getElementById('formTipeAnggota').value = '';
@@ -189,6 +261,7 @@ function editAnggota(kode) {
   const member = allMembers.find(m => m['KODE'] == kode);
   if (member) {
     document.getElementById('formKodeAnggota').value = member['KODE'] || '';
+    document.getElementById('formKodeAnggota').setAttribute('readonly', 'readonly');
     document.getElementById('formNamaAnggota').value = member['NAMA'] || '';
     document.getElementById('formJenisKelamin').value = member['JENIS KELAMIN'] || '';
     document.getElementById('formTipeAnggota').value = member['TIPE'] || '';
@@ -200,24 +273,31 @@ function editAnggota(kode) {
 function saveAnggota(event) {
   event.preventDefault();
   
-  const kode = document.getElementById('formKodeAnggota').value;
-  const isNew = !allMembers.find(m => m['KODE'] == kode);
+  const kode = document.getElementById('formKodeAnggota').value.trim();
+  const isNew = !allMembers.find(m => m['KODE'].trim() == kode);
   
   const action = isNew ? 'addAnggota' : 'updateAnggota';
+  const message = isNew ? 'Menambah anggota...' : 'Mengupdate anggota...';
+  
+  showLoading(message);
   
   apiCall(action, {
     kode: kode,
-    nama: document.getElementById('formNamaAnggota').value,
-    jenisKelamin: document.getElementById('formJenisKelamin').value,
-    tipe: document.getElementById('formTipeAnggota').value,
-    keterangan: document.getElementById('formKeteranganAnggota').value
+    nama: document.getElementById('formNamaAnggota').value.trim(),
+    jenisKelamin: document.getElementById('formJenisKelamin').value.trim(),
+    tipe: document.getElementById('formTipeAnggota').value.trim(),
+    keterangan: document.getElementById('formKeteranganAnggota').value.trim()
   })
     .then(data => {
+      hideLoading();
       showAlert(data.message, 'success');
       closeModal('anggotaModal');
       loadAllMembers();
     })
-    .catch(err => showAlert(`Error: ${err}`, 'error'));
+    .catch(err => {
+      hideLoading();
+      showAlert(`Error: ${err}`, 'error');
+    });
 }
 
 // =============================================================================
@@ -284,12 +364,13 @@ function displayBukuTable(books) {
   const tbody = document.getElementById('bukuTable');
   
   if (!books || books.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center">Tidak ada data buku</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">Tidak ada data buku</td></tr>';
     return;
   }
 
   tbody.innerHTML = books.map(b => `
     <tr>
+      <td><input type="checkbox" class="book-checkbox" value="${b['KODE BUKU']}" onchange="updateBookSelection()"></td>
       <td>${b['KODE BUKU'] || '-'}</td>
       <td>${b['JUDUL BUKU'] || '-'}</td>
       <td>${b['PENGARANG'] || '-'}</td>
@@ -311,6 +392,7 @@ function displayBukuTable(books) {
 
 function openAddBukuModal() {
   document.getElementById('formKodeBuku').value = '';
+  document.getElementById('formKodeBuku').removeAttribute('readonly');
   document.getElementById('formKodeRak').value = '';
   document.getElementById('formJudulBuku').value = '';
   document.getElementById('formPengarang').value = '';
@@ -324,14 +406,15 @@ function openAddBukuModal() {
 function editBuku(kode) {
   const book = allBooks.find(b => b['KODE BUKU'] == kode);
   if (book) {
-    document.getElementById('formKodeBuku').value = book['Kode Buku'] || '';
+    document.getElementById('formKodeBuku').value = book['KODE BUKU'] || '';
+    document.getElementById('formKodeBuku').setAttribute('readonly', 'readonly');
     document.getElementById('formKodeRak').value = book['KODE RAK'] || '';
     document.getElementById('formJudulBuku').value = book['JUDUL BUKU'] || '';
     document.getElementById('formPengarang').value = book['PENGARANG'] || '';
     document.getElementById('formPenerbit').value = book['PENERBIT'] || '';
     document.getElementById('formTahunTerbit').value = book['TAHUN'] || '';
     document.getElementById('formKategori').value = book['KATEGORI'] || '';
-    document.getElementById('formStok').value = book['Stok Tersedia'] || '0';
+    document.getElementById('formStok').value = book['STOK TERSEDIA'] || '0';
     openModal('bukuModal');
   }
 }
@@ -339,27 +422,34 @@ function editBuku(kode) {
 function saveBuku(event) {
   event.preventDefault();
   
-  const kode = document.getElementById('formKodeBuku').value;
-  const isNew = !allBooks.find(b => b['KODE BUKU'] == kode);
+  const kode = document.getElementById('formKodeBuku').value.trim();
+  const isNew = !allBooks.find(b => b['KODE BUKU'].trim() == kode);
   
   const action = isNew ? 'addBuku' : 'updateBuku';
+  const message = isNew ? 'Menambah buku...' : 'Mengupdate buku...';
+  
+  showLoading(message);
   
   apiCall(action, {
     kode: kode,
-    kodeRak: document.getElementById('formKodeRak').value,
-    judul: document.getElementById('formJudulBuku').value,
-    pengarang: document.getElementById('formPengarang').value,
-    penerbit: document.getElementById('formPenerbit').value,
-    tahunTerbit: document.getElementById('formTahunTerbit').value,
-    kategori: document.getElementById('formKategori').value,
-    stok: document.getElementById('formStok').value
+    kodeRak: document.getElementById('formKodeRak').value.trim(),
+    judul: document.getElementById('formJudulBuku').value.trim(),
+    pengarang: document.getElementById('formPengarang').value.trim(),
+    penerbit: document.getElementById('formPenerbit').value.trim(),
+    tahunTerbit: document.getElementById('formTahunTerbit').value.trim(),
+    kategori: document.getElementById('formKategori').value.trim(),
+    stok: document.getElementById('formStok').value.trim()
   })
     .then(data => {
+      hideLoading();
       showAlert(data.message, 'success');
       closeModal('bukuModal');
       loadAllBooks();
     })
-    .catch(err => showAlert(`Error: ${err}`, 'error'));
+    .catch(err => {
+      hideLoading();
+      showAlert(`Error: ${err}`, 'error');
+    });
 }
 
 // =============================================================================
@@ -383,6 +473,8 @@ function prosesPinjam() {
   }
 
   const lamaPinjam = parseInt(document.getElementById('lamaPinjam').value) || 7;
+  
+  showLoading('Memproses peminjaman...');
 
   apiCall('pinjamBuku', {
     kodeAnggota: currentMember.kode,
@@ -390,12 +482,16 @@ function prosesPinjam() {
     lamaPinjam: lamaPinjam
   })
     .then(data => {
-      showAlert(`✅ ${data.message}\nNo Transaksi: ${data.noTransaksi}`, 'success');
+      hideLoading();
+      showAlert(`${data.message}\nNo Transaksi: ${data.noTransaksi}`, 'success');
       resetScanner();
       loadTransaksi();
       refreshStatistik();
     })
-    .catch(err => showAlert(`Gagal: ${err}`, 'error'));
+    .catch(err => {
+      hideLoading();
+      showAlert(`Gagal: ${err}`, 'error');
+    });
 }
 
 function prosesKembali() {
@@ -430,18 +526,24 @@ function prosesKembali() {
 
 function confirmReturn() {
   if (!currentTransaction) return;
+  
+  showLoading('Memproses pengembalian...');
 
   apiCall('kembaliBuku', {
     noTransaksi: currentTransaction['No Transaksi']
   })
     .then(data => {
-      showAlert(`✅ ${data.message}`, 'success');
+      hideLoading();
+      showAlert(`${data.message}`, 'success');
       closeModal('returnModal');
       resetScanner();
       loadTransaksi();
       refreshStatistik();
     })
-    .catch(err => showAlert(`Gagal: ${err}`, 'error'));
+    .catch(err => {
+      hideLoading();
+      showAlert(`Gagal: ${err}`, 'error');
+    });
 }
 
 function loadTransaksi() {
@@ -615,15 +717,250 @@ function refreshStatistik() {
 function switchPrintMode(mode) {
   // Hide all modes
   document.getElementById('member-search-mode').style.display = 'none';
-  document.getElementById('member-bulk-mode').style.display = 'none';
   document.getElementById('book-search-mode').style.display = 'none';
-  document.getElementById('book-bulk-mode').style.display = 'none';
   
   // Show selected mode
   document.getElementById(mode + '-mode').style.display = 'block';
 }
 
-// ===== MEMBER PRINTING =====
+function switchToSelectiveMode(type) {
+  selectivePrintMode = type;
+  const selectedTab = type === 'member' ? 'anggota' : 'buku';
+  
+  // Switch to that tab
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  document.getElementById(selectedTab).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  showAlert(`Pilih ${type === 'member' ? 'anggota' : 'buku'} yang ingin dicetak dengan checkbox`, 'info');
+}
+
+function toggleSelectAllMembers(checked) {
+  const checkboxes = document.querySelectorAll('.member-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = checked;
+  });
+  updateMemberSelection();
+}
+
+function toggleSelectAllBooks(checked) {
+  const checkboxes = document.querySelectorAll('.book-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = checked;
+  });
+  updateBookSelection();
+}
+
+function updateMemberSelection() {
+  const checkboxes = document.querySelectorAll('.member-checkbox:checked');
+  selectedForPrint.members = Array.from(checkboxes).map(cb => cb.value);
+  
+  if (selectedForPrint.members.length > 0) {
+    showAlert(`${selectedForPrint.members.length} anggota terpilih`, 'info', true, 1500);
+  }
+}
+
+function updateBookSelection() {
+  const checkboxes = document.querySelectorAll('.book-checkbox:checked');
+  selectedForPrint.books = Array.from(checkboxes).map(cb => cb.value);
+  
+  if (selectedForPrint.books.length > 0) {
+    showAlert(`${selectedForPrint.books.length} buku terpilih`, 'info', true, 1500);
+  }
+}
+
+function selectivePrintMembers() {
+  if (selectedForPrint.members.length === 0) {
+    showAlert('Pilih minimal 1 anggota untuk dicetak', 'warning');
+    return;
+  }
+  
+  showConfirm(`Cetak ${selectedForPrint.members.length} kartu anggota yang terpilih?`, () => {
+    const selected = selectedForPrint.members.map(kode => 
+      allMembers.find(m => m['KODE'] === kode)
+    ).filter(m => m);
+    
+    printSelectedMembers(selected);
+  });
+}
+
+function selectivePrintBooks() {
+  if (selectedForPrint.books.length === 0) {
+    showAlert('Pilih minimal 1 buku untuk dicetak', 'warning');
+    return;
+  }
+  
+  showConfirm(`Cetak ${selectedForPrint.books.length} label buku yang terpilih?`, () => {
+    const selected = selectedForPrint.books.map(kode => 
+      allBooks.find(b => b['KODE BUKU'] === kode)
+    ).filter(b => b);
+    
+    printSelectedBooks(selected);
+  });
+}
+
+function printSelectedMembers(members) {
+  if (members.length === 0) return;
+  
+  let html = '<html><head><meta charset="UTF-8"><style>' +
+    '* {box-sizing: border-box; margin: 0; padding: 0;}' +
+    '@page {size: landscape; margin: 10mm;}' +
+    'body {font-family: "Courier New", Courier, monospace; background: white; font-size: 12px;}' +
+    '.wrapper-anggota {display: grid; grid-template-columns: 1fr 1fr; gap: 15px;}' +
+    '.card-anggota {width: 100%; min-height: 95vh; border: 1px solid #333; background: white; padding: 20px; display: flex; flex-direction: column; page-break-inside: avoid;}' +
+    '.page-break {page-break-after: always;}' +
+    '.school-header {text-align: center; padding-bottom: 10px; border-bottom: 2px solid #333; font-weight: bold; line-height: 1.5; margin-bottom: 20px;}' +
+    '.school-title {font-size: 16px;}' +
+    '.school-name {font-size: 14px;}' +
+    '.school-tag {font-size: 11px;}' +
+    '.header-card {display: flex; margin-bottom: 20px; align-items: flex-start;}' +
+    '.info-left {flex: 2; padding-right: 15px;}' +
+    '.info-right {flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;}' +
+    '.detail-table {border-collapse: collapse; font-size: 13px; margin-bottom: 10px;}' +
+    '.detail-table td {padding: 3px 4px; vertical-align: top;}' +
+    '.detail-table td:first-child {width: 110px; text-align: left;}' +
+    '.detail-table td:nth-child(2) {width: 8px; text-align: center;}' +
+    '.detail-table td:nth-child(3) {text-align: left;}' +
+    '.table-transaksi {width: 100%; border-collapse: collapse; flex-grow: 1;}' +
+    '.table-transaksi th, .table-transaksi td {border: 1px solid #333; padding: 6px; text-align: center; font-size: 11px;}' +
+    '.table-transaksi th {background-color: #f7f7f7; font-weight: bold;}' +
+    '.qr-code-img {width: 80px; height: 80px; border: 1px solid #333;}' +
+    '.qr-code-text {margin-top: 5px; font-weight: bold; font-size: 10px; text-align: center;}' +
+    '@media print {body {margin: 0; padding: 0; background: white;} @page {margin: 10mm;}}' +
+    '</style></head><body>';
+
+  let cardsOnPage = 0;
+
+  members.forEach((member, index) => {
+    if (cardsOnPage === 0) {
+      html += '<div class="wrapper-anggota">';
+    }
+
+    const memberTransactions = allTransactions.filter(t => t['Kode Anggota'] == member['KODE']);
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(member['KODE'])}`;
+
+    html += '<div class="card-anggota">' +
+      '<div class="school-header">' +
+      '<div class="school-title">KARTU ANGGOTA PERPUSTAKAAN</div>' +
+      '<div class="school-name">SD MUHAMMADIYAH 1 SEDATI</div>' +
+      '<div class="school-tag">Islamic Modern School</div>' +
+      '</div>' +
+      '<div class="header-card">' +
+      '<div class="info-left">' +
+      '<table class="detail-table"><tr><td>Kode Anggota</td><td>:</td><td>' + member['KODE'] + '</td></tr>' +
+      '<tr><td>Nama</td><td>:</td><td>' + member['NAMA'] + '</td></tr>' +
+      '<tr><td>Tipe</td><td>:</td><td>' + member['TIPE'] + '</td></tr>' +
+      '<tr><td>Keterangan</td><td>:</td><td>' + member['KETERANGAN'] + '</td></tr></table>' +
+      '</div>' +
+      '<div class="info-right">' +
+      '<img src="' + qrUrl + '" class="qr-code-img"><div class="qr-code-text">' + member['KODE'] + '</div>' +
+      '</div>' +
+      '</div>' +
+      '<table class="table-transaksi"><thead><tr><th style="width: 6%;">No</th><th style="width: 18%;">No Transaksi</th><th style="width: 15%;">Kode Buku</th><th style="width: 30%;">Jatuh Tempo</th><th style="width: 31%;">Tgl Kembali</th></tr></thead><tbody>';
+
+    for (let i = 0; i < 15; i++) {
+      const trx = memberTransactions[i];
+      html += '<tr><td>' + (i + 1) + '</td><td>' + (trx ? trx['No Transaksi'] : '') + '</td><td>' + (trx ? trx['Kode Buku'] : '') + '</td><td>' + (trx ? formatDate(trx['Jatuh Tempo']) : '') + '</td><td>' + (trx ? formatDate(trx['Tgl Kembali']) : '') + '</td></tr>';
+    }
+
+    html += '</tbody></table></div>';
+
+    cardsOnPage++;
+
+    if (cardsOnPage === 2 || index === members.length - 1) {
+      html += '</div>';
+      if (index < members.length - 1) {
+        html += '<div class="page-break"></div>';
+      }
+      cardsOnPage = 0;
+    }
+  });
+
+  html += '</body></html>';
+
+  const printWindow = window.open('', 'Print Selected Members');
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.print();
+  
+  showAlert('Data siap dicetak', 'success');
+}
+
+function printSelectedBooks(books) {
+  if (books.length === 0) return;
+  
+  let html = '<html><head><meta charset="UTF-8"><style>' +
+    '* {box-sizing: border-box; margin: 0; padding: 0;}' +
+    '@page {size: portrait; margin: 10mm;}' +
+    'body {font-family: "Courier New", Courier, monospace; background: white; font-size: 12px;}' +
+    '.container-buku {display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;}' +
+    '.label-buku {border: 1px solid #333; background: white; padding: 15px; display: flex; align-items: flex-start; min-height: 120px; page-break-inside: avoid;}' +
+    '.buku-info {flex: 2; font-size: 12px;}' +
+    '.buku-qr {flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;}' +
+    '.detail-table {border-collapse: collapse; margin: 0; width: 100%;}' +
+    '.detail-table td {padding: 2px 4px; font-size: 12px; vertical-align: top;}' +
+    '.detail-table td:first-child {width: 85px; text-align: left;}' +
+    '.detail-table td:nth-child(2) {width: 8px; text-align: center;}' +
+    '.detail-table td:nth-child(3) {text-align: left;}' +
+    '.kode-buku-text {margin-top: 3px; font-weight: bold; font-size: 10px; text-align: center;}' +
+    '.page-buku {page-break-before: always;}' +
+    '.page-buku:first-child {page-break-before: avoid;}' +
+    '@media print {body {margin: 0; padding: 0; background: white;} @page {margin: 10mm;} .container-buku {page-break-inside: auto;}}' +
+    '</style></head><body>';
+
+  let labelsOnPage = 0;
+  let pageOpen = false;
+
+  books.forEach((book, index) => {
+    if (labelsOnPage === 0) {
+      if (pageOpen) {
+        html += '</div>';
+      }
+      html += '<div class="page-buku"><div class="container-buku">';
+      pageOpen = true;
+    }
+
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(book['KODE BUKU'])}`;
+
+    html += '<div class="label-buku">' +
+      '<div class="buku-info">' +
+      '<table class="detail-table"><tr><td>Judul</td><td>:</td><td><strong>' + book['JUDUL BUKU'] + '</strong></td></tr>' +
+      '<tr><td>Pengarang</td><td>:</td><td>' + book['PENGARANG'] + '</td></tr>' +
+      '<tr><td>Penerbit</td><td>:</td><td>' + book['PENERBIT'] + ' (' + book['TAHUN'] + ')</td></tr>' +
+      '<tr><td>Kategori</td><td>:</td><td>' + book['KATEGORI'] + '</td></tr>' +
+      '<tr><td>Rak</td><td>:</td><td>' + book['KODE RAK'] + '</td></tr></table>' +
+      '</div>' +
+      '<div class="buku-qr">' +
+      '<img src="' + qrUrl + '" class="qr-code-preview">' +
+      '<div class="kode-buku-text">' + book['KODE BUKU'] + '</div>' +
+      '</div>' +
+      '</div>';
+
+    labelsOnPage++;
+
+    if (labelsOnPage === 8 || index === books.length - 1) {
+      labelsOnPage = 0;
+    }
+  });
+
+  if (pageOpen) {
+    html += '</div></div>';
+  }
+
+  html += '</body></html>';
+
+  const printWindow = window.open('', 'Print Selected Books');
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.print();
+  
+  showAlert('Data siap dicetak', 'success');
+}
 
 function searchMember() {
   const searchText = document.getElementById('memberSearchInput').value.trim().toUpperCase();
@@ -729,6 +1066,18 @@ function printMemberCard(kodeAnggota) {
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.print();
+}
+
+function confirmBulkPrintMembers() {
+  showConfirm(`Yakin ingin mencetak ${allMembers.length} kartu anggota?`, () => {
+    bulkPrintMembers();
+  });
+}
+
+function confirmBulkPrintBooks() {
+  showConfirm(`Yakin ingin mencetak ${allBooks.length} label buku?`, () => {
+    bulkPrintBooks();
+  });
 }
 
 function bulkPrintMembers() {
@@ -1056,26 +1405,6 @@ function resetScanner() {
   showAlert('Scanner direset', 'info');
 }
 
-function showAlert(message, type = 'info') {
-  const container = document.getElementById('alertContainer');
-  const alertId = 'alert-' + Date.now();
-  
-  const alert = document.createElement('div');
-  alert.id = alertId;
-  alert.className = `alert alert-${type}`;
-  alert.innerHTML = `
-    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-    <span>${message}</span>
-  `;
-  
-  container.appendChild(alert);
-
-  setTimeout(() => {
-    const el = document.getElementById(alertId);
-    if (el) el.remove();
-  }, 5000);
-}
-
 function formatDate(dateStr) {
   if (!dateStr) return '-';
   const date = new Date(dateStr);
@@ -1086,7 +1415,21 @@ function formatDate(dateStr) {
 function viewTransaction(noTransaksi) {
   const trx = allTransactions.find(t => t['No Transaksi'] == noTransaksi);
   if (trx) {
-    showAlert(`Transaksi: ${noTransaksi}\nStatus: ${trx['Status']}\nPinjam: ${formatDate(trx['Tgl Pinjam'])}\nJatuh Tempo: ${formatDate(trx['Jatuh Tempo'])}`, 'info');
+    const html = `
+      <div style="text-align: left;">
+        <p><strong>No Transaksi:</strong> ${noTransaksi}</p>
+        <p><strong>Status:</strong> <span style="padding: 5px 10px; border-radius: 4px; background: ${trx['Status'] === 'DIPINJAM' ? '#fef3c7' : '#d1fae5'}; color: ${trx['Status'] === 'DIPINJAM' ? '#92400e' : '#065f46'};">${trx['Status']}</span></p>
+        <p><strong>Tanggal Pinjam:</strong> ${formatDate(trx['Tgl Pinjam'])}</p>
+        <p><strong>Jatuh Tempo:</strong> ${formatDate(trx['Jatuh Tempo'])}</p>
+      </div>
+    `;
+    Swal.fire({
+      title: 'Detail Transaksi',
+      html: html,
+      icon: 'info',
+      confirmButtonText: 'Tutup',
+      confirmButtonColor: '#667eea'
+    });
   }
 }
 
@@ -1095,6 +1438,8 @@ function viewTransaction(noTransaksi) {
 // =============================================================================
 
 function loadAllData() {
+  showLoading('Memuat data...');
+  
   Promise.all([
     loadAllMembers(),
     loadAllBooks(),
@@ -1102,9 +1447,11 @@ function loadAllData() {
     refreshStatistik()
   ])
     .then(() => {
+      hideLoading();
       showAlert('Data berhasil dimuat', 'success');
     })
     .catch(err => {
+      hideLoading();
       showAlert(`Error loading data: ${err}`, 'error');
     });
 }
