@@ -1,10 +1,10 @@
 SHEET = ANGGOTA
 KODE	NAMA	JENIS KELAMIN	TIPE	KETERANGAN
-S-1A-001	Adam Rasyid Albani	Laki-Laki	Siswa	Kelas 1 A
-S-1A-002	Anisa Nur Cahyani	Perempuan	Siswa	Kelas 1 A
-G-ADM-001	Dhani Harsyahyadi, S.H.I	Laki-Laki	Gukar	Kepala Sekolah
-G-PPK-001	Siti Nurhaliza	Perempuan	Gukar	Guru Perpustakaan
-O-WM-001	Wulandari Andriani	Perempuan	Other	Wali Murid
+S-001	Adam Rasyid Albani	Laki-Laki	Siswa	Kelas 1 A
+S-002	Anisa Nur Cahyani	Perempuan	Siswa	Kelas 1 A
+G-001	Dhani Harsyahyadi, S.H.I	Laki-Laki	Gukar	Kepala Sekolah
+G-001	Siti Nurhaliza	Perempuan	Gukar	Guru Perpustakaan
+O-001	Wulandari Andriani	Perempuan	Other	Wali Murid
 
 
 SHEET = BANK BUKU
@@ -17,15 +17,20 @@ PL-2A-001	2-A	Matematika Dasar	Suratman	Erlangga	2019	5	10	Pelajaran
 
 SHEET = TRANSAKSI
 No Transaksi	Tgl Pinjam	Kode Anggota	Kode Buku	Lama Pinjam	Jatuh Tempo	Tgl Kembali	Status
-TRX-20260501-0001	2026-05-01	S-1A-001	DA-1A-001	7	2026-05-08		DIPINJAM
-TRX-20260501-0002	2026-05-02	S-1A-002	NV-1B-001	7	2026-05-09		DIPINJAM
-TRX-20260430-0001	2026-04-30	G-ADM-001	PL-2A-001	14	2026-05-14	2026-05-10	KEMBALI
+TRX-20260501-0001	2026-05-01	S-001	DA-1A-001	7	2026-05-08		DIPINJAM
+TRX-20260501-0002	2026-05-02	S-002	NV-1B-001	7	2026-05-09		DIPINJAM
+TRX-20260430-0001	2026-04-30	G-001	PL-2A-001	14	2026-05-14	2026-05-10	KEMBALI
 
 
 SHEET = KUNJUNGAN
 Tgl Kunjungan	Kode Anggota	Keterangan
-2026-05-01	S-1A-001	Meminjam buku
-2026-05-02	S-1A-002	Membaca di tempat
-2026-05-02	G-ADM-001	Mengembalikan buku
-2026-05-03	O-WM-001	Meminjam buku
-2026-05-03	S-1A-001	Membaca di tempat
+2026-05-01	S-001	Meminjam buku
+2026-05-02	S-002	Membaca di tempat
+2026-05-02	G-001	Mengembalikan buku
+2026-05-03	O-001	Meminjam buku
+2026-05-03	S-001	Membaca di tempat
+
+
+SHEET = ADMIN
+USERNAME	PASSWORD_HASH	NAMA_LENGKAP	EMAIL	FOLDER_ID_DRIVE	FOTO_URL	CREATED_AT
+admin	rLjd+gNLF7L7kI87qTGvHI3oDvW9/J77qFpEBp1V3Vw=	Administrator	admin@perpustakaan.local			2026-05-06

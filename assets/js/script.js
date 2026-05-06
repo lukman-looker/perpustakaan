@@ -8,6 +8,10 @@
 // =============================================================================
 // URL_GAS is loaded from config.js
 
+// Session & Auth variables
+let currentSession = null;
+let currentAdminId = null;
+
 // State variables
 let currentMember = null;
 let currentBook = null;
@@ -23,6 +27,275 @@ let selectedForPrint = {
   members: [],
   books: []
 };
+
+// =============================================================================
+// LOGIN & AUTHENTICATION
+// =============================================================================
+
+function handleLogin(event) {
+  event.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  
+  apiCall('login', { username, password })
+    .then(data => {
+      currentSession = data.sessionToken;
+      currentAdminId = data.adminId;
+      localStorage.setItem('sessionToken', data.sessionToken);
+      localStorage.setItem('adminId', data.adminId);
+      localStorage.setItem('adminNama', data.namaLengkap);
+      showDashboard();
+    })
+    .catch(err => {
+      document.getElementById('loginError').textContent = err;
+      document.getElementById('loginError').style.display = 'block';
+    });
+}
+
+function showDashboard() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboardScreen').classList.remove('dashboard-hidden');
+  
+  currentSession = localStorage.getItem('sessionToken');
+  currentAdminId = localStorage.getItem('adminId');
+  
+  // Display admin info in header
+  const namaLengkap = localStorage.getItem('adminNama');
+  document.getElementById('adminNameHeader').textContent = namaLengkap;
+  
+  // Initialize dashboard
+  initializeScanner();
+  loadAllData();
+  loadAdminProfile();
+}
+
+function handleLogout() {
+  showConfirm('Anda yakin ingin logout?', () => {
+    localStorage.removeItem('sessionToken');
+    localStorage.removeItem('adminId');
+    localStorage.removeItem('adminNama');
+    location.reload();
+  });
+}
+
+function loadAdminProfile() {
+  apiCall('getAdmin', { adminId: currentAdminId })
+    .then(data => {
+      document.getElementById('adminUsername').textContent = data.username;
+      document.getElementById('adminNama').textContent = data.namaLengkap;
+      document.getElementById('adminEmail').textContent = data.email;
+      
+      if (data.fotoUrl && data.fotoUrl.trim() !== '') {
+        const photoPreview = document.getElementById('adminPhotoPreview');
+        const headerPhoto = document.getElementById('headerAdminPhoto');
+        // Try multiple formats to handle different URL types
+        const urls = [
+          data.fotoUrl,
+          `https://drive.google.com/thumbnail?id=${extractFileId(data.fotoUrl)}&sz=w200`,
+          `https://drive.google.com/uc?export=view&id=${extractFileId(data.fotoUrl)}`
+        ].filter(url => url && url.trim() !== '');
+        
+        let urlIndex = 0;
+        
+        function tryLoadProfilePhoto() {
+          if (urlIndex >= urls.length) {
+            document.getElementById('adminPhotoPreview').style.display = 'none';
+            document.getElementById('adminPhotoPlaceholder').style.display = 'flex';
+            headerPhoto.style.display = 'none';
+            return;
+          }
+          
+          const currentUrl = urls[urlIndex];
+          
+          photoPreview.src = currentUrl;
+          photoPreview.onerror = function() {
+            urlIndex++;
+            tryLoadProfilePhoto();
+          };
+          photoPreview.onload = function() {
+            document.getElementById('adminPhotoPreview').style.display = 'block';
+            document.getElementById('adminPhotoPlaceholder').style.display = 'none';
+            // Also set header photo
+            headerPhoto.src = currentUrl;
+            headerPhoto.style.display = 'block';
+          };
+        }
+        
+        tryLoadProfilePhoto();
+      }
+      
+      document.getElementById('updateNamaLengkap').value = data.namaLengkap;
+      document.getElementById('updateEmail').value = data.email;
+    })
+    .catch(err => console.log('Error loading admin profile:', err));
+}
+
+// Helper function to extract fileId from various Drive URL formats
+function extractFileId(url) {
+  if (!url) return '';
+  // Handle format: https://drive.google.com/uc?export=view&id=FILE_ID
+  if (url.includes('id=')) {
+    return url.split('id=')[1];
+  }
+  // Handle format: https://drive.google.com/file/d/FILE_ID/view
+  if (url.includes('/d/')) {
+    return url.split('/d/')[1].split('/')[0];
+  }
+  return '';
+}
+
+function handleChangePassword(event) {
+  event.preventDefault();
+  const oldPassword = document.getElementById('oldPassword').value;
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  
+  if (newPassword !== confirmPassword) {
+    showAlert('Password baru tidak cocok', 'error');
+    return;
+  }
+  
+  if (newPassword.length < 6) {
+    showAlert('Password minimal 6 karakter', 'warning');
+    return;
+  }
+  
+  showLoading('Mengubah password...');
+  apiCall('updateAdminPassword', {
+    adminId: currentAdminId,
+    oldPassword,
+    newPassword
+  })
+    .then(data => {
+      hideLoading();
+      showAlert('Password berhasil diubah', 'success');
+      document.getElementById('changePasswordForm').reset();
+    })
+    .catch(err => {
+      hideLoading();
+      showAlert(`Gagal: ${err}`, 'error');
+    });
+}
+
+function handleUpdateProfile(event) {
+  event.preventDefault();
+  const namaLengkap = document.getElementById('updateNamaLengkap').value;
+  const email = document.getElementById('updateEmail').value;
+  
+  showLoading('Menyimpan perubahan...');
+  apiCall('updateAdminProfile', {
+    adminId: currentAdminId,
+    namaLengkap,
+    email
+  })
+    .then(data => {
+      hideLoading();
+      showAlert('Profil berhasil diperbarui', 'success');
+      localStorage.setItem('adminNama', namaLengkap);
+      document.getElementById('adminNama').textContent = namaLengkap;
+      document.getElementById('adminEmail').textContent = email;
+    })
+    .catch(err => {
+      hideLoading();
+      showAlert(`Gagal: ${err}`, 'error');
+    });
+}
+
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    showAlert('File harus berupa gambar', 'error');
+    return;
+  }
+  
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    showAlert('Ukuran file terlalu besar (max 5MB)', 'error');
+    return;
+  }
+  
+  showLoading('Mengupload foto...');
+  uploadPhotoToDrive(file);
+}
+
+function uploadPhotoToDrive(file) {
+  // Convert file to base64
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64 = e.target.result.split(',')[1];
+    
+    apiCall('uploadAdminPhoto', {
+      adminId: currentAdminId,
+      fileName: `admin_${currentAdminId}_${Date.now()}.jpg`,
+      base64: base64,
+      mimeType: file.type
+    })
+      .then(data => {
+        hideLoading();
+        
+        if (!data.fotoUrl && !data.publicUrl) {
+          showAlert('Foto URL tidak valid', 'error');
+          return;
+        }
+        
+        // Try multiple URL formats for maximum compatibility
+        const urls = [
+          data.fotoUrl,                    // Download URL (primary)
+          data.publicUrl,                  // Thumbnail URL (fallback)
+          `https://drive.google.com/uc?export=view&id=${data.fileId}` // Alternative
+        ].filter(url => url); // Remove any undefined/null values
+        
+        const photoPreview = document.getElementById('adminPhotoPreview');
+        let urlIndex = 0;
+        
+        function tryLoadPhoto() {
+          if (urlIndex >= urls.length) {
+            showAlert('Foto diupload ke Drive tapi tidak bisa ditampilkan. Cek di folder: My Drive > Perpustakaan > admin', 'warning');
+            document.getElementById('adminPhotoPreview').style.display = 'none';
+            return;
+          }
+          
+          const currentUrl = urls[urlIndex];
+          
+          photoPreview.src = currentUrl;
+          photoPreview.onerror = function() {
+            urlIndex++;
+            tryLoadPhoto();
+          };
+          photoPreview.onload = function() {
+            showAlert('Foto berhasil diupload', 'success');
+            document.getElementById('adminPhotoPlaceholder').style.display = 'none';
+            document.getElementById('adminPhotoPreview').style.display = 'block';
+            // Also update header photo
+            const headerPhoto = document.getElementById('headerAdminPhoto');
+            headerPhoto.src = currentUrl;
+            headerPhoto.style.display = 'block';
+          };
+        }
+        
+        photoPreview.style.display = 'block';
+        tryLoadPhoto();
+        document.getElementById('photoUpload').value = '';
+      })
+      .catch(err => {
+        hideLoading();
+        showAlert(`Gagal upload foto: ${err}`, 'error');
+      });
+  };
+  reader.readAsDataURL(file);
+}
+
+// =============================================================================
+window.addEventListener('DOMContentLoaded', function() {
+  // Check if user is already logged in
+  const session = localStorage.getItem('sessionToken');
+  if (session) {
+    showDashboard();
+  }
+});
 
 // =============================================================================
 // UI STATE & NOTIFICATION HELPERS
@@ -89,12 +362,9 @@ function showConfirm(message, onConfirm, onCancel = null) {
 }
 
 // =============================================================================
-// INITIALIZATION
+// OLD INITIALIZATION (REPLACED BY LOGIN SYSTEM)
 // =============================================================================
-window.addEventListener('DOMContentLoaded', function() {
-  initializeScanner();
-  loadAllData();
-});
+// Initialization moved to handleLogin() and showDashboard()
 
 function initializeScanner() {
   try {
@@ -153,15 +423,22 @@ function apiCall(action, params) {
       method: "POST",
       body: payload
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'success') {
-          resolve(data.data);
-        } else {
-          reject(data.message || 'Error');
+      .then(res => res.text())
+      .then(text => {
+        try {
+          const data = JSON.parse(text);
+          if (data.status === 'success') {
+            resolve(data.data);
+          } else {
+            reject(data.message || 'Error');
+          }
+        } catch (e) {
+          console.error('JSON Parse Error:', text);
+          reject('Server error - Response is not valid JSON. Check browser console.');
         }
       })
       .catch(err => {
+        console.error('Fetch Error:', err);
         reject(err.message || 'Network error');
       });
   });
@@ -177,6 +454,8 @@ function fetchMemberData(kode) {
       currentMember = data;
       displayMemberInfo(data);
       showAlert(`Selamat datang, ${data.nama}!`, 'success');
+      // Log member visit
+      logMemberVisit(kode);
     })
     .catch(err => {
       currentMember = null;
@@ -1369,6 +1648,9 @@ function switchTab(tabName) {
     case 'overdued':
       loadOverdue();
       break;
+    case 'kunjungan':
+      loadKunjungan();
+      break;
     case 'statistik':
       refreshStatistik();
       break;
@@ -1386,14 +1668,48 @@ function closeModal(modalId) {
 function toggleScanner() {
   scannerActive = !scannerActive;
   const btn = event.target.closest('button');
+  const statusBadge = document.getElementById('scannerStatus');
+  const statusText = document.getElementById('statusText');
+  const statusLight = document.getElementById('statusLight');
+  const readerElement = document.getElementById('reader');
+  
   if (scannerActive) {
+    // Scanner ON - Recreate scanner if it was destroyed
     btn.classList.remove('btn-danger');
     btn.classList.add('btn-success');
-    btn.innerHTML = '<i class="fas fa-play-circle"></i> Mulai Scanner';
+    btn.innerHTML = '<i class="fas fa-stop-circle"></i> Hentikan Scanner';
+    statusBadge.classList.remove('scanner-off');
+    statusBadge.classList.add('scanner-on');
+    statusText.textContent = 'Siap Scanning';
+    statusLight.classList.remove('status-inactive');
+    readerElement.classList.remove('scanner-inactive');
+    readerElement.classList.add('scanner-active');
+    
+    // Recreate scanner
+    if (!scanner || !scanner.isScanning) {
+      initializeScanner();
+    }
   } else {
+    // Scanner OFF - Destroy scanner to fully stop
     btn.classList.remove('btn-success');
     btn.classList.add('btn-danger');
-    btn.innerHTML = '<i class="fas fa-stop-circle"></i> Hentikan Scanner';
+    btn.innerHTML = '<i class="fas fa-play-circle"></i> Mulai Scanner';
+    statusBadge.classList.remove('scanner-on');
+    statusBadge.classList.add('scanner-off');
+    statusText.textContent = 'Scanner OFF';
+    statusLight.classList.add('status-inactive');
+    readerElement.classList.remove('scanner-active');
+    readerElement.classList.add('scanner-inactive');
+    
+    // Destroy scanner
+    if (scanner) {
+      scanner.stop().then(() => {
+        scanner = null;
+      }).catch(err => {
+        console.log('Scanner stop error (ignore):', err);
+        scanner = null;
+      });
+    }
   }
 }
 
@@ -1421,6 +1737,14 @@ function formatDate(dateStr) {
   const date = new Date(dateStr);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function formatDateTime(dateStr) {
+  if (!dateStr) return '-';
+  const date = new Date(dateStr);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const time = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()} ${time}`;
 }
 
 function viewTransaction(noTransaksi) {
@@ -1455,6 +1779,7 @@ function loadAllData() {
     loadAllMembers(),
     loadAllBooks(),
     loadTransaksi(),
+    loadKunjungan(),
     refreshStatistik()
   ])
     .then(() => {
@@ -1464,6 +1789,117 @@ function loadAllData() {
     .catch(err => {
       hideLoading();
       showAlert(`Error loading data: ${err}`, 'error');
+    });
+}
+
+// =============================================================================
+// KUNJUNGAN (VISITOR LOG) FUNCTIONS
+// =============================================================================
+
+let allKunjungan = [];
+
+function loadKunjungan() {
+  return apiCall('getKunjungan', {})
+    .then(data => {
+      allKunjungan = data;
+      displayKunjunganTable(data);
+      updateKunjunganStats(data);
+    })
+    .catch(err => showAlert(`Gagal load kunjungan: ${err}`, 'error'));
+}
+
+function displayKunjunganTable(kunjungan) {
+  const tbody = document.getElementById('kunjunganTable');
+  
+  if (!kunjungan || kunjungan.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data kunjungan</td></tr>';
+    return;
+  }
+
+  // Sort by date descending (newest first)
+  const sorted = [...kunjungan].sort((a, b) => new Date(b['Tgl Kunjungan']) - new Date(a['Tgl Kunjungan']));
+
+  tbody.innerHTML = sorted.map((k, index) => {
+    const member = allMembers.find(m => m['KODE'] === k['Kode Anggota']);
+    const nama = member ? member['NAMA'] : '-';
+    const tipe = member ? member['TIPE'] : '-';
+    const keterangan = member ? member['KETERANGAN'] : '-';
+    
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${formatDateTime(k['Tgl Kunjungan'])}</td>
+        <td><strong>${k['Kode Anggota']}</strong></td>
+        <td>${nama}</td>
+        <td>${tipe}</td>
+        <td>${keterangan}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateKunjunganStats(kunjungan) {
+  if (!kunjungan || kunjungan.length === 0) {
+    document.getElementById('statTotalKunjungan').textContent = '0';
+    document.getElementById('statKunjunganHariIni').textContent = '0';
+    document.getElementById('statAnggotaUnik').textContent = '0';
+    return;
+  }
+
+  // Total kunjungan
+  document.getElementById('statTotalKunjungan').textContent = kunjungan.length;
+
+  // Kunjungan hari ini
+  const today = new Date().toISOString().split('T')[0];
+  const todayVisits = kunjungan.filter(k => k['Tgl Kunjungan'].startsWith(today)).length;
+  document.getElementById('statKunjunganHariIni').textContent = todayVisits;
+
+  // Anggota unik
+  const uniqueMembers = new Set(kunjungan.map(k => k['Kode Anggota']));
+  document.getElementById('statAnggotaUnik').textContent = uniqueMembers.size;
+}
+
+function filterKunjungan() {
+  const tgl = document.getElementById('filterKunjunganTgl').value;
+  const anggota = document.getElementById('filterKunjunganAnggota').value.toUpperCase();
+
+  let filtered = allKunjungan;
+
+  if (tgl) {
+    filtered = filtered.filter(k => k['Tgl Kunjungan'].startsWith(tgl));
+  }
+
+  if (anggota) {
+    const member = allMembers.find(m => m['KODE'].includes(anggota) || m['NAMA'].toUpperCase().includes(anggota));
+    if (member) {
+      filtered = filtered.filter(k => k['Kode Anggota'] === member['KODE']);
+    }
+  }
+
+  displayKunjunganTable(filtered);
+  updateKunjunganStats(filtered);
+}
+
+function resetKunjunganFilter() {
+  document.getElementById('filterKunjunganTgl').value = '';
+  document.getElementById('filterKunjunganAnggota').value = '';
+  displayKunjunganTable(allKunjungan);
+  updateKunjunganStats(allKunjungan);
+}
+
+function logMemberVisit(kodeAnggota) {
+  apiCall('logKunjungan', { kodeAnggota: kodeAnggota })
+    .then(data => {
+      const waktu = data.data?.waktu || new Date().toLocaleString();
+      showAlert(`Kunjungan tercatat: ${waktu}`, 'success');
+      // Reload kunjungan if tab is visible
+      if (document.getElementById('kunjungan').classList.contains('active')) {
+        loadKunjungan();
+      }
+    })
+    .catch(err => {
+      // Don't show error for visit logging, as it might not be critical
+      // But log it for debugging
     });
 }
 

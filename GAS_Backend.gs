@@ -2,6 +2,7 @@ const SHEET_ANGGOTA = "ANGGOTA";
 const SHEET_BANK_BUKU = "BANK BUKU";
 const SHEET_TRANSAKSI = "TRANSAKSI";
 const SHEET_KUNJUNGAN = "KUNJUNGAN";
+const SHEET_ADMIN = "ADMIN";
 const STATUS_DIPINJAM = "DIPINJAM";
 const STATUS_KEMBALI = "KEMBALI";
 
@@ -78,6 +79,20 @@ function doPost(e) {
       case "generateQRCode":
         return generateQRCode(params);
       
+      // Admin operations
+      case "login":
+        return adminLogin(params.username, params.password);
+      case "getAdmin":
+        return getAdmin(params.adminId);
+      case "updateAdminProfile":
+        return updateAdminProfile(params);
+      case "updateAdminPassword":
+        return updateAdminPassword(params.adminId, params.oldPassword, params.newPassword);
+      case "getAllAdmins":
+        return getAllAdmins();
+      case "uploadAdminPhoto":
+        return uploadAdminPhoto(params);
+      
       default:
         return response(false, "Action not found: " + action);
     }
@@ -102,6 +117,229 @@ function response(success, data, message = null) {
       message: message || (success ? "OK" : "Error")
     })
   ).setMimeType(ContentService.MimeType.JSON);
+}
+
+// =============================================================================
+// ADMIN FUNCTIONS
+// =============================================================================
+
+function hashPassword(password) {
+  // Simple hash using Utilities.computeDigest with SHA256
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, password);
+  const hashStr = Utilities.base64Encode(digest);
+  return hashStr;
+}
+
+function adminLogin(username, password) {
+  try {
+    const admins = getAllDataFromSheet(SHEET_ADMIN);
+    const admin = admins.find(a => a['USERNAME'] === username);
+    
+    if (!admin) {
+      return response(false, null, "Username tidak ditemukan");
+    }
+    
+    const passwordHash = hashPassword(password);
+    if (admin['PASSWORD_HASH'] !== passwordHash) {
+      return response(false, null, "Password salah");
+    }
+    
+    // Generate simple session token
+    const sessionToken = Utilities.getUuid();
+    
+    return response(true, {
+      sessionToken: sessionToken,
+      adminId: username,
+      namaLengkap: admin['NAMA_LENGKAP'],
+      email: admin['EMAIL'],
+      fotoUrl: admin['FOTO_URL'] || '',
+      folderId: admin['FOLDER_ID_DRIVE'] || ''
+    });
+  } catch (error) {
+    return response(false, null, "Login gagal: " + error.toString());
+  }
+}
+
+function getAdmin(adminId) {
+  try {
+    const admins = getAllDataFromSheet(SHEET_ADMIN);
+    const admin = admins.find(a => a['USERNAME'] === adminId);
+    
+    if (!admin) {
+      return response(false, null, "Admin tidak ditemukan");
+    }
+    
+    return response(true, {
+      username: admin['USERNAME'],
+      namaLengkap: admin['NAMA_LENGKAP'],
+      email: admin['EMAIL'],
+      fotoUrl: admin['FOTO_URL'] || '',
+      folderId: admin['FOLDER_ID_DRIVE'] || ''
+    });
+  } catch (error) {
+    return response(false, null, "Gagal get admin: " + error.toString());
+  }
+}
+
+function updateAdminPassword(adminId, oldPassword, newPassword) {
+  try {
+    const admins = getAllDataFromSheet(SHEET_ADMIN);
+    const adminIndex = admins.findIndex(a => a['USERNAME'] === adminId);
+    
+    if (adminIndex === -1) {
+      return response(false, null, "Admin tidak ditemukan");
+    }
+    
+    const admin = admins[adminIndex];
+    const oldPasswordHash = hashPassword(oldPassword);
+    
+    if (admin['PASSWORD_HASH'] !== oldPasswordHash) {
+      return response(false, null, "Password lama salah");
+    }
+    
+    const sheet = getSheet(SHEET_ADMIN);
+    const rowNum = adminIndex + 2; // +1 for header, +1 for array index
+    const newPasswordHash = hashPassword(newPassword);
+    sheet.getRange(rowNum, 2).setValue(newPasswordHash); // Update PASSWORD_HASH
+    
+    return response(true, { message: "Password berhasil diperbarui" });
+  } catch (error) {
+    return response(false, null, "Gagal update password: " + error.toString());
+  }
+}
+
+function updateAdminProfile(params) {
+  try {
+    const adminId = params.adminId;
+    const admins = getAllDataFromSheet(SHEET_ADMIN);
+    const adminIndex = admins.findIndex(a => a['USERNAME'] === adminId);
+    
+    if (adminIndex === -1) {
+      return response(false, null, "Admin tidak ditemukan");
+    }
+    
+    const sheet = getSheet(SHEET_ADMIN);
+    const rowNum = adminIndex + 2;
+    
+    // Update fields
+    if (params.namaLengkap) {
+      sheet.getRange(rowNum, 3).setValue(params.namaLengkap);
+    }
+    if (params.email) {
+      sheet.getRange(rowNum, 4).setValue(params.email);
+    }
+    if (params.fotoUrl) {
+      sheet.getRange(rowNum, 6).setValue(params.fotoUrl);
+    }
+    if (params.folderId) {
+      sheet.getRange(rowNum, 5).setValue(params.folderId);
+    }
+    
+    return response(true, { message: "Profil berhasil diperbarui" });
+  } catch (error) {
+    return response(false, null, "Gagal update profil: " + error.toString());
+  }
+}
+
+function getAllAdmins() {
+  try {
+    const data = getAllDataFromSheet(SHEET_ADMIN);
+    // Don't return password hashes
+    const safeData = data.map(a => ({
+      username: a['USERNAME'],
+      namaLengkap: a['NAMA_LENGKAP'],
+      email: a['EMAIL'],
+      fotoUrl: a['FOTO_URL'] || '',
+      createdAt: a['CREATED_AT']
+    }));
+    return response(true, safeData);
+  } catch (error) {
+    return response(false, null, "Gagal get admins: " + error.toString());
+  }
+}
+
+function uploadAdminPhoto(params) {
+  try {
+    const adminId = params.adminId;
+    const fileName = params.fileName;
+    const base64 = params.base64;
+    const mimeType = params.mimeType || 'image/jpeg';
+    
+    // Get or create admin folder in Drive - using root folder approach
+    let rootFolder = DriveApp.getRootFolder();
+    let perpusFolder = null;
+    
+    // Check if Perpustakaan folder exists
+    const rootFolders = rootFolder.getFolders();
+    while (rootFolders.hasNext()) {
+      const f = rootFolders.next();
+      if (f.getName() === "Perpustakaan") {
+        perpusFolder = f;
+        break;
+      }
+    }
+    
+    // Create Perpustakaan folder if it doesn't exist
+    if (!perpusFolder) {
+      perpusFolder = rootFolder.createFolder("Perpustakaan");
+    }
+    
+    // Check if admin subfolder exists inside Perpustakaan
+    let adminSubFolder = null;
+    const adminFolders = perpusFolder.getFolders();
+    while (adminFolders.hasNext()) {
+      const f = adminFolders.next();
+      if (f.getName() === adminId) {
+        adminSubFolder = f;
+        break;
+      }
+    }
+    
+    // Create admin subfolder if it doesn't exist
+    if (!adminSubFolder) {
+      adminSubFolder = perpusFolder.createFolder(adminId);
+    }
+    
+    // Upload file
+    const blob = Utilities.newBlob(Utilities.base64Decode(base64), mimeType, fileName);
+    const file = adminSubFolder.createFile(blob);
+    
+    // Get shareable link
+    file.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.VIEW);
+    
+    // Use webContentLink - this is the most reliable format for Drive files
+    // webContentLink bypasses some CORS issues and is designed for external sharing
+    const fileId = file.getId();
+    let fotoUrl = '';
+    try {
+      // Try to get the actual download/webContentLink
+      const fileObj = DriveApp.getFileById(fileId);
+      fotoUrl = fileObj.getDownloadUrl();
+    } catch(e) {
+      // Fallback to direct view URL if webContentLink fails
+      fotoUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    }
+    
+    // Update admin profile with foto URL
+    const admins = getAllDataFromSheet(SHEET_ADMIN);
+    const adminIndex = admins.findIndex(a => a['USERNAME'] === adminId);
+    
+    if (adminIndex !== -1) {
+      const sheet = getSheet(SHEET_ADMIN);
+      const rowNum = adminIndex + 2;
+      sheet.getRange(rowNum, 6).setValue(fotoUrl); // Update FOTO_URL column
+    }
+    
+    return response(true, {
+      message: "Foto berhasil diupload",
+      fotoUrl: fotoUrl,
+      fileId: fileId,
+      fileName: fileName,
+      publicUrl: `https://drive.google.com/thumbnail?id=${fileId}&sz=w200`
+    });
+  } catch (error) {
+    return response(false, null, "Gagal upload foto: " + error.toString());
+  }
 }
 
 /**
@@ -471,9 +709,13 @@ function getStatistik() {
   const dipinjam = transaksi.filter(t => t['Status'] == STATUS_DIPINJAM).length;
   const kembali = transaksi.filter(t => t['Status'] == STATUS_KEMBALI).length;
   
-  // Get overdue
-  const overdueRes = getOverdue();
-  const overdue = overdueRes.data ? overdueRes.data.length : 0;
+  // Calculate overdue directly
+  const today = new Date();
+  const overdueCount = transaksi.filter(t => {
+    if (t['Status'] !== STATUS_DIPINJAM) return false;
+    const dueDate = new Date(t['Jatuh Tempo']);
+    return today > dueDate;
+  }).length;
   
   return response(true, {
     totalBuku: totalBuku,
@@ -481,7 +723,7 @@ function getStatistik() {
     bukuDipinjam: dipinjam,
     bukuTersedia: totalStok - dipinjam,
     bukuKembali: kembali,
-    overdueCount: overdue
+    overdueCount: overdueCount
   });
 }
 
