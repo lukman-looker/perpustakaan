@@ -302,18 +302,20 @@ function pinjamBuku(params) {
   const lamaPinjam = parseInt(params.lamaPinjam) || 7;
   
   // Validate member exists
-  const anggotaRes = getAnggota(kodeAnggota);
-  if (anggotaRes.status !== "success") {
-    return anggotaRes;
+  const allAnggota = getAllDataFromSheet(SHEET_ANGGOTA);
+  const anggota = allAnggota.find(a => a['KODE'] == kodeAnggota);
+  if (!anggota) {
+    return response(false, null, "Anggota tidak ditemukan");
   }
   
   // Validate book exists and has stock
-  const bukuRes = getBuku(kodeBuku);
-  if (bukuRes.status !== "success") {
-    return bukuRes;
+  const allBuku = getAllDataFromSheet(SHEET_BANK_BUKU);
+  const buku = allBuku.find(b => b['KODE BUKU'] == kodeBuku);
+  if (!buku) {
+    return response(false, null, "Buku tidak ditemukan");
   }
   
-  if (bukuRes.data.stok < 1) {
+  if (parseInt(buku['STOK TERSEDIA']) < 1) {
     return response(false, null, "Stok buku tidak tersedia");
   }
   

@@ -118,13 +118,22 @@ function initializeScanner() {
 }
 
 function processQRCode(kode) {
-  if (kode.startsWith("S-") || kode.startsWith("G-") || kode.startsWith("O-")) {
-    // Member QR
+  // Check if code exists in members first
+  const isMember = allMembers.some(m => m['KODE'] === kode);
+  if (isMember) {
     fetchMemberData(kode);
-  } else if (kode.startsWith("B-")) {
-    // Book QR
-    fetchBookData(kode);
+    return;
   }
+  
+  // Check if code exists in books
+  const isBook = allBooks.some(b => b['KODE BUKU'] === kode);
+  if (isBook) {
+    fetchBookData(kode);
+    return;
+  }
+  
+  // Code not found in either list
+  showAlert(`Kode tidak ditemukan: ${kode}`, 'error');
 }
 
 // =============================================================================
@@ -485,9 +494,10 @@ function prosesPinjam() {
       hideLoading();
       showAlert(`${data.message}\nNo Transaksi: ${data.noTransaksi}`, 'success');
       resetScanner();
-      loadTransaksi();
-      refreshStatistik();
+      // Refresh data after successful loan
+      return Promise.all([loadTransaksi(), loadAllBooks()]);
     })
+    .then(() => refreshStatistik())
     .catch(err => {
       hideLoading();
       showAlert(`Gagal: ${err}`, 'error');
@@ -537,9 +547,10 @@ function confirmReturn() {
       showAlert(`${data.message}`, 'success');
       closeModal('returnModal');
       resetScanner();
-      loadTransaksi();
-      refreshStatistik();
+      // Refresh data after successful return
+      return Promise.all([loadTransaksi(), loadAllBooks()]);
     })
+    .then(() => refreshStatistik())
     .catch(err => {
       hideLoading();
       showAlert(`Gagal: ${err}`, 'error');

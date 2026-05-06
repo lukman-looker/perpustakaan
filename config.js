@@ -8,4 +8,4 @@
  * 3. Paste URL di bawah
  */
 
-const URL_GAS = "https://script.google.com/macros/s/AKfycbzbycIWhmYj7VM2UVzGvcdlE6DhtLC5eLB2eH5MA-px9FxxJ8e81jVo8WYFW8ZW8hVA/exec";
+const URL_GAS = "https://script.google.com/macros/s/AKfycbyKe13R5FrSrZaDz9IjyBJCZ6jy2pLicU8DqWk-4omv6vlCc-0rddHBbWBOibgfn3tp/exec";
