@@ -670,15 +670,20 @@ function getOverdue() {
 
 function logKunjungan(kodeAnggota) {
   // Validate member exists
-  const anggotaRes = getAnggota(kodeAnggota);
-  if (anggotaRes.status !== "success") {
-    return anggotaRes;
+  const allAnggota = getAllDataFromSheet(SHEET_ANGGOTA);
+  const anggota = allAnggota.find(a => a['KODE'] == kodeAnggota);
+  
+  if (!anggota) {
+    return response(false, null, "Anggota tidak ditemukan");
   }
   
   // Add visit log
   const sheet = getSheet(SHEET_KUNJUNGAN);
-  const newRow = sheet.getLastRow() + 1;
+  if (!sheet) {
+    return response(false, null, "Sheet KUNJUNGAN tidak ditemukan");
+  }
   
+  const newRow = sheet.getLastRow() + 1;
   const today = new Date();
   
   sheet.getRange(newRow, 1).setValue(today);

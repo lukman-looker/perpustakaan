@@ -1801,9 +1801,10 @@ let allKunjungan = [];
 function loadKunjungan() {
   return apiCall('getKunjungan', {})
     .then(data => {
-      allKunjungan = data;
-      displayKunjunganTable(data);
-      updateKunjunganStats(data);
+      // apiCall already extracts data.data, so we get the array directly
+      allKunjungan = Array.isArray(data) ? data : [];
+      displayKunjunganTable(allKunjungan);
+      updateKunjunganStats(allKunjungan);
     })
     .catch(err => showAlert(`Gagal load kunjungan: ${err}`, 'error'));
 }
@@ -1890,16 +1891,14 @@ function resetKunjunganFilter() {
 function logMemberVisit(kodeAnggota) {
   apiCall('logKunjungan', { kodeAnggota: kodeAnggota })
     .then(data => {
-      const waktu = data.data?.waktu || new Date().toLocaleString();
+      // apiCall already extracts data.data, so we get the object directly
+      const waktu = data?.waktu || new Date().toLocaleString();
       showAlert(`Kunjungan tercatat: ${waktu}`, 'success');
-      // Reload kunjungan if tab is visible
-      if (document.getElementById('kunjungan').classList.contains('active')) {
-        loadKunjungan();
-      }
+      // Always reload kunjungan data
+      loadKunjungan();
     })
     .catch(err => {
-      // Don't show error for visit logging, as it might not be critical
-      // But log it for debugging
+      console.log('Visit logging error:', err);
     });
 }
 
