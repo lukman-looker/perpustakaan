@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembaca Suara Teks</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        body {
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f0f4f8;
+        }
+
+        h2 {
+            color: #2d3748;
+        }
+
+        .kotak-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #3182ce;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .kotak-input:focus {
+            border-color: #2b6cb0;
+        }
+
+        .tombol-bunyikan {
+            padding: 12px 30px;
+            font-size: 17px;
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .tombol-bunyikan:hover {
+            background-color: #2b6cb0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Masukkan Teks Lalu Bunyikan</h2>
+    <input type="text" id="teksInput" class="kotak-input" placeholder="Tulis teks yang ingin dibacakan di sini...">
+    <br>
+    <button id="btnBunyikan" class="tombol-bunyikan">🔊 Bunyikan</button>
+
+    <script>
+        const teksInput = document.getElementById('teksInput');
+        const btnBunyikan = document.getElementById('btnBunyikan');
+
+        // ✅ Cek dulu apakah fitur tersedia sebelum dipakai
+        function bunyikanTeks(teks) {
+            if (!window.speechSynthesis) {
+                alert("Maaf, fitur suara tidak didukung di peramban ini");
+                return;
+            }
+
+            // ✅ Aman: cek dulu sebelum batalkan suara
+            try {
+                window.speechSynthesis.cancel();
+            } catch (e) { }
+
+            const ucapan = new SpeechSynthesisUtterance();
+            ucapan.text = teks;
+            ucapan.lang = 'id-ID';
+            ucapan.volume = 1;
+            ucapan.rate = 0.95;
+            ucapan.pitch = 1;
+
+            const daftarSuara = window.speechSynthesis.getVoices();
+            const suaraIndo = daftarSuara.find(s => s.lang === 'id-ID');
+            if (suaraIndo) ucapan.voice = suaraIndo;
+
+            window.speechSynthesis.speak(ucapan);
+        }
+
+        btnBunyikan.addEventListener('click', () => {
+            const isiTeks = teksInput.value.trim();
+            if (!isiTeks) {
+                alert('Silakan isi teks terlebih dahulu!');
+                return;
+            }
+            bunyikanTeks(isiTeks);
+        });
+
+        // ✅ Perbaikan utama: cek dulu sebelum pasang event
+        if (window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                // daftar suara sudah siap
+            };
+        }
+    </script>
+
+</body>
+
+</html>

@@ -521,7 +521,13 @@ function initializeScanner() {
   }
 }
 
+const scanBeep = new Audio('assets/audio/scanner-beep.mp3');
+
 function processQRCode(kode) {
+  // Putar suara beep
+  scanBeep.currentTime = 0;
+  scanBeep.play().catch(e => console.log('Autoplay audio diblokir browser:', e));
+
   // Check if code exists in members first
   const isMember = allMembers.some(m => m['KODE'] === kode);
   if (isMember) {
@@ -2151,4 +2157,52 @@ function initQRAnimation() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initQRAnimation();
+});
+
+// =============================================================================
+// DUKUNGAN HARDWARE SCANNER TEMBAK (KEYBOARD WEDGE)
+// =============================================================================
+let barcodeBuffer = '';
+let barcodeTimeout = null;
+
+document.addEventListener('keydown', function(e) {
+  // Abaikan event jika user sedang mengetik di dalam form input, textarea, dll.
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+    return;
+  }
+  
+  // Tangkap karakter biasa (huruf/angka/simbol)
+  if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    barcodeBuffer += e.key;
+    
+    // Scanner tembak mengetik sangat cepat (10-20ms per karakter).
+    // Jika lebih dari 50ms tidak ada ketikan, anggap itu manusia dan reset buffer.
+    clearTimeout(barcodeTimeout);
+    barcodeTimeout = setTimeout(() => {
+      barcodeBuffer = '';
+    }, 50);
+  }
+  
+  // Jika tombol Enter ditekan dan buffer memiliki isi
+  if (e.key === 'Enter' && barcodeBuffer.length > 0) {
+    e.preventDefault();
+    const scannedCode = barcodeBuffer.trim();
+    
+    // Reset buffer
+    barcodeBuffer = '';
+    clearTimeout(barcodeTimeout);
+    
+    if (scannedCode) {
+      console.log('Input terdeteksi dari Hardware Scanner:', scannedCode);
+      
+      // Secara otomatis pindah ke tab Scanner agar transisinya terlihat
+      const scannerBtn = document.querySelector('.tab-btn[onclick="switchTab(\'scanner\')"]');
+      if (scannerBtn && !scannerBtn.classList.contains('active')) {
+         scannerBtn.click();
+      }
+      
+      // Proses kode QR/Barcode yang ditangkap
+      processQRCode(scannedCode);
+    }
+  }
 });
