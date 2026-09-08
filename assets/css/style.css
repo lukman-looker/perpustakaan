@@ -68,9 +68,21 @@ body {
   text-align: center;
 }
 
+.login-brand-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.login-brand-text {
+  text-align: left;
+}
+
 .login-logo {
-  width: 70px;
-  margin-bottom: 25px;
+  width: 80px;
+  margin-bottom: 0;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
 }
 
@@ -100,6 +112,46 @@ body {
   height: 100%;
   transform: translateY(-3px); 
 }
+
+.clock-face .number {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  padding-top: 2px;
+}
+
+.clock-face .number span {
+  display: inline-block;
+}
+
+.clock-face .number1 { transform: rotate(30deg); }
+.clock-face .number1 span { transform: rotate(-30deg); }
+.clock-face .number2 { transform: rotate(60deg); }
+.clock-face .number2 span { transform: rotate(-60deg); }
+.clock-face .number3 { transform: rotate(90deg); }
+.clock-face .number3 span { transform: rotate(-90deg); }
+.clock-face .number4 { transform: rotate(120deg); }
+.clock-face .number4 span { transform: rotate(-120deg); }
+.clock-face .number5 { transform: rotate(150deg); }
+.clock-face .number5 span { transform: rotate(-150deg); }
+.clock-face .number6 { transform: rotate(180deg); }
+.clock-face .number6 span { transform: rotate(-180deg); }
+.clock-face .number7 { transform: rotate(210deg); }
+.clock-face .number7 span { transform: rotate(-210deg); }
+.clock-face .number8 { transform: rotate(240deg); }
+.clock-face .number8 span { transform: rotate(-240deg); }
+.clock-face .number9 { transform: rotate(270deg); }
+.clock-face .number9 span { transform: rotate(-270deg); }
+.clock-face .number10 { transform: rotate(300deg); }
+.clock-face .number10 span { transform: rotate(-300deg); }
+.clock-face .number11 { transform: rotate(330deg); }
+.clock-face .number11 span { transform: rotate(-330deg); }
+.clock-face .number12 { transform: rotate(360deg); }
+.clock-face .number12 span { transform: rotate(-360deg); }
 
 .hand {
   position: absolute;
@@ -150,13 +202,13 @@ body {
 }
 
 .login-brand {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
 }
 
 .login-subbrand {
-  font-size: 13px;
+  font-size: 12px;
   opacity: 0.8;
 }
 
@@ -1709,14 +1761,61 @@ tr:hover {
     margin: 20px;
     border-radius: 20px;
   }
+  .login-brand-group {
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  .login-brand-text {
+    text-align: center;
+  }
+  .login-logo {
+    width: 60px;
+  }
+  .login-brand {
+    font-size: 18px;
+  }
+  .login-subbrand {
+    font-size: 11px;
+  }
+  .analog-clock {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+  }
+  .clock-face .number {
+    font-size: 11px;
+    padding-top: 1px;
+  }
+  .hour-hand {
+    height: 25px;
+  }
+  .min-hand {
+    height: 35px;
+  }
+  .second-hand {
+    height: 40px;
+  }
+  .login-date {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
   .login-left {
-    padding: 30px 20px;
+    padding: 25px 20px 15px;
   }
   .login-right {
-    padding: 30px 20px;
+    padding: 25px 20px;
+  }
+  .login-welcome {
+    font-size: 20px;
+  }
+  .login-instruction {
+    font-size: 13px;
+    margin-bottom: 20px;
   }
   .login-actions {
     justify-content: center;
+    margin-top: 20px;
   }
   .btn-login-submit {
     width: 100% !important;
