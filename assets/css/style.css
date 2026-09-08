@@ -202,14 +202,14 @@ body {
 }
 
 .login-brand {
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 700;
   margin-bottom: 2px;
 }
 
 .login-subbrand {
-  font-size: 12px;
-  opacity: 0.8;
+  font-size: 15px;
+  opacity: 0.9;
 }
 
 .login-welcome {
