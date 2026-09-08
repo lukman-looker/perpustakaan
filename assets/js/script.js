@@ -52,9 +52,62 @@ function handleLogin(event) {
     });
 }
 
+function updateGreeting() {
+  const greetingEl = document.getElementById('dynamicGreeting');
+  if (!greetingEl) return;
+  
+  const hour = new Date().getHours();
+  let greeting = "Selamat malam,";
+  
+  if (hour >= 4 && hour < 10) {
+    greeting = "Selamat pagi,";
+  } else if (hour >= 10 && hour < 15) {
+    greeting = "Selamat siang,";
+  } else if (hour >= 15 && hour < 18) {
+    greeting = "Selamat sore,";
+  }
+  
+  greetingEl.textContent = greeting;
+}
+
+function startClock() {
+  const clockEl = document.getElementById('liveClock');
+  if (!clockEl) return;
+  
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  
+  setInterval(() => {
+    const now = new Date();
+    const dayName = days[now.getDay()];
+    const date = now.getDate().toString().padStart(2, '0');
+    const monthName = months[now.getMonth()];
+    const year = now.getFullYear();
+    
+    const h = now.getHours().toString().padStart(2, '0');
+    const m = now.getMinutes().toString().padStart(2, '0');
+    const s = now.getSeconds().toString().padStart(2, '0');
+    
+    clockEl.innerHTML = `<i class="far fa-clock"></i> <span>${dayName}, ${date} ${monthName} ${year} • ${h}:${m}:${s}</span>`;
+  }, 1000);
+  
+  // Initial call so it doesn't wait 1 second to show
+  const now = new Date();
+  const dayName = days[now.getDay()];
+  const date = now.getDate().toString().padStart(2, '0');
+  const monthName = months[now.getMonth()];
+  const year = now.getFullYear();
+  const h = now.getHours().toString().padStart(2, '0');
+  const m = now.getMinutes().toString().padStart(2, '0');
+  const s = now.getSeconds().toString().padStart(2, '0');
+  clockEl.innerHTML = `<i class="far fa-clock"></i> <span>${dayName}, ${date} ${monthName} ${year} • ${h}:${m}:${s}</span>`;
+}
+
 function showDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboardScreen').classList.remove('dashboard-hidden');
+  
+  updateGreeting();
   
   currentSession = localStorage.getItem('sessionToken');
   currentAdminId = localStorage.getItem('adminId');
@@ -290,6 +343,8 @@ function uploadPhotoToDrive(file) {
 
 // =============================================================================
 window.addEventListener('DOMContentLoaded', function() {
+  startClock();
+  
   // Check if user is already logged in
   const session = localStorage.getItem('sessionToken');
   if (session) {
@@ -469,34 +524,34 @@ function displayMemberInfo(member) {
   
   if (!member) {
     memberInfo.innerHTML = `
-      <div class="info-row">
-        <span class="label">Status</span>
-        <span class="value">-</span>
+      <div class="detail-item">
+        <span class="detail-label">Status</span>
+        <span class="detail-value">-</span>
       </div>
     `;
     return;
   }
 
   memberInfo.innerHTML = `
-    <div class="info-row">
-      <span class="label">Kode</span>
-      <span class="value">${member.kode}</span>
+    <div class="detail-item">
+      <span class="detail-label">Kode</span>
+      <span class="detail-value">${member.kode}</span>
     </div>
-    <div class="info-row">
-      <span class="label">Nama</span>
-      <span class="value">${member.nama}</span>
+    <div class="detail-item">
+      <span class="detail-label">Nama</span>
+      <span class="detail-value">${member.nama}</span>
     </div>
-    <div class="info-row">
-      <span class="label">Jenis Kelamin</span>
-      <span class="value">${member.jenisKelamin || '-'}</span>
+    <div class="detail-item">
+      <span class="detail-label">Jenis Kelamin</span>
+      <span class="detail-value">${member.jenisKelamin || '-'}</span>
     </div>
-    <div class="info-row">
-      <span class="label">Tipe</span>
-      <span class="value">${member.tipe}</span>
+    <div class="detail-item">
+      <span class="detail-label">Tipe</span>
+      <span class="detail-value">${member.tipe}</span>
     </div>
-    <div class="info-row">
-      <span class="label">Keterangan</span>
-      <span class="value">${member.keterangan || '-'}</span>
+    <div class="detail-item">
+      <span class="detail-label">Keterangan</span>
+      <span class="detail-value">${member.keterangan || '-'}</span>
     </div>
   `;
 }
@@ -611,30 +666,30 @@ function displayBookInfo(book) {
   
   if (!book) {
     bookInfo.innerHTML = `
-      <div class="info-row">
-        <span class="label">Status</span>
-        <span class="value">-</span>
+      <div class="detail-item">
+        <span class="detail-label">Status</span>
+        <span class="detail-value">-</span>
       </div>
     `;
     return;
   }
 
   bookInfo.innerHTML = `
-    <div class="info-row">
-      <span class="label">Kode Buku</span>
-      <span class="value">${book.kode}</span>
+    <div class="detail-item">
+      <span class="detail-label">Kode Buku</span>
+      <span class="detail-value">${book.kode}</span>
     </div>
-    <div class="info-row">
-      <span class="label">Judul Buku</span>
-      <span class="value">${book.judul}</span>
+    <div class="detail-item">
+      <span class="detail-label">Judul Buku</span>
+      <span class="detail-value">${book.judul}</span>
     </div>
-    <div class="info-row">
-      <span class="label">Pengarang</span>
-      <span class="value">${book.pengarang || '-'}</span>
+    <div class="detail-item">
+      <span class="detail-label">Pengarang</span>
+      <span class="detail-value">${book.pengarang || '-'}</span>
     </div>
-    <div class="info-row">
-      <span class="label">Stok Tersedia</span>
-      <span class="value ${book.stok > 0 ? 'stok-available' : 'stok-unavailable'}">${book.stok}</span>
+    <div class="detail-item">
+      <span class="detail-label">Stok Tersedia</span>
+      <span class="detail-value ${book.stok > 0 ? 'stok-available' : 'stok-unavailable'}">${book.stok}</span>
     </div>
   `;
 }
@@ -1717,15 +1772,15 @@ function resetScanner() {
   currentMember = null;
   currentBook = null;
   document.getElementById('memberInfo').innerHTML = `
-    <div class="info-row">
-      <span class="label">Status</span>
-      <span class="value">-</span>
+    <div class="detail-item">
+      <span class="detail-label">Status</span>
+      <span class="detail-value">-</span>
     </div>
   `;
   document.getElementById('bookInfo').innerHTML = `
-    <div class="info-row">
-      <span class="label">Status</span>
-      <span class="value">-</span>
+    <div class="detail-item">
+      <span class="detail-label">Status</span>
+      <span class="detail-value">-</span>
     </div>
   `;
   document.getElementById('lamaPinjam').value = '7';
