@@ -523,21 +523,50 @@ function initializeScanner() {
 
 const scanBeep = new Audio('assets/audio/scanner-beep.mp3');
 
+// --- TEXT-TO-SPEECH ---
+function bunyikanTeks(teks) {
+  if (!window.speechSynthesis) return;
+
+  try {
+    window.speechSynthesis.cancel();
+  } catch (e) { }
+
+  const ucapan = new SpeechSynthesisUtterance();
+  ucapan.text = teks;
+  ucapan.lang = 'id-ID';
+  ucapan.volume = 1;
+  ucapan.rate = 0.95;
+  ucapan.pitch = 1;
+
+  const daftarSuara = window.speechSynthesis.getVoices();
+  const suaraIndo = daftarSuara.find(s => s.lang === 'id-ID');
+  if (suaraIndo) ucapan.voice = suaraIndo;
+
+  window.speechSynthesis.speak(ucapan);
+}
+
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => {};
+}
+// ----------------------
+
 function processQRCode(kode) {
   // Putar suara beep
   scanBeep.currentTime = 0;
   scanBeep.play().catch(e => console.log('Autoplay audio diblokir browser:', e));
 
   // Check if code exists in members first
-  const isMember = allMembers.some(m => m['KODE'] === kode);
-  if (isMember) {
+  const member = allMembers.find(m => m['KODE'] === kode);
+  if (member) {
+    bunyikanTeks(`Berhasil scan Data Anggota atas nama ${member['NAMA']}`);
     fetchMemberData(kode);
     return;
   }
   
   // Check if code exists in books
-  const isBook = allBooks.some(b => b['KODE BUKU'] === kode);
-  if (isBook) {
+  const book = allBooks.find(b => b['KODE BUKU'] === kode);
+  if (book) {
+    bunyikanTeks(`Berhasil scan Data Buku dengan judul ${book['JUDUL BUKU']}`);
     fetchBookData(kode);
     return;
   }
