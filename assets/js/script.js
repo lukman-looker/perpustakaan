@@ -1288,6 +1288,7 @@ function printSelectedMembers(members) {
     '.detail-table td:nth-child(3) {text-align: left;}' +
     '.table-transaksi {width: 100%; border-collapse: collapse; flex-grow: 1;}' +
     '.table-transaksi th, .table-transaksi td {border: 1px solid #333; padding: 6px; text-align: center; font-size: 11px;}' +
+    '.table-transaksi td:nth-child(2) {font-size: 9px; white-space: nowrap;}' +
     '.table-transaksi th {background-color: #f7f7f7; font-weight: bold;}' +
     '.qr-code-img {width: 80px; height: 80px; border: 1px solid #333;}' +
     '.qr-code-text {margin-top: 5px; font-weight: bold; font-size: 10px; text-align: center;}' +
@@ -1303,13 +1304,17 @@ function printSelectedMembers(members) {
 
     const memberTransactions = allTransactions.filter(t => t['Kode Anggota'] == member['KODE']);
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(member['KODE'])}`;
+    const logoUrl = new URL('assets/img/logo.webp', window.location.href).href;
 
     html += '<div class="card-anggota">' +
       '<div class="school-header">' +
+      '<div style="display: flex; align-items: center; justify-content: center; gap: 15px;">' +
+      '<img src="' + logoUrl + '" style="width: 50px; height: 50px; object-fit: contain;">' +
+      '<div>' +
       '<div class="school-title">KARTU ANGGOTA PERPUSTAKAAN</div>' +
       '<div class="school-name">SD MUHAMMADIYAH 1 SEDATI</div>' +
       '<div class="school-tag">Islamic Modern School</div>' +
-      '</div>' +
+      '</div></div></div>' +
       '<div class="header-card">' +
       '<div class="info-left">' +
       '<table class="detail-table"><tr><td>Kode Anggota</td><td>:</td><td>' + member['KODE'] + '</td></tr>' +
@@ -1321,7 +1326,7 @@ function printSelectedMembers(members) {
       '<img src="' + qrUrl + '" class="qr-code-img"><div class="qr-code-text">' + member['KODE'] + '</div>' +
       '</div>' +
       '</div>' +
-      '<table class="table-transaksi"><thead><tr><th style="width: 6%;">No</th><th style="width: 18%;">No Transaksi</th><th style="width: 15%;">Kode Buku</th><th style="width: 30%;">Jatuh Tempo</th><th style="width: 31%;">Tgl Kembali</th></tr></thead><tbody>';
+      '<table class="table-transaksi"><thead><tr><th style="width: 6%;">No</th><th style="width: 28%;">No Transaksi</th><th style="width: 16%;">Kode Buku</th><th style="width: 25%;">Jatuh Tempo</th><th style="width: 25%;">Tgl Kembali</th></tr></thead><tbody>';
 
     for (let i = 0; i < 15; i++) {
       const trx = memberTransactions[i];
@@ -1469,6 +1474,7 @@ function printMemberCard(kodeAnggota) {
 
   const memberTransactions = allTransactions.filter(t => t['Kode Anggota'] == kodeAnggota);
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(kodeAnggota)}`;
+  const logoUrl = new URL('assets/img/logo.webp', window.location.href).href;
 
   let html = '<html><head><meta charset="UTF-8"><style>' +
     '* {box-sizing: border-box; margin: 0; padding: 0;}' +
@@ -1490,6 +1496,7 @@ function printMemberCard(kodeAnggota) {
     '.detail-table td:nth-child(3) {text-align: left;}' +
     '.table-transaksi {width: 100%; border-collapse: collapse; flex-grow: 1;}' +
     '.table-transaksi th, .table-transaksi td {border: 1px solid #333; padding: 6px; text-align: center; font-size: 11px;}' +
+    '.table-transaksi td:nth-child(2) {font-size: 9px; white-space: nowrap;}' +
     '.table-transaksi th {background-color: #f7f7f7; font-weight: bold;}' +
     '.qr-code-img {width: 80px; height: 80px; border: 1px solid #333;}' +
     '.qr-code-text {margin-top: 5px; font-weight: bold; font-size: 10px; text-align: center;}' +
@@ -1498,10 +1505,13 @@ function printMemberCard(kodeAnggota) {
     '<div class="wrapper">' +
     '<div class="card-anggota">' +
     '<div class="school-header">' +
+    '<div style="display: flex; align-items: center; justify-content: center; gap: 15px;">' +
+    '<img src="' + logoUrl + '" style="width: 50px; height: 50px; object-fit: contain;">' +
+    '<div>' +
     '<div class="school-title">KARTU ANGGOTA PERPUSTAKAAN</div>' +
     '<div class="school-name">SD MUHAMMADIYAH 1 SEDATI</div>' +
     '<div class="school-tag">Islamic Modern School</div>' +
-    '</div>' +
+    '</div></div></div>' +
     '<div class="header-card">' +
     '<div class="info-left">' +
     '<table class="detail-table"><tr><td>Kode Anggota</td><td>:</td><td>' + member['KODE'] + '</td></tr>' +
@@ -1513,7 +1523,7 @@ function printMemberCard(kodeAnggota) {
     '<img src="' + qrUrl + '" class="qr-code-img"><div class="qr-code-text">' + kodeAnggota + '</div>' +
     '</div>' +
     '</div>' +
-    '<table class="table-transaksi"><thead><tr><th style="width: 6%;">No</th><th style="width: 18%;">No Transaksi</th><th style="width: 15%;">Kode Buku</th><th style="width: 30%;">Jatuh Tempo</th><th style="width: 31%;">Tgl Kembali</th></tr></thead><tbody>'
+    '<table class="table-transaksi"><thead><tr><th style="width: 6%;">No</th><th style="width: 28%;">No Transaksi</th><th style="width: 16%;">Kode Buku</th><th style="width: 25%;">Jatuh Tempo</th><th style="width: 25%;">Tgl Kembali</th></tr></thead><tbody>'
 
   for (let i = 0; i < 15; i++) {
     const trx = memberTransactions[i];
