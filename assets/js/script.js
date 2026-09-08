@@ -374,14 +374,24 @@ function hideLoading() {
 }
 
 function showAlert(message, type = 'info', autoClose = true, timer = 2000) {
+  const bgColors = {
+    'success': '#10B981',
+    'error': '#EF4444',
+    'warning': '#F59E0B',
+    'info': '#3B82F6'
+  };
+
   const config = {
-    title: type === 'success' ? '✓ Berhasil' : type === 'error' ? '✗ Error' : type === 'warning' ? '⚠ Perhatian' : 'ℹ Info',
+    title: type === 'success' ? 'Berhasil' : type === 'error' ? 'Error' : type === 'warning' ? 'Perhatian' : 'Info',
     text: message,
     icon: type,
     toast: true,
     position: 'top-end',
     showConfirmButton: false,
     timerProgressBar: autoClose,
+    background: bgColors[type] || bgColors['info'],
+    color: '#ffffff',
+    iconColor: '#ffffff',
     didOpen: (toast) => {
       toast.addEventListener('mouseenter', Swal.stopTimer);
       toast.addEventListener('mouseleave', Swal.resumeTimer);
