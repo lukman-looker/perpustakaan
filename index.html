@@ -22,25 +22,49 @@
 <!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-container">
   <div class="login-box">
-    <div class="login-header">
-      <img src="assets/img/logo.webp" alt="Logo" style="width: 80px; margin-bottom: 15px; display: inline-block;">
-      <h1>Perpustakaan</h1>
-      <p>SD Muhammadiyah 1 Sedati</p>
+    
+    <div class="login-left">
+      <img src="assets/img/logo.webp" alt="Logo" class="login-logo">
+      <div class="analog-clock">
+        <div class="clock-face">
+          <div class="hand hour-hand" id="loginHourHand"></div>
+          <div class="hand min-hand" id="loginMinHand"></div>
+          <div class="hand second-hand" id="loginSecHand"></div>
+          <div class="clock-center"></div>
+        </div>
+      </div>
+      <div class="login-date" id="loginDateText">Memuat tanggal...</div>
+      <h2 class="login-brand">Perpustakaan</h2>
+      <p class="login-subbrand">SD Muhammadiyah 1 Sedati</p>
     </div>
-    <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" placeholder="Masukkan username" required autofocus>
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Masukkan password" required>
-      </div>
-      <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">
-        <i class="fas fa-sign-in-alt"></i> Login
-      </button>
-    </form>
-    <div id="loginError" style="color: #e74c3c; margin-top: 15px; text-align: center; display: none;"></div>
+
+    <div class="login-right">
+      <h3 class="login-welcome">Selamat Datang!</h3>
+      <p class="login-instruction">Silakan masuk ke akun Anda</p>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Masukkan username" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+            <button type="button" class="btn-toggle-password" onclick="togglePassword()">
+              <i class="fas fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+        </div>
+        <div class="login-actions">
+          <button type="submit" class="btn-primary btn-login-submit">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </div>
+      </form>
+      <div id="loginError" class="login-error-msg"></div>
+    </div>
+    
   </div>
 </div>
 

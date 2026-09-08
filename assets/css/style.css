@@ -43,20 +43,183 @@ body {
 
 .login-box {
   background: rgba(255, 255, 255, 0.95);
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border-radius: 24px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 400px;
+  max-width: 850px;
   position: relative;
   z-index: 1;
-  border-top: 5px solid #3B82F6;
+  display: flex;
+  overflow: hidden;
   backdrop-filter: blur(10px);
+  padding: 0;
+  border-top: none;
 }
 
-.login-header {
+.login-left {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: white;
+  padding: 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+}
+
+.login-logo {
+  width: 70px;
+  margin-bottom: 25px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+}
+
+.login-right {
+  padding: 50px 40px;
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Clock CSS */
+.analog-clock {
+  width: 120px;
+  height: 120px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  position: relative;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+
+.clock-face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: translateY(-3px); 
+}
+
+.hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: bottom;
+  background: white;
+  border-radius: 4px;
+  transition: all 0.05s;
+  transition-timing-function: cubic-bezier(0.1, 2.7, 0.58, 1);
+}
+
+.hour-hand {
+  width: 4px;
+  height: 35px;
+  margin-left: -2px;
+}
+
+.min-hand {
+  width: 3px;
+  height: 45px;
+  margin-left: -1.5px;
+}
+
+.second-hand {
+  width: 2px;
+  height: 50px;
+  background: #fcd34d;
+  margin-left: -1px;
+}
+
+.clock-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.login-date {
+  font-size: 14px;
+  font-weight: 500;
   margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.login-brand {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.login-subbrand {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.login-welcome {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 5px;
+}
+
+.login-instruction {
+  font-size: 14px;
+  color: #64748B;
+  margin-bottom: 30px;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 45px;
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748B;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 5px;
+  outline: none;
+}
+
+.btn-toggle-password:hover {
+  color: #3B82F6;
+}
+
+.login-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.btn-login-submit {
+  width: auto !important;
+  padding: 12px 30px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-error-msg {
+  color: #EF4444;
+  margin-top: 15px;
+  text-align: right;
+  font-size: 13px;
+  display: none;
 }
 
 .login-header i {
@@ -108,23 +271,6 @@ body {
   background: #F0F4FF;
 }
 
-#loginForm button {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #3B82F6, #2563EB);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 15px;
-}
-
-#loginForm button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 139, 0.3);
-}
 
 .dashboard-hidden {
   display: none;
@@ -1557,6 +1703,25 @@ tr:hover {
 }
 
 @media (max-width: 600px) {
+  .login-box {
+    flex-direction: column;
+    max-width: 400px;
+    margin: 20px;
+    border-radius: 20px;
+  }
+  .login-left {
+    padding: 30px 20px;
+  }
+  .login-right {
+    padding: 30px 20px;
+  }
+  .login-actions {
+    justify-content: center;
+  }
+  .btn-login-submit {
+    width: 100% !important;
+    justify-content: center;
+  }
   .stat-widget-grid {
     grid-template-columns: 1fr;
   }

@@ -103,6 +103,57 @@ function startClock() {
   clockEl.innerHTML = `<i class="far fa-clock"></i> <span>${dayName}, ${date} ${monthName} ${year} • ${h}:${m}:${s}</span>`;
 }
 
+function startLoginClock() {
+  const hourHand = document.getElementById('loginHourHand');
+  const minHand = document.getElementById('loginMinHand');
+  const secHand = document.getElementById('loginSecHand');
+  const dateText = document.getElementById('loginDateText');
+  
+  if (!hourHand || !minHand || !secHand || !dateText) return;
+
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+  function updateClock() {
+    const now = new Date();
+    
+    const seconds = now.getSeconds();
+    const secondsDegrees = ((seconds / 60) * 360);
+    secHand.style.transform = `rotate(${secondsDegrees}deg)`;
+
+    const mins = now.getMinutes();
+    const minsDegrees = ((mins / 60) * 360) + ((seconds/60)*6);
+    minHand.style.transform = `rotate(${minsDegrees}deg)`;
+
+    const hours = now.getHours();
+    const hoursDegrees = ((hours / 12) * 360) + ((mins/60)*30);
+    hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
+    
+    const dayName = days[now.getDay()];
+    const date = now.getDate();
+    const monthName = months[now.getMonth()];
+    const year = now.getFullYear();
+    dateText.textContent = `${dayName}, ${date} ${monthName} ${year}`;
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+}
+
+function togglePassword() {
+  const passwordInput = document.getElementById('password');
+  const eyeIcon = document.getElementById('eyeIcon');
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    eyeIcon.classList.remove('fa-eye');
+    eyeIcon.classList.add('fa-eye-slash');
+  } else {
+    passwordInput.type = 'password';
+    eyeIcon.classList.remove('fa-eye-slash');
+    eyeIcon.classList.add('fa-eye');
+  }
+}
+
 function showDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboardScreen').classList.remove('dashboard-hidden');
@@ -344,6 +395,7 @@ function uploadPhotoToDrive(file) {
 // =============================================================================
 window.addEventListener('DOMContentLoaded', function() {
   startClock();
+  startLoginClock();
   
   // Check if user is already logged in
   const session = localStorage.getItem('sessionToken');
