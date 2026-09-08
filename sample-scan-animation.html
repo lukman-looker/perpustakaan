@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner Reconstruct Animation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f1f5f9;
+            font-family: sans-serif;
+        }
+
+        /* Pembungkus Utama */
+        .scanner-wrapper {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+        }
+
+        /* Bingkai Pemindai */
+        .scan-area {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            border: 1.5px solid #d1d5db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        /* Canvas tempat merender QR secara dinamis */
+        #qrCanvas {
+            width: 215px;
+            height: 215px;
+            image-rendering: pixelated;
+        }
+
+        /* Garis Laser Merah */
+        .scan-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2.5px;
+            background: #ff1e1e;
+            box-shadow: 0 0 10px #ff1e1e, 0 0 18px rgba(255, 30, 30, 0.7);
+            z-index: 10;
+            animation: scanMovement 2.4s ease-in-out infinite alternate;
+        }
+
+        .scan-line::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: -12px;
+            width: 100%;
+            height: 25px;
+            background: linear-gradient(to bottom, rgba(255, 30, 30, 0.2), transparent);
+            pointer-events: none;
+        }
+
+        @keyframes scanMovement {
+            0% {
+                top: 0%;
+            }
+
+            100% {
+                top: calc(100% - 2.5px);
+            }
+        }
+
+        /* 4 Sudut Biru Tebal */
+        .corner {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            border: 12px solid #3b82f6;
+            z-index: 12;
+        }
+
+        .corner-top-left {
+            top: -6px;
+            left: -6px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-top-right {
+            top: -6px;
+            right: -6px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-bottom-left {
+            bottom: -6px;
+            left: -6px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-bottom-right {
+            bottom: -6px;
+            right: -6px;
+            border-left: none;
+            border-top: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="scanner-wrapper">
+        <!-- Sudut Pembingkai -->
+        <div class="corner corner-top-left"></div>
+        <div class="corner corner-top-right"></div>
+        <div class="corner corner-bottom-left"></div>
+        <div class="corner corner-bottom-right"></div>
+
+        <div class="scan-area">
+            <!-- Garis Laser -->
+            <div class="scan-line"></div>
+
+            <!-- Canvas Tempat QR Code Dibangun Ulang -->
+            <canvas id="qrCanvas" width="250" height="250"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('qrCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 25; // Resolusi matriks QR 25x25
+        const cellSize = canvas.width / gridSize;
+
+        // Matriks dasar pola QR code (Finder pattern 3 sudut + data acak)
+        let qrMatrix = [];
+        let blackPixels = [];
+        let revealedIndex = 0;
+        let animState = 'forming'; // 'forming', 'hold', 'erasing'
+
+        // Fungsi membuat pola matriks QR realistis
+        function generateQRMatrix() {
+            qrMatrix = Array(gridSize).fill(0).map(() => Array(gridSize).fill(0));
+            blackPixels = [];
+
+            // Gambar data acak
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (Math.random() > 0.5) qrMatrix[r][c] = 1;
+                }
+            }
+
+            // Format ulang 3 Finder Pattern utama (Pojok kiri atas, kanan atas, kiri bawah)
+            const drawFinder = (startR, startC) => {
+                for (let r = 0; r < 7; r++) {
+                    for (let c = 0; c < 7; c++) {
+                        const isBorder = (r === 0 || r === 6 || c === 0 || c === 6);
+                        const isCenter = (r >= 2 && r <= 4 && c >= 2 && c <= 4);
+                        qrMatrix[startR + r][startC + c] = (isBorder || isCenter) ? 1 : 0;
+                    }
+                }
+                // Bersihkan area tepi sekitar finder
+                for (let r = -1; r <= 7; r++) {
+                    for (let c = -1; c <= 7; c++) {
+                        const currR = startR + r;
+                        const currC = startC + c;
+                        if (currR >= 0 && currR < gridSize && currC >= 0 && currC < gridSize) {
+                            if (r === -1 || r === 7 || c === -1 || c === 7) {
+                                qrMatrix[currR][currC] = 0;
+                            }
+                        }
+                    }
+                }
+            };
+
+            drawFinder(0, 0);
+            drawFinder(0, gridSize - 7);
+            drawFinder(gridSize - 7, 0);
+
+            // Kumpulkan koordinat semua kotak hitam
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (qrMatrix[r][c] === 1) {
+                        blackPixels.push({ r, c });
+                    }
+                }
+            }
+
+            // Acak urutan muncul kotak-kotak hitam
+            for (let i = blackPixels.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [blackPixels[i], blackPixels[j]] = [blackPixels[j], blackPixels[i]];
+            }
+        }
+
+        // Render ulang kanvas
+        function draw(count) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#000000';
+            for (let i = 0; i < count; i++) {
+                const p = blackPixels[i];
+                ctx.fillRect(p.c * cellSize, p.r * cellSize, cellSize, cellSize);
+            }
+        }
+
+        // Loop alur: Hilang Total -> Membentuk Acak -> Tahan Sebentar -> Kosongkan Lagi
+        function updateAnimation() {
+            if (animState === 'forming') {
+                revealedIndex += 8; // Kecepatan muncul pixel per frame
+                if (revealedIndex >= blackPixels.length) {
+                    revealedIndex = blackPixels.length;
+                    draw(revealedIndex);
+                    animState = 'hold';
+                    setTimeout(() => {
+                        animState = 'erasing';
+                    }, 1200); // QR code utuh ditampilkan selama 1.2 detik
+                } else {
+                    draw(revealedIndex);
+                }
+            } else if (animState === 'erasing') {
+                // Hilang total secara instan
+                revealedIndex = 0;
+                draw(0);
+                animState = 'waiting';
+                setTimeout(() => {
+                    generateQRMatrix(); // Pola baru setiap perulangan
+                    animState = 'forming';
+                }, 500); // Waktu kosong sebelum mulai membentuk kembali
+            }
+
+            requestAnimationFrame(updateAnimation);
+        }
+
+        // Jalankan siklus pertama
+        generateQRMatrix();
+        updateAnimation();
+    </script>
+
+</body>
+
+</html>

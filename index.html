@@ -103,7 +103,31 @@
     </div>
     <div class="header-right">
       <div class="header-clock" id="liveClock">
-        <i class="far fa-clock"></i> <span>Memuat waktu...</span>
+        <div class="analog-clock header-analog-clock desktop-only">
+          <div class="clock-face">
+            <div class="number number1"><span>1</span></div>
+            <div class="number number2"><span>2</span></div>
+            <div class="number number3"><span>3</span></div>
+            <div class="number number4"><span>4</span></div>
+            <div class="number number5"><span>5</span></div>
+            <div class="number number6"><span>6</span></div>
+            <div class="number number7"><span>7</span></div>
+            <div class="number number8"><span>8</span></div>
+            <div class="number number9"><span>9</span></div>
+            <div class="number number10"><span>10</span></div>
+            <div class="number number11"><span>11</span></div>
+            <div class="number number12"><span>12</span></div>
+            <div class="hand hour-hand" id="headerHourHand"></div>
+            <div class="hand min-hand" id="headerMinHand"></div>
+            <div class="hand second-hand" id="headerSecHand"></div>
+            <div class="clock-center"></div>
+          </div>
+        </div>
+        <div class="header-date-container desktop-only">
+          <div class="header-day-text" id="headerDayText">Memuat...</div>
+          <div class="header-date-text" id="headerDateText">Memuat waktu...</div>
+        </div>
+        <span class="header-digital-text mobile-only" id="headerDigitalText"><i class="far fa-clock"></i> Memuat waktu...</span>
       </div>
       <div class="admin-profile-card">
         <img id="headerAdminPhoto" src="" alt="Foto" style="display: none;">

@@ -356,7 +356,7 @@ body {
 }
 
 .header-logo {
-  width: 70px;
+  width: 95px;
   flex-shrink: 0;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
 }
@@ -369,7 +369,7 @@ body {
 
 .header-title {
   color: white;
-  font-size: 24px;
+  font-size: 28px;
   margin: 0;
   font-weight: 700;
   line-height: 1.2;
@@ -377,7 +377,7 @@ body {
 
 .header-subtitle {
   color: #E0E7FF;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -423,6 +423,46 @@ body {
   white-space: nowrap;
 }
 
+.header-analog-clock {
+  width: 75px;
+  height: 75px;
+  margin-bottom: 0;
+  border-width: 3px;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.header-analog-clock .clock-face {
+  transform: translateY(0);
+}
+.header-analog-clock .hour-hand { height: 20px; width: 3px; margin-left: -1.5px; }
+.header-analog-clock .min-hand { height: 28px; width: 2px; margin-left: -1px; }
+.header-analog-clock .second-hand { height: 33px; width: 1.5px; margin-left: -0.75px; }
+.header-analog-clock .clock-center { width: 7px; height: 7px; }
+.header-analog-clock .number { display: block; font-size: 11px; padding-top: 2px; }
+
+.desktop-only {
+  display: flex;
+}
+.header-date-container.desktop-only {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2px;
+}
+.header-day-text {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.header-date-text {
+  font-size: 14px;
+  opacity: 0.9;
+  line-height: 1.2;
+}
+.mobile-only {
+  display: none;
+}
+
 .admin-profile-card {
   display: flex;
   align-items: center;
@@ -435,8 +475,8 @@ body {
 }
 
 .admin-profile-card img {
-  width: 44px;
-  height: 44px;
+  width: 55px;
+  height: 55px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.5);
   object-fit: cover;
@@ -448,23 +488,24 @@ body {
 
 .admin-info-text .greeting {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
+  font-size: 14px;
   margin-bottom: 2px;
 }
 
 .admin-info-text .admin-name {
   font-weight: 700;
   color: #ffffff;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .btn-logout-icon {
   background: rgba(255, 255, 255, 0.15);
   color: white;
   border: none;
-  width: 45px;
-  height: 45px;
+  width: 55px;
+  height: 55px;
   border-radius: 50%;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1717,6 +1758,9 @@ tr:hover {
     white-space: normal;
     text-align: center;
   }
+
+  .desktop-only { display: none !important; }
+  .mobile-only { display: inline-block !important; }
 
   .admin-profile-card {
     flex: 1;

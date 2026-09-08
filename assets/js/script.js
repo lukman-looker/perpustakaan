@@ -77,30 +77,47 @@ function startClock() {
   const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
   const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   
-  setInterval(() => {
+  function tick() {
     const now = new Date();
     const dayName = days[now.getDay()];
     const date = now.getDate().toString().padStart(2, '0');
     const monthName = months[now.getMonth()];
     const year = now.getFullYear();
-    
     const h = now.getHours().toString().padStart(2, '0');
     const m = now.getMinutes().toString().padStart(2, '0');
     const s = now.getSeconds().toString().padStart(2, '0');
-    
-    clockEl.innerHTML = `<i class="far fa-clock"></i> <span>${dayName}, ${date} ${monthName} ${year} • ${h}:${m}:${s}</span>`;
-  }, 1000);
-  
-  // Initial call so it doesn't wait 1 second to show
-  const now = new Date();
-  const dayName = days[now.getDay()];
-  const date = now.getDate().toString().padStart(2, '0');
-  const monthName = months[now.getMonth()];
-  const year = now.getFullYear();
-  const h = now.getHours().toString().padStart(2, '0');
-  const m = now.getMinutes().toString().padStart(2, '0');
-  const s = now.getSeconds().toString().padStart(2, '0');
-  clockEl.innerHTML = `<i class="far fa-clock"></i> <span>${dayName}, ${date} ${monthName} ${year} • ${h}:${m}:${s}</span>`;
+
+    const headerDateText = document.getElementById('headerDateText');
+    const headerDayText = document.getElementById('headerDayText');
+    const headerDigitalText = document.getElementById('headerDigitalText');
+    const headerHourHand = document.getElementById('headerHourHand');
+    const headerMinHand = document.getElementById('headerMinHand');
+    const headerSecHand = document.getElementById('headerSecHand');
+
+    if (headerDayText) {
+      headerDayText.textContent = `${dayName},`;
+    }
+    if (headerDateText) {
+      headerDateText.textContent = `${date} ${monthName} ${year}`;
+    }
+    if (headerDigitalText) {
+      headerDigitalText.innerHTML = `<i class="far fa-clock"></i> ${dayName}, ${date} ${monthName} ${year} • ${h}:${m}:${s}`;
+    }
+    if (headerHourHand && headerMinHand && headerSecHand) {
+      const seconds = now.getSeconds();
+      const secondsDegrees = ((seconds / 60) * 360);
+      headerSecHand.style.transform = `rotate(${secondsDegrees}deg)`;
+      const mins = now.getMinutes();
+      const minsDegrees = ((mins / 60) * 360) + ((seconds/60)*6);
+      headerMinHand.style.transform = `rotate(${minsDegrees}deg)`;
+      const hours = now.getHours();
+      const hoursDegrees = ((hours / 12) * 360) + ((mins/60)*30);
+      headerHourHand.style.transform = `rotate(${hoursDegrees}deg)`;
+    }
+  }
+
+  setInterval(tick, 1000);
+  tick();
 }
 
 function startLoginClock() {
