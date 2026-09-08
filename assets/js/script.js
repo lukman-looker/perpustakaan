@@ -1091,7 +1091,8 @@ function exportTransaksi() {
   const printWindow = window.open('', 'Print');
   printWindow.document.write(html);
   printWindow.document.close();
-  printWindow.print();
+  printWindow.focus();
+  setTimeout(() => { printWindow.print(); }, 1000);
 }
 
 // =============================================================================
@@ -1345,7 +1346,8 @@ function printSelectedMembers(members) {
   const printWindow = window.open('', 'Print Selected Members');
   printWindow.document.write(html);
   printWindow.document.close();
-  printWindow.print();
+  printWindow.focus();
+  setTimeout(() => { printWindow.print(); }, 1000);
   
   showAlert('Data siap dicetak', 'success');
 }
@@ -1416,7 +1418,8 @@ function printSelectedBooks(books) {
   const printWindow = window.open('', 'Print Selected Books');
   printWindow.document.write(html);
   printWindow.document.close();
-  printWindow.print();
+  printWindow.focus();
+  setTimeout(() => { printWindow.print(); }, 1000);
   
   showAlert('Data siap dicetak', 'success');
 }
@@ -1524,7 +1527,8 @@ function printMemberCard(kodeAnggota) {
   const printWindow = window.open('', 'Print Member Card');
   printWindow.document.write(html);
   printWindow.document.close();
-  printWindow.print();
+  printWindow.focus();
+  setTimeout(() => { printWindow.print(); }, 1000);
 }
 
 function confirmBulkPrintMembers() {
@@ -1624,7 +1628,8 @@ function bulkPrintMembers() {
   const printWindow = window.open('', 'Bulk Print Members');
   printWindow.document.write(html);
   printWindow.document.close();
-  printWindow.print();
+  printWindow.focus();
+  setTimeout(() => { printWindow.print(); }, 1500); // bulk might need more time
 }
 
 // ===== BOOK PRINTING =====
@@ -1709,7 +1714,8 @@ function printBookLabel(kodeBuku) {
   const printWindow = window.open('', 'Print Book Label');
   printWindow.document.write(html);
   printWindow.document.close();
-  printWindow.print();
+  printWindow.focus();
+  setTimeout(() => { printWindow.print(); }, 1000);
 }
 
 function bulkPrintBooks() {
@@ -1781,7 +1787,8 @@ function bulkPrintBooks() {
   const printWindow = window.open('', 'Bulk Print Books');
   printWindow.document.write(html);
   printWindow.document.close();
-  printWindow.print();
+  printWindow.focus();
+  setTimeout(() => { printWindow.print(); }, 1500); // bulk might need more time
 }
 
 // =============================================================================
