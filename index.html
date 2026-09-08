@@ -181,10 +181,16 @@
           <h2><i class="fas fa-qrcode"></i> QR Scanner</h2>
         </div>
         <div class="scanner-frame">
-          <div class="scanner-corner scanner-corner-tl"></div>
-          <div class="scanner-corner scanner-corner-tr"></div>
-          <div class="scanner-corner scanner-corner-bl"></div>
-          <div class="scanner-corner scanner-corner-br"></div>
+          <div class="corner corner-top-left"></div>
+          <div class="corner corner-top-right"></div>
+          <div class="corner corner-bottom-left"></div>
+          <div class="corner corner-bottom-right"></div>
+          
+          <div class="scan-area">
+            <div class="scan-line" id="scanLine"></div>
+          </div>
+          <canvas id="qrCanvas" width="240" height="240"></canvas>
+          
           <div id="reader" class="scanner-active"></div>
           <div class="scanner-status" id="scannerStatus">
             <span class="status-light" id="statusLight"></span>

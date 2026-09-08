@@ -1818,6 +1818,8 @@ function toggleScanner() {
     statusLight.classList.remove('status-inactive');
     readerElement.classList.remove('scanner-inactive');
     readerElement.classList.add('scanner-active');
+    const qrCanvas = document.getElementById('qrCanvas');
+    if (qrCanvas) qrCanvas.style.display = 'none';
     
     // Recreate scanner
     if (!scanner || !scanner.isScanning) {
@@ -1834,6 +1836,8 @@ function toggleScanner() {
     statusLight.classList.add('status-inactive');
     readerElement.classList.remove('scanner-active');
     readerElement.classList.add('scanner-inactive');
+    const qrCanvas = document.getElementById('qrCanvas');
+    if (qrCanvas) qrCanvas.style.display = 'block';
     
     // Destroy scanner
     if (scanner) {
@@ -2039,6 +2043,112 @@ function logMemberVisit(kodeAnggota) {
 // Close modal when clicking outside
 window.addEventListener('click', function(event) {
   if (event.target.classList.contains('modal')) {
-    event.target.classList.remove('active');
+    event.target.style.display = 'none';
   }
+});
+
+// --- QR SCANNER ANIMATION ---
+function initQRAnimation() {
+  const canvas = document.getElementById('qrCanvas');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const gridSize = 25; 
+  const cellSize = canvas.width / gridSize;
+
+  let qrMatrix = [];
+  let blackPixels = [];
+  let revealedIndex = 0;
+  let animState = 'forming'; 
+
+  function generateQRMatrix() {
+    qrMatrix = Array(gridSize).fill(0).map(() => Array(gridSize).fill(0));
+    blackPixels = [];
+
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
+        if (Math.random() > 0.5) qrMatrix[r][c] = 1;
+      }
+    }
+
+    const drawFinder = (startR, startC) => {
+      for (let r = 0; r < 7; r++) {
+        for (let c = 0; c < 7; c++) {
+          const isBorder = (r === 0 || r === 6 || c === 0 || c === 6);
+          const isCenter = (r >= 2 && r <= 4 && c >= 2 && c <= 4);
+          qrMatrix[startR + r][startC + c] = (isBorder || isCenter) ? 1 : 0;
+        }
+      }
+      for (let r = -1; r <= 7; r++) {
+        for (let c = -1; c <= 7; c++) {
+          const currR = startR + r;
+          const currC = startC + c;
+          if (currR >= 0 && currR < gridSize && currC >= 0 && currC < gridSize) {
+            if (r === -1 || r === 7 || c === -1 || c === 7) {
+              qrMatrix[currR][currC] = 0;
+            }
+          }
+        }
+      }
+    };
+
+    drawFinder(0, 0);
+    drawFinder(0, gridSize - 7);
+    drawFinder(gridSize - 7, 0);
+
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
+        if (qrMatrix[r][c] === 1) {
+          blackPixels.push({ r, c });
+        }
+      }
+    }
+
+    for (let i = blackPixels.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [blackPixels[i], blackPixels[j]] = [blackPixels[j], blackPixels[i]];
+    }
+  }
+
+  function draw(count) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#000000';
+    for (let i = 0; i < count; i++) {
+      const p = blackPixels[i];
+      ctx.fillRect(p.c * cellSize, p.r * cellSize, cellSize, cellSize);
+    }
+  }
+
+  function updateAnimation() {
+    if (animState === 'forming') {
+      revealedIndex += 8;
+      if (revealedIndex >= blackPixels.length) {
+        revealedIndex = blackPixels.length;
+        draw(revealedIndex);
+        animState = 'hold';
+        setTimeout(() => {
+          animState = 'erasing';
+        }, 1200);
+      } else {
+        draw(revealedIndex);
+      }
+    } else if (animState === 'erasing') {
+      revealedIndex = 0;
+      draw(0);
+      animState = 'waiting';
+      setTimeout(() => {
+        generateQRMatrix(); 
+        animState = 'forming';
+      }, 500); 
+    }
+
+    requestAnimationFrame(updateAnimation);
+  }
+
+  generateQRMatrix();
+  updateAnimation();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initQRAnimation();
 });

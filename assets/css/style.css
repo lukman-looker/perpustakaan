@@ -621,140 +621,104 @@ header .status {
 
 #reader {
   width: 100%;
-  max-width: 350px;
-  height: 350px;
-  border-radius: 20px;
-  margin: 0 auto 20px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #0f172a;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  position: relative;
-  /* Lens effect */
-}
-
-/* Subtle glass effect */
-#reader::before {
-  content: '';
+  height: 100%;
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-  pointer-events: none;
+  border-radius: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  z-index: 5;
+  overflow: hidden;
 }
 
 #reader.scanner-inactive {
-  background: #0a0a0a !important;
-  opacity: 0.4 !important;
+  background: transparent !important;
+  opacity: 1 !important;
   cursor: not-allowed !important;
   pointer-events: none !important;
-  filter: grayscale(100%) brightness(0.5) !important;
+  filter: none !important;
 }
 
-#reader.scanner-inactive::before {
-  animation: none !important;
-  animation-play-state: paused !important;
-  animation-duration: 0s !important;
-  opacity: 0.1 !important;
-  background: transparent !important;
-}
-
-#reader.scanner-inactive::after {
-  content: '' !important;
-  animation: none !important;
-  animation-play-state: paused !important;
-  animation-duration: 0s !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
+#reader.scanner-inactive video {
   display: none !important;
-  pointer-events: none !important;
-  top: 50% !important;
-  height: 0 !important;
-  box-shadow: none !important;
-}
-#reader::after {
-  content: '';
-  position: absolute;
-  width: 70%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, #3B82F6 50%, transparent 100%);
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.8);
-  pointer-events: none;
-  z-index: 3;
-  animation: laserScan 3s ease-in-out infinite;
-  top: 50%;
-  left: 15%;
-}
-
-@keyframes laserScan {
-  0%, 100% {
-    top: 25%;
-    opacity: 0;
-  }
-  15%, 85% {
-    opacity: 1;
-  }
-  50% {
-    top: 75%;
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.4);
-  }
 }
 
 .scanner-frame {
   position: relative;
   width: 100%;
-  max-width: 350px;
+  max-width: 280px;
+  height: 280px;
   margin: 0 auto 20px;
+  background: #ffffff;
+  border: 1.5px solid #d1d5db;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
 }
 
-.scanner-corner {
+.scan-area {
   position: absolute;
-  width: 35px;
-  height: 35px;
-  border: 3px solid rgba(59, 130, 246, 0.8);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
   z-index: 10;
-  border-radius: 8px;
+  pointer-events: none;
 }
 
-.scanner-corner-tl {
-  top: -4px;
-  left: -4px;
-  border-right: none;
-  border-bottom: none;
-  border-bottom-right-radius: 0;
+.corner {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border: 12px solid #3b82f6;
+  z-index: 12;
 }
 
-.scanner-corner-tr {
-  top: -4px;
-  right: -4px;
-  border-left: none;
-  border-bottom: none;
-  border-bottom-left-radius: 0;
+.corner-top-left { top: -6px; left: -6px; border-right: none; border-bottom: none; }
+.corner-top-right { top: -6px; right: -6px; border-left: none; border-bottom: none; }
+.corner-bottom-left { bottom: -6px; left: -6px; border-right: none; border-top: none; }
+.corner-bottom-right { bottom: -6px; right: -6px; border-left: none; border-top: none; }
+
+#qrCanvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px;
+  height: 240px;
+  image-rendering: pixelated;
+  z-index: 2;
 }
 
-.scanner-corner-bl {
-  bottom: -4px;
-  left: -4px;
-  border-right: none;
-  border-top: none;
-  border-top-right-radius: 0;
+.scan-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  background: #ff1e1e;
+  box-shadow: 0 0 10px #ff1e1e, 0 0 18px rgba(255, 30, 30, 0.7);
+  z-index: 10;
+  animation: scanMovement 2.4s ease-in-out infinite alternate;
 }
 
-.scanner-corner-br {
-  bottom: -4px;
-  right: -4px;
-  border-left: none;
-  border-top: none;
-  border-top-left-radius: 0;
+.scan-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -12px;
+  width: 100%;
+  height: 25px;
+  background: linear-gradient(to bottom, rgba(255, 30, 30, 0.2), transparent);
+  pointer-events: none;
+}
+
+@keyframes scanMovement {
+  0% { top: 0%; }
+  100% { top: calc(100% - 2.5px); }
 }
 
 .scanner-status {
