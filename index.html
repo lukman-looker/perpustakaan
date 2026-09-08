@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Perpustakaan - Sistem Manajemen</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon/favicon-16x16.png">
+  <link rel="manifest" href="assets/img/favicon/site.webmanifest">
+  <link rel="icon" href="assets/img/favicon/favicon.ico">
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +20,7 @@
 <div id="loginScreen" class="login-container">
   <div class="login-box">
     <div class="login-header">
-      <i class="fas fa-book-open"></i>
+      <img src="assets/img/logo.webp" alt="Logo" style="width: 80px; margin-bottom: 15px; display: inline-block;">
       <h1>Perpustakaan</h1>
       <p>SD Muhammadiyah 1 Sedati</p>
     </div>
@@ -44,7 +49,10 @@
   <header>
     <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 30px;">
       <div>
-        <h1><i class="fas fa-book"></i> Dashboard Perpustakaan SD Muhammadiyah 1 Sedati</h1>
+        <h1 style="display: flex; align-items: center; gap: 15px;">
+          <img src="assets/img/logo.webp" alt="Logo" style="width: 45px;">
+          Dashboard Perpustakaan SD Muhammadiyah 1 Sedati
+        </h1>
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 15px;">
         <button class="btn-danger btn-sm" onclick="handleLogout()">
