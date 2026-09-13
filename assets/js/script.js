@@ -1,3 +1,4 @@
+if (window.history.replaceState) { window.history.replaceState(null, '', window.location.protocol + "//" + window.location.host + window.location.pathname); }
 function formatLongText(text, maxLen = 20, maxWidth = '100%') {
   if (!text) return '-'; const str = String(text); if (str.length > maxLen) {
     const duration = Math.max(6, str.length * 0.25); return `<div class="seamless-marquee-container" style="width: ${maxWidth};">
