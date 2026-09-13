@@ -892,7 +892,7 @@ function saveAnggota(event) {
   event.preventDefault();
 
   const kode = document.getElementById('formKodeAnggota').value.trim();
-  const isNew = !allMembers.find(m => m['KODE'].trim() == kode);
+  const isNew = !allMembers.find(m => String(m['KODE'] || '').trim() == kode);
 
   const action = isNew ? 'addAnggota' : 'updateAnggota';
   const message = isNew ? 'Menambah anggota...' : 'Mengupdate anggota...';
@@ -1155,7 +1155,7 @@ function saveBuku(event) {
   event.preventDefault();
 
   const kode = document.getElementById('formKodeBuku').value.trim();
-  const isNew = !allBooks.find(b => b['KODE BUKU'].trim() == kode);
+  const isNew = !allBooks.find(b => String(b['KODE BUKU'] || '').trim() == kode);
 
   const action = isNew ? 'addBuku' : 'updateBuku';
   const message = isNew ? 'Menambah buku...' : 'Mengupdate buku...';
@@ -2467,7 +2467,8 @@ function logMemberVisit(kodeAnggota) {
 // Close modal when clicking outside
 window.addEventListener('click', function (event) {
   if (event.target.classList.contains('modal')) {
-    event.target.style.display = 'none';
+    event.target.classList.remove('active');
+    event.target.style.display = ''; // Reset inline style
   }
 });
 
