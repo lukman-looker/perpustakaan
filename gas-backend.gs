@@ -237,10 +237,7 @@ function updateAdminProfile(params) {
       sheet.getRange(rowNum, 4).setValue(params.email);
     }
     if (params.fotoUrl) {
-      sheet.getRange(rowNum, 6).setValue(params.fotoUrl);
-    }
-    if (params.folderId) {
-      sheet.getRange(rowNum, 5).setValue(params.folderId);
+      sheet.getRange(rowNum, 5).setValue(params.fotoUrl);
     }
     
     return response(true, { message: "Profil berhasil diperbarui" });
@@ -257,8 +254,7 @@ function getAllAdmins() {
       username: a['USERNAME'],
       namaLengkap: a['NAMA_LENGKAP'],
       email: a['EMAIL'],
-      fotoUrl: a['FOTO_URL'] || '',
-      createdAt: a['CREATED_AT']
+      fotoUrl: a['FOTO_URL'] || ''
     }));
     return response(true, safeData);
   } catch (error) {
@@ -335,7 +331,7 @@ function uploadAdminPhoto(params) {
     if (adminIndex !== -1) {
       const sheet = getSheet(SHEET_ADMIN);
       const rowNum = adminIndex + 2;
-      sheet.getRange(rowNum, 6).setValue(fotoUrl); // Update FOTO_URL column
+      sheet.getRange(rowNum, 5).setValue(fotoUrl); // Update FOTO_URL column
     }
     
     return response(true, {
@@ -749,7 +745,6 @@ function logKunjungan(kodeAnggota) {
   
   sheet.getRange(newRow, 1).setValue(today);
   sheet.getRange(newRow, 2).setValue(kodeAnggota);
-  sheet.getRange(newRow, 3).setValue(''); // keterangan
   
   return response(true, {
     message: "Kunjungan berhasil dicatat",

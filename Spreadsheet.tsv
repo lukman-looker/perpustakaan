@@ -23,14 +23,14 @@ TRX-20260430-0001	2026-04-30	G-001	PL-2A-001	14	2026-05-14	2026-05-10	KEMBALI
 
 
 SHEET = KUNJUNGAN
-Tgl Kunjungan	Kode Anggota	Keterangan
-2026-05-01	S-001	Meminjam buku
-2026-05-02	S-002	Membaca di tempat
-2026-05-02	G-001	Mengembalikan buku
-2026-05-03	O-001	Meminjam buku
-2026-05-03	S-001	Membaca di tempat
+Tgl Kunjungan	Kode Anggota
+2026-05-01	S-001
+2026-05-02	S-002
+2026-05-02	G-001
+2026-05-03	O-001
+2026-05-03	S-001
 
 
 SHEET = ADMIN
-USERNAME	PASSWORD_HASH	NAMA_LENGKAP	EMAIL	FOLDER_ID_DRIVE	FOTO_URL	CREATED_AT
-admin	rLjd+gNLF7L7kI87qTGvHI3oDvW9/J77qFpEBp1V3Vw=	Administrator	admin@perpustakaan.local			2026-05-06
+USERNAME	PASSWORD_HASH	NAMA_LENGKAP	EMAIL	FOTO_URL
+admin	TRiaT0865yiizBj0RnMVvJeqiygV4D/hJjrcLA7MYgM=	Wildan Al Musthofa 	admin@perpustakaan	https://drive.google.com/uc?id=1Wlp-wk0QrKbAY08TsxZgaprA2dPnards&export=download
