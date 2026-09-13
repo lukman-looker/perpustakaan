@@ -54,7 +54,7 @@
       <div class="login-right">
         <h3 class="login-welcome">Selamat Datang!</h3>
         <p class="login-instruction">Silakan masuk ke akun Anda</p>
-        <form id="loginForm" onsubmit="return false;">
+        <form id="loginForm">
           <div class="form-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Masukkan username" required autofocus>
@@ -639,7 +639,7 @@
                 <div class="settings-main">
                   <div class="card settings-card">
                     <h3 class="settings-title"><i class="fas fa-user-edit"></i> Ubah Informasi Profil</h3>
-                    <form id="updateProfileForm" class="settings-form" onsubmit="return false;">
+                    <form id="updateProfileForm" class="settings-form">
                       <div class="form-group">
                         <label>Nama Lengkap</label>
                         <input type="text" id="updateNamaLengkap" class="form-control" required>
@@ -654,7 +654,7 @@
                   </div>
                   <div class="card settings-card">
                     <h3 class="settings-title"><i class="fas fa-lock"></i> Ubah Password</h3>
-                    <form id="changePasswordForm" class="settings-form" onsubmit="return false;">
+                    <form id="changePasswordForm" class="settings-form">
                       <div class="form-group">
                         <label>Password Lama</label>
                         <input type="password" id="oldPassword" class="form-control" required>
@@ -708,7 +708,7 @@
         <button class="modal-close" data-action="closeModal" data-modal="anggotaModal"><i
             class="fas fa-times"></i></button>
       </div>
-      <form id="anggotaForm" onsubmit="return false;">
+      <form id="anggotaForm">
         <div class="form-group">
           <label>Kode</label>
           <input type="text" id="formKodeAnggota" placeholder="Sebaiknya dikosongkan (dibuat otomatis oleh sistem)">
@@ -756,7 +756,7 @@
         <button class="modal-close" data-action="closeModal" data-modal="bukuModal"><i
             class="fas fa-times"></i></button>
       </div>
-      <form id="bukuForm" onsubmit="return false;">
+      <form id="bukuForm">
         <div class="form-group">
           <label>Kode Buku</label>
           <input type="text" id="formKodeBuku" placeholder="Sebaiknya dikosongkan (dibuat otomatis oleh sistem)">
@@ -828,7 +828,7 @@
           </tbody>
         </table>
       </div>
-      <form id="rombelForm" onsubmit="return false;">
+      <form id="rombelForm">
         <div class="form-group">
           <label>Kelas Baru (Keterangan)</label>
           <input type="text" id="formKeteranganBaru" required placeholder="Contoh: Kelas 2 A">
