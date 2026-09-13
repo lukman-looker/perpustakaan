@@ -521,30 +521,34 @@ function addBuku(params) {
   if (!kode) {
     const kategori = params.kategori || '';
     let categoryAbbr = '';
-    
-    if (kategori.indexOf(' ') === -1) {
-      categoryAbbr = kategori.substring(0, 2).toUpperCase();
-    } else {
-      const words = kategori.split(' ');
-      categoryAbbr = (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+    // derive abbreviation from category
+    if (kategori) {
+      const words = kategori.trim().split(' ');
+      if (words.length === 1) {
+        categoryAbbr = kategori.substring(0, 2).toUpperCase();
+      } else {
+        categoryAbbr = (words[0][0] + words[1][0]).toUpperCase();
+      }
     }
     if (!categoryAbbr) categoryAbbr = 'BK';
-    
+    // use kode rak without hyphen
+    const kodeRakRaw = params.kodeRak || '';
+    const kodeRak = kodeRakRaw.replace(/-/g, '');
+    const prefix = `${categoryAbbr}-${kodeRak}-`;
     const allBuku = getAllDataFromSheet(SHEET_BANK_BUKU);
     let maxNum = 0;
     allBuku.forEach(row => {
-      const k = row['KODE BUKU'];
-      if (k) {
-        const parts = k.split('-');
-        if (parts.length >= 2) {
-          const numPart = parseInt(parts[parts.length - 1]);
-          if (!isNaN(numPart) && numPart > maxNum) {
-            maxNum = numPart;
-          }
+      const existing = row['KODE BUKU'];
+      if (existing && existing.startsWith(prefix)) {
+        const parts = existing.split('-');
+        const numPart = parseInt(parts[parts.length - 1], 10);
+        if (!isNaN(numPart) && numPart > maxNum) {
+          maxNum = numPart;
         }
       }
     });
-    kode = categoryAbbr + '-B-' + (maxNum + 1);
+    const newNum = String(maxNum + 1).padStart(3, '0');
+    kode = `${categoryAbbr}-${kodeRak}-${newNum}`;
   }
   
   // Column order: KODE BUKU | KODE RAK | JUDUL BUKU | PENGARANG | PENERBIT | TAHUN | STOK TERSEDIA | STOK TOTAL | KATEGORI | STATUS CETAK
