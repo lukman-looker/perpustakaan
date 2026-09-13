@@ -448,10 +448,14 @@ body {
   background: rgba(255, 255, 255, 0.15);
   color: white;
   border: none;
-  width: 55px;
-  height: 55px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  flex-shrink: 0;
+  padding: 0;
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2253,28 +2257,32 @@ tr:hover {
 
 .topbar .admin-name {
   color: #ffffff;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .topbar .greeting {
   color: rgba(255, 255, 255, 0.75);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .topbar .admin-profile-card img {
-  width: 34px;
-  height: 34px;
+  width: 48px;
+  height: 48px;
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-logout-icon {
   color: #ffffff;
-  width: 55px;
-  height: 55px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  flex-shrink: 0;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 15px;
   cursor: pointer;
   backdrop-filter: blur(5px);
   background: rgba(255, 255, 255, 0.15);
