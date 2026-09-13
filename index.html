@@ -55,7 +55,7 @@
       <div class="login-right">
         <h3 class="login-welcome">Selamat Datang!</h3>
         <p class="login-instruction">Silakan masuk ke akun Anda</p>
-        <form id="loginForm" onsubmit="handleLogin(event)">
+        <form id="loginForm" >
           <div class="form-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Masukkan username" required autofocus>
@@ -64,7 +64,7 @@
             <label for="password">Password</label>
             <div class="password-wrapper">
               <input type="password" id="password" name="password" placeholder="Masukkan password" required>
-              <button type="button" class="btn-toggle-password" onclick="togglePassword()">
+              <button type="button" class="btn-toggle-password" data-action="togglePassword">
                 <i class="fas fa-eye" id="eyeIcon"></i>
               </button>
             </div>
@@ -90,23 +90,23 @@
           </div>
         </div>
         <nav class="sidebar-nav tabs">
-          <button class="tab-btn active" onclick="switchTab('scanner')">
+          <button class="tab-btn active" data-action="switchTab" data-tab="scanner">
             <i class="fas fa-qrcode"></i> Scanner </button>
-          <button class="tab-btn" onclick="switchTab('statistik')">
+          <button class="tab-btn" data-action="switchTab" data-tab="statistik">
             <i class="fas fa-chart-bar"></i> Statistik </button>
-          <button class="tab-btn" onclick="switchTab('transaksi')">
+          <button class="tab-btn" data-action="switchTab" data-tab="transaksi">
             <i class="fas fa-exchange-alt"></i> Transaksi </button>
-          <button class="tab-btn" onclick="switchTab('overdued')">
+          <button class="tab-btn" data-action="switchTab" data-tab="overdued">
             <i class="fas fa-exclamation-triangle"></i> Overdue </button>
-          <button class="tab-btn" onclick="switchTab('anggota')">
+          <button class="tab-btn" data-action="switchTab" data-tab="anggota">
             <i class="fas fa-users"></i> Anggota </button>
-          <button class="tab-btn" onclick="switchTab('buku')">
+          <button class="tab-btn" data-action="switchTab" data-tab="buku">
             <i class="fas fa-book-open"></i> Buku </button>
-          <button class="tab-btn" onclick="switchTab('qrgen')">
+          <button class="tab-btn" data-action="switchTab" data-tab="qrgen">
             <i class="fas fa-print"></i> Cetak </button>
-          <button class="tab-btn" onclick="switchTab('kunjungan')">
+          <button class="tab-btn" data-action="switchTab" data-tab="kunjungan">
             <i class="fas fa-calendar-check"></i> Kunjungan </button>
-          <button class="tab-btn" onclick="switchTab('admin')">
+          <button class="tab-btn" data-action="switchTab" data-tab="admin">
             <i class="fas fa-user-cog"></i> Admin </button>
         </nav>
         <div class="sidebar-bottom">
@@ -143,22 +143,21 @@
       <div class="main-wrapper">
         <header class="topbar">
           <div class="topbar-left">
-            <button class="btn-menu-mobile" onclick="toggleMobileMenu()" title="Menu">
+            <button class="btn-menu-mobile" data-action="toggleMobileMenu" title="Menu">
               <i class="fas fa-bars"></i>
             </button>
-            <h1 class="topbar-page-title" id="topbarPageTitle">Dashboard <span
-                style="opacity:0.5; margin:0 8px; font-weight:400;">&gt;</span> <span id="topbarSubtitle">Scanner &amp;
-                Transaksi</span></h1>
+            <h1 class="topbar-page-title" id="topbarPageTitle">Dashboard <span class="topbar-separator">&gt;</span> <span id="topbarSubtitle">Scanner &amp;
+                Sirkulasi</span></h1>
           </div>
           <div class="topbar-right">
             <div class="admin-profile-card">
-              <img id="headerAdminPhoto" src="" alt="Foto" style="display: none;">
+              <img id="headerAdminPhoto" src="" alt="Foto" class="d-none">
               <div class="admin-info-text">
                 <div class="greeting" id="dynamicGreeting">Selamat datang,</div>
                 <div class="admin-name" id="adminNameHeader">-</div>
               </div>
             </div>
-            <button class="btn-logout-icon" onclick="handleLogout()" title="Logout">
+            <button class="btn-logout-icon" data-action="handleLogout" title="Logout">
               <i class="fas fa-power-off"></i>
             </button>
           </div>
@@ -188,7 +187,7 @@
                       </div>
                     </div>
                     <div class="button-group flex-center mt-15">
-                      <button class="btn-danger btn-sm btn-rounded px-15" onclick="toggleScanner()">
+                      <button class="btn-danger btn-sm btn-rounded px-15" data-action="toggleScanner">
                         <i class="fas fa-stop-circle"></i> Hentikan Scanner </button>
                     </div>
                   </div>
@@ -198,11 +197,11 @@
                       <input type="number" id="lamaPinjam" class="form-control input-small" value="7" min="1" max="30">
                     </div>
                     <div class="button-group wrap-group mt-15">
-                      <button class="btn-success flex-1 text-sm py-10" onclick="prosesPinjam()">
+                      <button class="btn-success flex-1 text-sm py-10" data-action="prosesPinjam">
                         <i class="fas fa-download"></i> PINJAM BUKU </button>
-                      <button class="btn-primary flex-1 text-sm py-10" onclick="prosesKembali()">
+                      <button class="btn-primary flex-1 text-sm py-10" data-action="prosesKembali">
                         <i class="fas fa-upload"></i> KEMBALI BUKU </button>
-                      <button class="btn-secondary text-sm py-10 px-15" onclick="resetScanner()">
+                      <button class="btn-secondary text-sm py-10 px-15" data-action="resetScanner">
                         <i class="fas fa-redo"></i> Reset </button>
                     </div>
                   </div>
@@ -269,7 +268,7 @@
                 <div class="table-header-luxury">
                   <h2><i class="fas fa-chart-pie text-purple"></i> Statistik Perpustakaan</h2>
                   <div class="table-actions">
-                    <button class="btn-primary" onclick="refreshStatistik()">
+                    <button class="btn-primary" data-action="refreshStatistik">
                       <i class="fas fa-sync-alt"></i> Refresh Data </button>
                   </div>
                 </div>
@@ -313,7 +312,7 @@
                 <div class="filter-bar-modern">
                   <div class="filter-item">
                     <label>Filter Status</label>
-                    <select id="filterStatus" class="form-control min-w-150" onchange="filterTransaksi()">
+                    <select id="filterStatus" class="form-control min-w-150" >
                       <option value="">Semua</option>
                       <option value="DIPINJAM">Dipinjam</option>
                       <option value="KEMBALI">Kembali</option>
@@ -322,12 +321,12 @@
                   <div class="filter-item flex-grow-1">
                     <label>Cari Kode Anggota</label>
                     <input type="text" id="filterAnggota" class="form-control" placeholder="S-001"
-                      onchange="filterTransaksi()">
+                      >
                   </div>
                   <div class="filter-actions">
-                    <button class="btn-secondary" onclick="loadTransaksi()">
+                    <button class="btn-secondary" data-action="loadTransaksi">
                       <i class="fas fa-redo"></i> Reset </button>
-                    <button class="btn-primary" onclick="exportTransaksi()">
+                    <button class="btn-primary" data-action="exportTransaksi">
                       <i class="fas fa-download"></i> Export </button>
                   </div>
                 </div>
@@ -384,11 +383,11 @@
                 <div class="table-header-luxury">
                   <h2><i class="fas fa-users"></i> Data Anggota</h2>
                   <div class="table-actions">
-                    <button class="btn-primary" onclick="openAddAnggotaModal()">
+                    <button class="btn-primary" data-action="openAddAnggotaModal">
                       <i class="fas fa-plus-circle"></i> Tambah Anggota </button>
-                    <button class="btn-success" onclick="openRombelModal()">
+                    <button class="btn-success" data-action="openRombelModal">
                       <i class="fas fa-layer-group"></i> Naik Kelas Serentak </button>
-                    <button class="btn-info" onclick="openBulkActions('anggota')">
+                    <button class="btn-info" data-action="openBulkActions" data-type="anggota">
                       <i class="fas fa-tasks"></i> Aksi Pilihan </button>
                   </div>
                 </div>
@@ -402,15 +401,15 @@
                   <table>
                     <thead>
                       <tr>
-                        <th style="width: 3%;"><input type="checkbox" id="selectAllMembers"
-                            onchange="toggleSelectAllMembers(this.checked)"></th>
-                        <th style="width: 8%;">Kode</th>
-                        <th style="width: 37%;">Nama</th>
-                        <th style="width: 12%; white-space: nowrap;">Jenis Kelamin</th>
-                        <th style="width: 7%;">Tipe</th>
-                        <th style="width: 15%;">Keterangan</th>
-                        <th style="width: 11%; white-space: nowrap;">Print Status</th>
-                        <th style="width: 7%;">Aksi</th>
+                        <th class="col-checkbox"><input type="checkbox" id="selectAllMembers"
+                            ></th>
+                        <th class="col-kode">Kode</th>
+                        <th class="col-nama">Nama</th>
+                        <th class="col-jk">Jenis Kelamin</th>
+                        <th class="col-tipe">Tipe</th>
+                        <th class="col-keterangan">Keterangan</th>
+                        <th class="col-print">Print Status</th>
+                        <th class="col-aksi">Aksi</th>
                       </tr>
                     </thead>
                     <tbody id="anggotaTable">
@@ -427,9 +426,9 @@
                 <div class="table-header-luxury">
                   <h2><i class="fas fa-book-open"></i> Data Buku</h2>
                   <div class="table-actions">
-                    <button class="btn-primary" onclick="openAddBukuModal()">
+                    <button class="btn-primary" data-action="openAddBukuModal">
                       <i class="fas fa-plus-circle"></i> Tambah Buku </button>
-                    <button class="btn-info" onclick="openBulkActions('buku')">
+                    <button class="btn-info" data-action="openBulkActions" data-type="buku">
                       <i class="fas fa-tasks"></i> Aksi Pilihan </button>
                   </div>
                 </div>
@@ -443,16 +442,16 @@
                   <table>
                     <thead>
                       <tr>
-                        <th style="width: 3%;"><input type="checkbox" id="selectAllBooks" onchange="toggleSelectAllBooks(this.checked)">
+                        <th class="col-checkbox"><input type="checkbox" id="selectAllBooks" >
                         </th>
-                        <th style="width: 11%;">Kode</th>
-                        <th style="width: 35%;">Judul</th>
-                        <th style="width: 13%;">Pengarang</th>
-                        <th style="width: 10%;">Kategori</th>
-                        <th style="width: 5%;">Stok</th>
-                        <th style="width: 5%;">Rak</th>
-                        <th style="width: 11%; white-space: nowrap;">Print Status</th>
-                        <th style="width: 7%;">Aksi</th>
+                        <th class="col-kode-buku">Kode</th>
+                        <th class="col-judul">Judul</th>
+                        <th class="col-pengarang">Pengarang</th>
+                        <th class="col-kategori">Kategori</th>
+                        <th class="col-stok">Stok</th>
+                        <th class="col-rak">Rak</th>
+                        <th class="col-print">Print Status</th>
+                        <th class="col-aksi">Aksi</th>
                       </tr>
                     </thead>
                     <tbody id="bukuTable">
@@ -471,21 +470,21 @@
                   <div class="form-group">
                     <label class="detail-label mb-10">Pilih Metode Cetak</label>
                     <div class="print-actions-grid">
-                      <button class="print-action-btn primary" onclick="switchPrintMode('member-search')">
+                      <button class="print-action-btn primary" data-action="switchPrintMode" data-mode="member-search">
                         <i class="fas fa-search"></i>
                         <span>Cari Anggota</span>
                       </button>
-                      <button class="print-action-btn warning" onclick="switchToSelectiveMode('member')">
+                      <button class="print-action-btn warning" data-action="switchToSelectiveMode" data-type="member">
                         <i class="fas fa-check-square"></i>
                         <span>Cetak Pilihan</span>
                       </button>
-                      <button class="print-action-btn success" onclick="confirmBulkPrintMembers()">
+                      <button class="print-action-btn success" data-action="confirmBulkPrintMembers">
                         <i class="fas fa-print"></i>
                         <span>Cetak Semua</span>
                       </button>
                     </div>
                   </div>
-                  <div id="member-search-mode" class="mt-25" style="display: none;">
+                  <div id="member-search-mode" class="mt-25 d-none">
                     <div class="filter-bar-modern">
                       <div class="filter-item flex-grow-1">
                         <label>Cari Kode atau Nama Anggota</label>
@@ -493,7 +492,7 @@
                           placeholder="Contoh: S-1A-001 atau Adam">
                       </div>
                       <div class="filter-actions">
-                        <button class="btn-dark" onclick="searchMember()">
+                        <button class="btn-dark" data-action="searchMember">
                           <i class="fas fa-search"></i> Cari </button>
                       </div>
                     </div>
@@ -505,21 +504,21 @@
                   <div class="form-group">
                     <label class="detail-label mb-10">Pilih Metode Cetak</label>
                     <div class="print-actions-grid">
-                      <button class="print-action-btn primary" onclick="switchPrintMode('book-search')">
+                      <button class="print-action-btn primary" data-action="switchPrintMode" data-mode="book-search">
                         <i class="fas fa-search"></i>
                         <span>Cari Buku</span>
                       </button>
-                      <button class="print-action-btn warning" onclick="switchToSelectiveMode('book')">
+                      <button class="print-action-btn warning" data-action="switchToSelectiveMode" data-type="book">
                         <i class="fas fa-check-square"></i>
                         <span>Cetak Pilihan</span>
                       </button>
-                      <button class="print-action-btn success" onclick="confirmBulkPrintBooks()">
+                      <button class="print-action-btn success" data-action="confirmBulkPrintBooks">
                         <i class="fas fa-print"></i>
                         <span>Cetak Semua</span>
                       </button>
                     </div>
                   </div>
-                  <div id="book-search-mode" class="mt-25" style="display: none;">
+                  <div id="book-search-mode" class="mt-25 d-none">
                     <div class="filter-bar-modern">
                       <div class="filter-item flex-grow-1">
                         <label>Cari Kode atau Judul Buku</label>
@@ -527,7 +526,7 @@
                           placeholder="Contoh: DA-1A-001 atau Pawai">
                       </div>
                       <div class="filter-actions">
-                        <button class="btn-dark" onclick="searchBook()">
+                        <button class="btn-dark" data-action="searchBook">
                           <i class="fas fa-search"></i> Cari </button>
                       </div>
                     </div>
@@ -552,8 +551,8 @@
                       placeholder="Kode atau nama anggota">
                   </div>
                   <div class="filter-actions">
-                    <button class="btn-dark" onclick="filterKunjungan()"><i class="fas fa-filter"></i> Filter</button>
-                    <button class="btn-secondary" onclick="resetKunjunganFilter()"><i class="fas fa-redo"></i>
+                    <button class="btn-dark" data-action="filterKunjungan"><i class="fas fa-filter"></i> Filter</button>
+                    <button class="btn-secondary" data-action="resetKunjunganFilter"><i class="fas fa-redo"></i>
                       Reset</button>
                   </div>
                 </div>
@@ -620,16 +619,16 @@
                 <div class="settings-sidebar">
                   <div class="card profile-overview-card">
                     <div class="profile-photo-wrapper">
-                      <img id="adminPhotoPreview" src="" alt="Foto Admin" style="display: none;">
+                      <img id="adminPhotoPreview" src="" alt="Foto Admin" class="d-none">
                       <div id="adminPhotoPlaceholder" class="photo-placeholder">
                         <i class="fas fa-user-circle"></i>
                       </div>
-                      <button class="btn-upload-photo" onclick="document.getElementById('photoUpload').click()"
+                      <button class="btn-upload-photo" data-action="triggerPhotoUpload"
                         title="Ubah Foto">
                         <i class="fas fa-camera"></i>
                       </button>
-                      <input type="file" id="photoUpload" accept="image/*" style="display: none;"
-                        onchange="handlePhotoUpload(event)">
+                      <input type="file" id="photoUpload" accept="image/*" class="d-none"
+                        >
                     </div>
                     <div class="profile-details-list">
                       <div class="detail-item">
@@ -650,7 +649,7 @@
                 <div class="settings-main">
                   <div class="card settings-card">
                     <h3 class="settings-title"><i class="fas fa-user-edit"></i> Ubah Informasi Profil</h3>
-                    <form id="updateProfileForm" onsubmit="handleUpdateProfile(event)" class="settings-form">
+                    <form id="updateProfileForm"  class="settings-form">
                       <div class="form-group">
                         <label>Nama Lengkap</label>
                         <input type="text" id="updateNamaLengkap" class="form-control" required>
@@ -665,7 +664,7 @@
                   </div>
                   <div class="card settings-card">
                     <h3 class="settings-title"><i class="fas fa-lock"></i> Ubah Password</h3>
-                    <form id="changePasswordForm" onsubmit="handleChangePassword(event)" class="settings-form">
+                    <form id="changePasswordForm"  class="settings-form">
                       <div class="form-group">
                         <label>Password Lama</label>
                         <input type="password" id="oldPassword" class="form-control" required>
@@ -701,7 +700,7 @@
                       </div>
                     </div>
                     <button type="button" class="btn-danger w-100 p-15 text-md fw-600 btn-rounded flex-center gap-10"
-                      onclick="handleResetData()" id="btnResetData">
+                      data-action="handleResetData" id="btnResetData">
                       <i class="fas fa-sync-alt"></i> Reset & Rapikan Data </button>
                   </div>
                 </div>
@@ -716,9 +715,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Tambah/Edit Anggota</h2>
-        <button class="modal-close" onclick="closeModal('anggotaModal')"><i class="fas fa-times"></i></button>
+        <button class="modal-close" data-action="closeModal" data-modal="anggotaModal"><i class="fas fa-times"></i></button>
       </div>
-      <form id="anggotaForm" onsubmit="saveAnggota(event)">
+      <form id="anggotaForm" >
         <div class="form-group">
           <label>Kode</label>
           <input type="text" id="formKodeAnggota" placeholder="Sebaiknya dikosongkan (dibuat otomatis oleh sistem)">
@@ -751,7 +750,7 @@
         <div class="button-group">
           <button type="submit" class="btn-primary">
             <i class="fas fa-save"></i> Simpan </button>
-          <button type="button" class="btn-secondary" onclick="closeModal('anggotaModal')">
+          <button type="button" class="btn-secondary" data-action="closeModal" data-modal="anggotaModal">
             <i class="fas fa-times"></i> Batal </button>
           <button type="button" id="btnHapusAnggotaModal" class="btn-danger hide ml-auto">
             <i class="fas fa-trash-alt"></i> Hapus </button>
@@ -763,9 +762,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Tambah/Edit Buku</h2>
-        <button class="modal-close" onclick="closeModal('bukuModal')"><i class="fas fa-times"></i></button>
+        <button class="modal-close" data-action="closeModal" data-modal="bukuModal"><i class="fas fa-times"></i></button>
       </div>
-      <form id="bukuForm" onsubmit="saveBuku(event)">
+      <form id="bukuForm" >
         <div class="form-group">
           <label>Kode Buku</label>
           <input type="text" id="formKodeBuku" placeholder="Sebaiknya dikosongkan (dibuat otomatis oleh sistem)">
@@ -801,7 +800,7 @@
         <div class="button-group">
           <button type="submit" class="btn-primary">
             <i class="fas fa-save"></i> Simpan </button>
-          <button type="button" class="btn-secondary" onclick="closeModal('bukuModal')">
+          <button type="button" class="btn-secondary" data-action="closeModal" data-modal="bukuModal">
             <i class="fas fa-times"></i> Batal </button>
           <button type="button" id="btnHapusBukuModal" class="btn-danger hide ml-auto">
             <i class="fas fa-trash-alt"></i> Hapus </button>
@@ -813,7 +812,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Naik Kelas Serentak</h2>
-        <button class="modal-close" onclick="closeModal('rombelModal')"><i class="fas fa-times"></i></button>
+        <button class="modal-close" data-action="closeModal" data-modal="rombelModal"><i class="fas fa-times"></i></button>
       </div>
       <div class="text-sm text-muted mb-15"> Gunakan fitur ini untuk menaikkan kelas beberapa siswa secara bersamaan.
         Cari siswa, pilih, lalu tentukan kelas baru. </div>
@@ -827,7 +826,7 @@
         <table>
           <thead>
             <tr>
-              <th><input type="checkbox" id="selectAllRombel" onchange="toggleSelectAllRombel(this.checked)"></th>
+              <th><input type="checkbox" id="selectAllRombel" ></th>
               <th>Kode</th>
               <th>Nama</th>
               <th>Kelas Saat Ini</th>
@@ -837,7 +836,7 @@
           </tbody>
         </table>
       </div>
-      <form id="rombelForm" onsubmit="submitRombel(event)">
+      <form id="rombelForm" >
         <div class="form-group">
           <label>Kelas Baru (Keterangan)</label>
           <input type="text" id="formKeteranganBaru" required placeholder="Contoh: Kelas 2 A">
@@ -845,7 +844,7 @@
         <div class="button-group">
           <button type="submit" class="btn-success">
             <i class="fas fa-save"></i> Proses Kenaikan Kelas </button>
-          <button type="button" class="btn-secondary" onclick="closeModal('rombelModal')">
+          <button type="button" class="btn-secondary" data-action="closeModal" data-modal="rombelModal">
             <i class="fas fa-times"></i> Batal </button>
         </div>
       </form>
@@ -855,14 +854,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Kembalikan Buku</h2>
-        <button class="modal-close" onclick="closeModal('returnModal')"><i class="fas fa-times"></i></button>
+        <button class="modal-close" data-action="closeModal" data-modal="returnModal"><i class="fas fa-times"></i></button>
       </div>
       <div id="returnInfo" class="form-container-light mb-20 bg-gray">
       </div>
       <div class="button-group">
-        <button class="btn-success" onclick="confirmReturn()">
+        <button class="btn-success" data-action="confirmReturn">
           <i class="fas fa-check"></i> Konfirmasi Kembali </button>
-        <button class="btn-secondary" onclick="closeModal('returnModal')">
+        <button class="btn-secondary" data-action="closeModal" data-modal="returnModal">
           <i class="fas fa-times"></i> Batal </button>
       </div>
     </div>

@@ -753,11 +753,11 @@ function displayAnggotaTable(members) {
   tbody.innerHTML = displayedMembers.map(m => {
     let statusCetak = m['STATUS CETAK'] === 'DICETAK'
       ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>`
-      : `<button class="btn-sm btn-secondary" onclick="markAsPrinted('anggota', '${m['KODE']}')"><i class="fas fa-print"></i> Tandai</button>`;
+      : `<button class="btn-sm btn-secondary" data-action="markAsPrinted" data-type="anggota" data-id="${m['KODE']}"><i class="fas fa-print"></i> Tandai</button>`;
 
     return `
-    <tr onclick="toggleRowCheckbox(event, this, 'member-checkbox')" style="cursor: pointer;" class="clickable-row">
-      <td><input type="checkbox" class="member-checkbox" value="${m['KODE']}" onchange="updateMemberSelection()"></td>
+    <tr data-action="toggleRowCheckbox" data-checkbox="member-checkbox" style="cursor: pointer;" class="clickable-row">
+      <td><input type="checkbox" class="member-checkbox" value="${m['KODE']}" data-action="updateMemberSelection"></td>
       <td>${m['KODE'] || '-'}</td>
       <td>${formatLongText(m['NAMA'], 40)}</td>
       <td>${m['JENIS KELAMIN'] || '-'}</td>
@@ -765,7 +765,7 @@ function displayAnggotaTable(members) {
       <td>${formatLongText(m['KETERANGAN'], 25)}</td>
       <td>${statusCetak}</td>
       <td>
-        <button class="btn-sm btn-secondary" onclick="editAnggota('${m['KODE']}')">
+        <button class="btn-sm btn-secondary" data-action="editAnggota" data-id="${m['KODE']}">
           <i class="fas fa-edit"></i>
         </button>
       </td>
@@ -782,15 +782,15 @@ function displayAnggotaTable(members) {
           <td colspan="8" style="padding: 12px 15px; background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
             <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
               <div style="display: flex; align-items: center; flex-wrap: nowrap;">
-                <button class="btn-sm btn-secondary" onclick="window.currentPageAnggota--; filterAnggotaTable();" ${prevDisabled} style="margin:0;">
+                <button class="btn-sm btn-secondary" data-action="prevPageAnggota" ${prevDisabled} style="margin:0;">
                   <i class="fas fa-chevron-left"></i> Prev
                 </button>
                 <span style="margin: 0 15px; font-weight: 500; color: #475569; font-size: 0.9rem; white-space: nowrap;">Hal ${window.currentPageAnggota} dari ${totalPages}</span>
-                <button class="btn-sm btn-secondary" onclick="window.currentPageAnggota++; filterAnggotaTable();" ${nextDisabled} style="margin:0;">
+                <button class="btn-sm btn-secondary" data-action="nextPageAnggota" ${nextDisabled} style="margin:0;">
                   Next <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
-              <button class="btn-sm btn-primary" onclick="window.showAllAnggota = true; filterAnggotaTable();" style="margin:0;">
+              <button class="btn-sm btn-primary" data-action="showAllAnggota" style="margin:0;">
                 <i class="fas fa-list"></i> Tampilkan Semua
               </button>
             </div>
@@ -802,7 +802,7 @@ function displayAnggotaTable(members) {
         <tr>
           <td colspan="8" class="text-center" style="padding: 15px; background: #f8fafc;">
             <span style="color: #64748b; font-size: 0.9rem; margin-right: 15px;">Menampilkan semua ${total} anggota.</span>
-            <button class="btn-sm btn-secondary" onclick="window.showAllAnggota = false; filterAnggotaTable();">
+            <button class="btn-sm btn-secondary" data-action="hideAllAnggota">
               <i class="fas fa-compress-arrows-alt"></i> Tampilkan Halaman
             </button>
           </td>
@@ -1020,11 +1020,11 @@ function displayBukuTable(books) {
   tbody.innerHTML = displayedBooks.map(b => {
     let statusCetak = b['STATUS CETAK'] === 'DICETAK'
       ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>`
-      : `<button class="btn-sm btn-secondary" onclick="markAsPrinted('buku', '${b['KODE BUKU']}')"><i class="fas fa-print"></i> Tandai</button>`;
+      : `<button class="btn-sm btn-secondary" data-action="markAsPrinted" data-type="buku" data-id="${b['KODE BUKU']}"><i class="fas fa-print"></i> Tandai</button>`;
 
     return `
-    <tr onclick="toggleRowCheckbox(event, this, 'book-checkbox')" style="cursor: pointer;" class="clickable-row">
-      <td><input type="checkbox" class="book-checkbox" value="${b['KODE BUKU']}" onchange="updateBookSelection()"></td>
+    <tr data-action="toggleRowCheckbox" data-checkbox="book-checkbox" style="cursor: pointer;" class="clickable-row">
+      <td><input type="checkbox" class="book-checkbox" value="${b['KODE BUKU']}" data-action="updateBookSelection"></td>
       <td>${b['KODE BUKU'] || '-'}</td>
       <td>${formatLongText(b['JUDUL BUKU'], 40)}</td>
       <td>${formatLongText(b['PENGARANG'], 25)}</td>
@@ -1037,7 +1037,7 @@ function displayBukuTable(books) {
       <td>${b['KODE RAK'] || '-'}</td>
       <td>${statusCetak}</td>
       <td>
-        <button class="btn-sm btn-secondary" onclick="editBuku('${b['KODE BUKU']}')">
+        <button class="btn-sm btn-secondary" data-action="editBuku" data-id="${b['KODE BUKU']}">
           <i class="fas fa-edit"></i>
         </button>
       </td>
@@ -1054,15 +1054,15 @@ function displayBukuTable(books) {
           <td colspan="9" style="padding: 12px 15px; background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
             <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
               <div style="display: flex; align-items: center; flex-wrap: nowrap;">
-                <button class="btn-sm btn-secondary" onclick="window.currentPageBooks--; filterBukuTable();" ${prevDisabled} style="margin:0;">
+                <button class="btn-sm btn-secondary" data-action="prevPageBooks" ${prevDisabled} style="margin:0;">
                   <i class="fas fa-chevron-left"></i> Prev
                 </button>
                 <span style="margin: 0 15px; font-weight: 500; color: #475569; font-size: 0.9rem; white-space: nowrap;">Hal ${window.currentPageBooks} dari ${totalPages}</span>
-                <button class="btn-sm btn-secondary" onclick="window.currentPageBooks++; filterBukuTable();" ${nextDisabled} style="margin:0;">
+                <button class="btn-sm btn-secondary" data-action="nextPageBooks" ${nextDisabled} style="margin:0;">
                   Next <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
-              <button class="btn-sm btn-primary" onclick="window.showAllBooks = true; filterBukuTable();" style="margin:0;">
+              <button class="btn-sm btn-primary" data-action="showAllBooks" style="margin:0;">
                 <i class="fas fa-list"></i> Tampilkan Semua
               </button>
             </div>
@@ -1074,7 +1074,7 @@ function displayBukuTable(books) {
         <tr>
           <td colspan="9" class="text-center" style="padding: 15px; background: #f8fafc;">
             <span style="color: #64748b; font-size: 0.9rem; margin-right: 15px;">Menampilkan semua ${total} buku.</span>
-            <button class="btn-sm btn-secondary" onclick="window.showAllBooks = false; filterBukuTable();">
+            <button class="btn-sm btn-secondary" data-action="hideAllBooks">
               <i class="fas fa-compress-arrows-alt"></i> Tampilkan Halaman
             </button>
           </td>
@@ -1325,7 +1325,7 @@ function displayTransaksiTable(transactions) {
         <td>${formatDate(t['Jatuh Tempo'])}</td>
         <td>${statusBadge}</td>
         <td>
-          <button class="btn-sm btn-secondary" onclick="viewTransaction('${t['No Transaksi']}')">
+          <button class="btn-sm btn-secondary" data-action="viewTransaction" data-id="${t['No Transaksi']}">
             <i class="fas fa-eye"></i>
           </button>
         </td>
@@ -1418,7 +1418,7 @@ function displayOverdueTable(overdue) {
         <td>${formatDate(o['Jatuh Tempo'])}</td>
         <td><span class="status-overdue-days">${daysLate} hari</span></td>
         <td>
-          <button class="btn-sm btn-danger" onclick="openReturnForOverdue('${o['No Transaksi']}')">
+          <button class="btn-sm btn-danger" data-action="openReturnForOverdue" data-id="${o['No Transaksi']}">
             <i class="fas fa-undo"></i> Kembali
           </button>
         </td>
@@ -1535,10 +1535,10 @@ function openBulkActions(type) {
     html: `
       <p style="margin-bottom: 20px;">Terdapat <strong>${selectedList.length}</strong> data yang dipilih. Apa yang ingin Anda lakukan?</p>
       <div style="display: flex; flex-direction: row; gap: 10px; justify-content: center;">
-        <button class="swal2-confirm swal2-styled" style="background-color: #F59E0B; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 15px;" onclick="Swal.close(); ${type === 'anggota' ? 'selectivePrintMembers()' : 'selectivePrintBooks()'}">
+        <button class="swal2-confirm swal2-styled" style="background-color: #F59E0B; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 15px;" data-action="selectivePrint">
           <i class="fas fa-print"></i> Cetak yang Dipilih
         </button>
-        <button class="swal2-confirm swal2-styled" style="background-color: #EF4444; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 15px;" onclick="Swal.close(); ${type === 'anggota' ? 'bulkDeleteMembers()' : 'bulkDeleteBooks()'}">
+        <button class="swal2-confirm swal2-styled" style="background-color: #EF4444; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 15px;" data-action="bulkDelete">
           <i class="fas fa-trash-alt"></i> Hapus yang Dipilih
         </button>
       </div>
@@ -1790,7 +1790,7 @@ function searchMember() {
           <strong>${member['KODE']}</strong> - ${member['NAMA']}
           <br><small>${member['TIPE']} | ${member['KETERANGAN']}</small>
         </div>
-        <button class="btn-success btn-sm" onclick="printMemberCard('${member['KODE']}')">
+        <button class="btn-success btn-sm" data-action="printMemberCard" data-id="${member['KODE']}">
           <i class="fas fa-print"></i> Cetak
         </button>
       </div>
@@ -2040,7 +2040,7 @@ function searchBook() {
           <strong>${book['KODE BUKU']}</strong> - ${book['JUDUL BUKU']}
           <br><small>${book['PENGARANG']} | ${book['KATEGORI']} | Rak ${book['KODE RAK']}</small>
         </div>
-        <button class="btn-success btn-sm" onclick="printBookLabel('${book['KODE BUKU']}')">
+        <button class="btn-success btn-sm" data-action="printBookLabel" data-id="${book['KODE BUKU']}">
           <i class="fas fa-print"></i> Cetak
         </button>
       </div>
@@ -2918,3 +2918,126 @@ function executeResetData() {
 function toggleMobileMenu() {
   document.getElementById('mainSidebar').classList.toggle('show');
 }
+// =============================================================================
+// DOM EVENT BINDINGS (REPLACES INLINE HTML ONCLICK/ONSUBMIT)
+// =============================================================================
+
+function initEventBindings() {
+  // Forms
+  const bindForm = (id, handler) => {
+    const form = document.getElementById(id);
+    if (form) form.addEventListener('submit', handler);
+  };
+  bindForm('loginForm', handleLogin);
+  bindForm('updateProfileForm', handleUpdateProfile);
+  bindForm('changePasswordForm', handleChangePassword);
+  bindForm('anggotaForm', saveAnggota);
+  bindForm('bukuForm', saveBuku);
+  bindForm('rombelForm', submitRombel);
+
+  // Inputs / Selects
+  const bindChange = (id, handler) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', handler);
+  };
+  bindChange('selectAllMembers', (e) => toggleSelectAllMembers(e.target.checked));
+  bindChange('selectAllBooks', (e) => toggleSelectAllBooks(e.target.checked));
+  bindChange('selectAllRombel', (e) => toggleSelectAllRombel(e.target.checked));
+  bindChange('filterStatus', filterTransaksi);
+  bindChange('filterBulanTransaksi', filterTransaksi);
+  bindChange('photoUpload', handlePhotoUpload);
+
+  // Global Event Delegation for data-action
+  document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    
+    const action = btn.getAttribute('data-action');
+    
+    switch (action) {
+      case 'togglePassword': togglePassword(); break;
+      case 'handleLogout': handleLogout(); break;
+      case 'toggleMobileMenu': toggleMobileMenu(); break;
+      case 'toggleScanner': toggleScanner(); break;
+      case 'prosesPinjam': prosesPinjam(); break;
+      case 'prosesKembali': prosesKembali(); break;
+      case 'resetScanner': resetScanner(); break;
+      case 'refreshStatistik': refreshStatistik(); break;
+      case 'loadTransaksi': loadTransaksi(); break;
+      case 'exportTransaksi': exportTransaksi(); break;
+      case 'openAddAnggotaModal': openAddAnggotaModal(); break;
+      case 'openRombelModal': openRombelModal(); break;
+      case 'confirmBulkPrintMembers': confirmBulkPrintMembers(); break;
+      case 'searchMember': searchMember(); break;
+      case 'openAddBukuModal': openAddBukuModal(); break;
+      case 'confirmBulkPrintBooks': confirmBulkPrintBooks(); break;
+      case 'searchBook': searchBook(); break;
+      case 'filterKunjungan': filterKunjungan(); break;
+      case 'resetKunjunganFilter': resetKunjunganFilter(); break;
+      case 'confirmReturn': confirmReturn(); break;
+      case 'handleResetData': handleResetData(); break;
+      case 'triggerPhotoUpload': document.getElementById('photoUpload').click(); break;
+      
+      // Dynamic Table Actions
+      case 'markAsPrinted': 
+        markAsPrinted(btn.getAttribute('data-type'), btn.getAttribute('data-id')); 
+        break;
+      case 'toggleRowCheckbox': 
+        toggleRowCheckbox(e, btn.closest('tr'), btn.getAttribute('data-checkbox')); 
+        break;
+      case 'updateMemberSelection': updateMemberSelection(); break;
+      case 'updateBookSelection': updateBookSelection(); break;
+      case 'editAnggota': editAnggota(btn.getAttribute('data-id')); break;
+      case 'editBuku': editBuku(btn.getAttribute('data-id')); break;
+      
+      // Pagination
+      case 'prevPageAnggota': window.currentPageAnggota--; filterAnggotaTable(); break;
+      case 'nextPageAnggota': window.currentPageAnggota++; filterAnggotaTable(); break;
+      case 'showAllAnggota': window.showAllAnggota = true; filterAnggotaTable(); break;
+      case 'hideAllAnggota': window.showAllAnggota = false; filterAnggotaTable(); break;
+      
+      case 'prevPageBooks': window.currentPageBooks--; filterBukuTable(); break;
+      case 'nextPageBooks': window.currentPageBooks++; filterBukuTable(); break;
+      case 'showAllBooks': window.showAllBooks = true; filterBukuTable(); break;
+      case 'hideAllBooks': window.showAllBooks = false; filterBukuTable(); break;
+      
+      case 'viewTransaction': viewTransaction(btn.getAttribute('data-id')); break;
+      case 'openReturnForOverdue': openReturnForOverdue(btn.getAttribute('data-id')); break;
+      case 'printMemberCard': printMemberCard(btn.getAttribute('data-id')); break;
+      case 'printBookLabel': printBookLabel(btn.getAttribute('data-id')); break;
+      
+      case 'selectivePrint': 
+        Swal.close(); 
+        const typeP = document.getElementById('bukuTable').closest('.tab-content').classList.contains('active') ? 'buku' : 'anggota';
+        if (typeP === 'anggota') selectivePrintMembers(); else selectivePrintBooks();
+        break;
+      case 'bulkDelete': 
+        Swal.close(); 
+        const typeD = document.getElementById('bukuTable').closest('.tab-content').classList.contains('active') ? 'buku' : 'anggota';
+        if (typeD === 'anggota') bulkDeleteMembers(); else bulkDeleteBooks();
+        break;
+
+      // Parametrized actions
+      case 'switchTab': 
+        switchTab(btn.getAttribute('data-tab')); 
+        break;
+      case 'closeModal': 
+        closeModal(btn.getAttribute('data-modal')); 
+        break;
+      case 'openBulkActions': 
+        openBulkActions(btn.getAttribute('data-type')); 
+        break;
+      case 'switchPrintMode': 
+        switchPrintMode(btn.getAttribute('data-mode')); 
+        break;
+      case 'switchToSelectiveMode': 
+        switchToSelectiveMode(btn.getAttribute('data-type')); 
+        break;
+    }
+  });
+}
+
+// Ensure bindings are initialized when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  initEventBindings();
+});

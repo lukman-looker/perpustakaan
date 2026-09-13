@@ -2509,3 +2509,24 @@ tr:hover {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+/* Utility Classes */
+.d-none { display: none !important; }
+.topbar-separator { opacity: 0.5; margin: 0 8px; font-weight: 400; }
+
+/* Table Columns Configuration */
+.col-checkbox { width: 3%; }
+.col-kode { width: 8%; }
+.col-nama { width: 37%; }
+.col-jk { width: 12%; white-space: nowrap; }
+.col-tipe { width: 7%; }
+.col-keterangan { width: 15%; }
+.col-print { width: 11%; white-space: nowrap; }
+.col-aksi { width: 7%; }
+
+.col-kode-buku { width: 11%; }
+.col-judul { width: 35%; }
+.col-pengarang { width: 13%; }
+.col-kategori { width: 10%; }
+.col-stok { width: 5%; }
+.col-rak { width: 5%; }
