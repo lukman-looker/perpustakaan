@@ -710,6 +710,38 @@ function displayAnggotaTable(members) {
   `}).join('');
 }
 
+function deleteAnggota(kode) {
+  showConfirm(`Yakin ingin menghapus anggota ${kode}? Data transaksi dan kunjungan tidak akan terhapus namun referensinya mungkin menjadi tidak valid.`, () => {
+    apiCall('deleteData', { type: 'anggota', kodeList: JSON.stringify([kode]) })
+      .then(res => {
+        showAlert(res.message, 'success');
+        loadAllMembers();
+      })
+      .catch(err => showAlert(`Gagal menghapus: ${err}`, 'error'));
+  });
+}
+
+function bulkDeleteMembers() {
+  const checkboxes = document.querySelectorAll('.member-checkbox:checked');
+  const kodeList = Array.from(checkboxes).map(cb => cb.value);
+  
+  if (kodeList.length === 0) {
+    showAlert('Pilih minimal 1 anggota untuk dihapus', 'warning');
+    return;
+  }
+  
+  showConfirm(`Yakin ingin menghapus ${kodeList.length} anggota terpilih?`, () => {
+    apiCall('deleteData', { type: 'anggota', kodeList: JSON.stringify(kodeList) })
+      .then(res => {
+        showAlert(res.message, 'success');
+        loadAllMembers();
+        selectedForPrint.members = [];
+        document.getElementById('selectAllMembers').checked = false;
+      })
+      .catch(err => showAlert(`Gagal menghapus: ${err}`, 'error'));
+  });
+}
+
 function filterAnggotaTable() {
   const searchText = document.getElementById('searchAnggotaInput').value.toLowerCase();
   const filtered = allMembers.filter(m => {
@@ -728,6 +760,7 @@ function openAddAnggotaModal() {
   document.getElementById('formJenisKelamin').value = '';
   document.getElementById('formTipeAnggota').value = '';
   document.getElementById('formKeteranganAnggota').value = '';
+  document.getElementById('btnHapusAnggotaModal').style.display = 'none';
   openModal('anggotaModal');
 }
 
@@ -740,6 +773,14 @@ function editAnggota(kode) {
     document.getElementById('formJenisKelamin').value = member['JENIS KELAMIN'] || '';
     document.getElementById('formTipeAnggota').value = member['TIPE'] || '';
     document.getElementById('formKeteranganAnggota').value = member['KETERANGAN'] || '';
+    
+    const btnHapus = document.getElementById('btnHapusAnggotaModal');
+    btnHapus.style.display = 'inline-block';
+    btnHapus.onclick = function() {
+      closeModal('anggotaModal');
+      deleteAnggota(kode);
+    };
+    
     openModal('anggotaModal');
   }
 }
@@ -870,6 +911,38 @@ function displayBukuTable(books) {
   `}).join('');
 }
 
+function deleteBuku(kode) {
+  showConfirm(`Yakin ingin menghapus buku ${kode}? Data transaksi tidak akan terhapus namun referensinya mungkin menjadi tidak valid.`, () => {
+    apiCall('deleteData', { type: 'buku', kodeList: JSON.stringify([kode]) })
+      .then(res => {
+        showAlert(res.message, 'success');
+        loadAllBooks();
+      })
+      .catch(err => showAlert(`Gagal menghapus: ${err}`, 'error'));
+  });
+}
+
+function bulkDeleteBooks() {
+  const checkboxes = document.querySelectorAll('.book-checkbox:checked');
+  const kodeList = Array.from(checkboxes).map(cb => cb.value);
+  
+  if (kodeList.length === 0) {
+    showAlert('Pilih minimal 1 buku untuk dihapus', 'warning');
+    return;
+  }
+  
+  showConfirm(`Yakin ingin menghapus ${kodeList.length} buku terpilih?`, () => {
+    apiCall('deleteData', { type: 'buku', kodeList: JSON.stringify(kodeList) })
+      .then(res => {
+        showAlert(res.message, 'success');
+        loadAllBooks();
+        selectedForPrint.books = [];
+        document.getElementById('selectAllBooks').checked = false;
+      })
+      .catch(err => showAlert(`Gagal menghapus: ${err}`, 'error'));
+  });
+}
+
 function filterBukuTable() {
   const searchText = document.getElementById('searchBukuInput').value.toLowerCase();
   const filtered = allBooks.filter(b => {
@@ -891,6 +964,7 @@ function openAddBukuModal() {
   document.getElementById('formTahunTerbit').value = '';
   document.getElementById('formKategori').value = '';
   document.getElementById('formStok').value = '0';
+  document.getElementById('btnHapusBukuModal').style.display = 'none';
   openModal('bukuModal');
 }
 
@@ -906,6 +980,14 @@ function editBuku(kode) {
     document.getElementById('formTahunTerbit').value = book['TAHUN'] || '';
     document.getElementById('formKategori').value = book['KATEGORI'] || '';
     document.getElementById('formStok').value = book['STOK TERSEDIA'] || '0';
+    
+    const btnHapus = document.getElementById('btnHapusBukuModal');
+    btnHapus.style.display = 'inline-block';
+    btnHapus.onclick = function() {
+      closeModal('bukuModal');
+      deleteBuku(kode);
+    };
+    
     openModal('bukuModal');
   }
 }
@@ -1266,6 +1348,32 @@ function updateBookSelection() {
   if (selectedForPrint.books.length > 0) {
     showAlert(`${selectedForPrint.books.length} buku terpilih`, 'info', true, 1500);
   }
+}
+
+function openBulkActions(type) {
+  const selectedList = type === 'anggota' ? selectedForPrint.members : selectedForPrint.books;
+  if (selectedList.length === 0) {
+    showAlert('Pilih minimal 1 data terlebih dahulu', 'warning');
+    return;
+  }
+  
+  Swal.fire({
+    title: 'Aksi Data Terpilih',
+    html: `
+      <p style="margin-bottom: 20px;">Terdapat <strong>${selectedList.length}</strong> data yang dipilih. Apa yang ingin Anda lakukan?</p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="swal2-confirm swal2-styled" style="background-color: #F59E0B; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;" onclick="Swal.close(); ${type === 'anggota' ? 'selectivePrintMembers()' : 'selectivePrintBooks()'}">
+          <i class="fas fa-print"></i> Cetak yang Dipilih
+        </button>
+        <button class="swal2-confirm swal2-styled" style="background-color: #EF4444; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;" onclick="Swal.close(); ${type === 'anggota' ? 'bulkDeleteMembers()' : 'bulkDeleteBooks()'}">
+          <i class="fas fa-trash-alt"></i> Hapus yang Dipilih
+        </button>
+      </div>
+    `,
+    showConfirmButton: false,
+    showCancelButton: true,
+    cancelButtonText: 'Tutup'
+  });
 }
 
 function selectivePrintMembers() {

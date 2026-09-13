@@ -430,8 +430,8 @@
               <button class="btn-success" onclick="openRombelModal()">
                 <i class="fas fa-layer-group"></i> Naik Kelas Serentak
               </button>
-              <button class="btn-warning" onclick="selectivePrintMembers()">
-                <i class="fas fa-print"></i> Cetak yang Dipilih
+              <button class="btn-info" onclick="openBulkActions('anggota')">
+                <i class="fas fa-tasks"></i> Aksi Pilihan
               </button>
             </div>
           </div>
@@ -476,8 +476,8 @@
               <button class="btn-primary" onclick="openAddBukuModal()">
                 <i class="fas fa-plus-circle"></i> Tambah Buku
               </button>
-              <button class="btn-warning" onclick="selectivePrintBooks()">
-                <i class="fas fa-print"></i> Cetak yang Dipilih
+              <button class="btn-info" onclick="openBulkActions('buku')">
+                <i class="fas fa-tasks"></i> Aksi Pilihan
               </button>
             </div>
           </div>
@@ -832,6 +832,9 @@
           <button type="button" class="btn-secondary" onclick="closeModal('anggotaModal')">
             <i class="fas fa-times"></i> Batal
           </button>
+          <button type="button" id="btnHapusAnggotaModal" class="btn-danger" style="display: none; margin-left: auto;">
+            <i class="fas fa-trash-alt"></i> Hapus
+          </button>
         </div>
       </form>
     </div>
@@ -885,6 +888,9 @@
           </button>
           <button type="button" class="btn-secondary" onclick="closeModal('bukuModal')">
             <i class="fas fa-times"></i> Batal
+          </button>
+          <button type="button" id="btnHapusBukuModal" class="btn-danger" style="display: none; margin-left: auto;">
+            <i class="fas fa-trash-alt"></i> Hapus
           </button>
         </div>
       </form>

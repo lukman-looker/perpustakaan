@@ -58,6 +58,8 @@ function doPost(e) {
         return updateBuku(params);
       case "updateStatusCetak":
         return updateStatusCetak(params);
+      case "deleteData":
+        return deleteData(params);
       
       // Transaction operations
       case "pinjamBuku":
@@ -888,8 +890,42 @@ function updateStatusCetak(params) {
   return response(true, { message: `Berhasil mengupdate status cetak untuk ${updatedCount} data` });
 }
 
+function deleteData(params) {
+  const type = params.type; // 'anggota' or 'buku'
+  let kodeList = [];
+  if (params.kodeList) {
+    try { kodeList = JSON.parse(params.kodeList); } catch(e) { }
+  } else if (params.kode) {
+    kodeList = [params.kode];
+  }
+  
+  if (kodeList.length === 0) {
+    return response(false, null, "Tidak ada kode yang diberikan untuk dihapus");
+  }
+  
+  const sheetName = type === 'anggota' ? SHEET_ANGGOTA : SHEET_BANK_BUKU;
+  const sheet = getSheet(sheetName);
+  const lastRow = sheet.getLastRow();
+  
+  if (lastRow <= 1) return response(false, null, "Tidak ada data di sheet");
+  
+  // Need to process from bottom to top to avoid shifting row indices during deletion
+  const data = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  let deletedCount = 0;
+  
+  for (let i = data.length - 1; i >= 0; i--) {
+    const kode = String(data[i][0]).trim();
+    if (kodeList.includes(kode)) {
+      sheet.deleteRow(i + 2);
+      deletedCount++;
+    }
+  }
+  
+  return response(true, { message: `Berhasil menghapus ${deletedCount} data ${type}` });
+}
+
 // =============================================================================
-// RESET DATA FUNCTION
+// RESET & RE-SORT FUNCTION
 // =============================================================================
 
 /**
