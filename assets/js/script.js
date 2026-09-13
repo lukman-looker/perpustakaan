@@ -1364,10 +1364,10 @@ function exportTransaksi() {
   html += '</table>';
 
   const printWindow = window.open('', 'Print');
+  html += '<script>let pr=false; const doPr=()=>{if(pr)return;pr=true;setTimeout(()=>{window.print();window.close();},500);}; window.onload=doPr; setTimeout(doPr, 8000);</script>';
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => { printWindow.print(); }, 1000);
 }
 
 // =============================================================================
@@ -1670,10 +1670,10 @@ function printSelectedMembers(members) {
   html += '</body></html>';
 
   const printWindow = window.open('', 'Print Selected Members');
+  html += '<script>let pr=false; const doPr=()=>{if(pr)return;pr=true;setTimeout(()=>{window.print();window.close();},500);}; window.onload=doPr; setTimeout(doPr, 8000);</script>';
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => { printWindow.print(); }, 1000);
 
   showAlert('Data siap dicetak', 'success');
 }
@@ -1742,10 +1742,10 @@ function printSelectedBooks(books) {
   html += '</body></html>';
 
   const printWindow = window.open('', 'Print Selected Books');
+  html += '<script>let pr=false; const doPr=()=>{if(pr)return;pr=true;setTimeout(()=>{window.print();window.close();},500);}; window.onload=doPr; setTimeout(doPr, 8000);</script>';
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => { printWindow.print(); }, 1000);
 
   showAlert('Data siap dicetak', 'success');
 }
@@ -1857,11 +1857,11 @@ function printMemberCard(kodeAnggota) {
       '</div></body></html>';
 
     const printWindow = window.open('', 'Print Member Card');
+    html += '<script>let pr=false; const doPr=()=>{if(pr)return;pr=true;setTimeout(()=>{window.print();window.close();},500);}; window.onload=doPr; setTimeout(doPr, 8000);</script>';
     printWindow.document.write(html);
     printWindow.document.close();
     printWindow.focus();
     setTimeout(() => {
-      printWindow.print();
       apiCall('updateStatusCetak', { type: 'anggota', kodeList: JSON.stringify([kodeAnggota]) })
         .then(() => loadAllMembers())
         .catch(err => console.error('Gagal update status cetak:', err));
@@ -1992,10 +1992,10 @@ function bulkPrintMembers() {
   html += '</body></html>';
 
   const printWindow = window.open('', 'Bulk Print Members');
+  html += '<script>let pr=false; const doPr=()=>{if(pr)return;pr=true;setTimeout(()=>{window.print();window.close();},1000);}; window.onload=doPr; setTimeout(doPr, 12000);</script>';
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => { printWindow.print(); }, 1500); // bulk might need more time
 }
 
 // ===== BOOK PRINTING =====
@@ -2079,11 +2079,11 @@ function printBookLabel(kodeBuku) {
       '</div></body></html>';
 
     const printWindow = window.open('', 'Print Book Label');
+    html += '<script>let pr=false; const doPr=()=>{if(pr)return;pr=true;setTimeout(()=>{window.print();window.close();},500);}; window.onload=doPr; setTimeout(doPr, 8000);</script>';
     printWindow.document.write(html);
     printWindow.document.close();
     printWindow.focus();
     setTimeout(() => {
-      printWindow.print();
       apiCall('updateStatusCetak', { type: 'buku', kodeList: JSON.stringify([kodeBuku]) })
         .then(() => loadAllBooks())
         .catch(err => console.error('Gagal update status cetak:', err));
@@ -2166,10 +2166,10 @@ function bulkPrintBooks() {
   html += '</body></html>';
 
   const printWindow = window.open('', 'Bulk Print Books');
+  html += '<script>let pr=false; const doPr=()=>{if(pr)return;pr=true;setTimeout(()=>{window.print();window.close();},1000);}; window.onload=doPr; setTimeout(doPr, 12000);</script>';
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => { printWindow.print(); }, 1500); // bulk might need more time
 }
 
 // =============================================================================
