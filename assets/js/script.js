@@ -2913,11 +2913,6 @@ function executeResetData() {
       });
     });
 }
-
-// NEW SIDEBAR MOBILE MENU
-function toggleMobileMenu() {
-  document.getElementById('mainSidebar').classList.toggle('show');
-}
 // =============================================================================
 // DOM EVENT BINDINGS (REPLACES INLINE HTML ONCLICK/ONSUBMIT)
 // =============================================================================
@@ -2936,9 +2931,9 @@ function initEventBindings() {
   bindForm('rombelForm', submitRombel);
 
   // Inputs / Selects
-  const bindChange = (id, handler) => {
+  const bindChange = (id, handler, event = 'change') => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('change', handler);
+    if (el) el.addEventListener(event, handler);
   };
   bindChange('selectAllMembers', (e) => toggleSelectAllMembers(e.target.checked));
   bindChange('selectAllBooks', (e) => toggleSelectAllBooks(e.target.checked));
@@ -2946,6 +2941,9 @@ function initEventBindings() {
   bindChange('filterStatus', filterTransaksi);
   bindChange('filterBulanTransaksi', filterTransaksi);
   bindChange('photoUpload', handlePhotoUpload);
+  bindChange('searchMemberInput', filterAnggotaTable, 'keyup');
+  bindChange('searchBookInput', filterBukuTable, 'keyup');
+  bindChange('searchRombelInput', filterRombelTable, 'keyup');
 
   // Global Event Delegation for data-action
   document.body.addEventListener('click', (e) => {
@@ -2957,7 +2955,6 @@ function initEventBindings() {
     switch (action) {
       case 'togglePassword': togglePassword(); break;
       case 'handleLogout': handleLogout(); break;
-      case 'toggleMobileMenu': toggleMobileMenu(); break;
       case 'toggleScanner': toggleScanner(); break;
       case 'prosesPinjam': prosesPinjam(); break;
       case 'prosesKembali': prosesKembali(); break;

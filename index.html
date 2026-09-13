@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Dashboard Perpustakaan - Sistem Manajemen</title>
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
@@ -111,7 +111,7 @@
         </nav>
         <div class="sidebar-bottom">
           <div class="sidebar-clock" id="liveClock">
-            <div class="analog-clock sidebar-analog-clock desktop-only">
+            <div class="analog-clock sidebar-analog-clock">
               <div class="clock-face">
                 <div class="number number1"><span>1</span></div>
                 <div class="number number2"><span>2</span></div>
@@ -131,21 +131,16 @@
                 <div class="clock-center"></div>
               </div>
             </div>
-            <div class="sidebar-date-container desktop-only">
+            <div class="sidebar-date-container">
               <div class="sidebar-day-text" id="headerDayText">Memuat...</div>
               <div class="sidebar-date-text" id="headerDateText">Memuat waktu...</div>
             </div>
-            <span class="header-digital-text mobile-only" id="headerDigitalText"><i class="far fa-clock"></i> Memuat
-              waktu...</span>
           </div>
         </div>
       </aside>
       <div class="main-wrapper">
         <header class="topbar">
           <div class="topbar-left">
-            <button class="btn-menu-mobile" data-action="toggleMobileMenu" title="Menu">
-              <i class="fas fa-bars"></i>
-            </button>
             <h1 class="topbar-page-title" id="topbarPageTitle">Dashboard <span class="topbar-separator">&gt;</span> <span id="topbarSubtitle">Scanner &amp;
                 Sirkulasi</span></h1>
           </div>
@@ -394,7 +389,7 @@
                 <div class="filter-bar-modern mt-10 mb-15">
                   <div class="filter-item flex-grow-1">
                     <input type="text" id="searchAnggotaInput" class="form-control"
-                      placeholder="Cari Kode, Nama, Tipe, Keterangan..." onkeyup="filterAnggotaTable()">
+                      placeholder="Cari Kode, Nama, Tipe, Keterangan..." >
                   </div>
                 </div>
                 <div class="table-container mt-20">
@@ -435,7 +430,7 @@
                 <div class="filter-bar-modern mt-10 mb-15">
                   <div class="filter-item flex-grow-1">
                     <input type="text" id="searchBukuInput" class="form-control"
-                      placeholder="Cari Kode, Judul, Pengarang, Kategori..." onkeyup="filterBukuTable()">
+                      placeholder="Cari Kode, Judul, Pengarang, Kategori..." >
                   </div>
                 </div>
                 <div class="table-container mt-20">
@@ -818,8 +813,7 @@
         Cari siswa, pilih, lalu tentukan kelas baru. </div>
       <div class="filter-bar-modern mb-15">
         <div class="filter-item flex-grow-1">
-          <input type="text" id="searchRombelInput" class="form-control" placeholder="Cari nama atau kelas lama..."
-            onkeyup="filterRombelTable()">
+          <input type="text" id="searchRombelInput" class="form-control" placeholder="Cari nama atau kelas lama...">
         </div>
       </div>
       <div class="table-container scroll-y-250 mb-15">

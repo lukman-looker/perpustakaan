@@ -386,11 +386,9 @@ body {
   margin: 0 auto;
 }
 
-.desktop-only {
-  display: flex;
-}
 
-.header-date-container.desktop-only {
+
+.header-date-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -410,9 +408,7 @@ body {
   line-height: 1.2;
 }
 
-.mobile-only {
-  display: none;
-}
+
 
 .admin-profile-card {
   display: flex;
@@ -555,11 +551,7 @@ header .status {
   margin-bottom: 0;
 }
 
-@media (max-width: 1024px) {
-  .scanner-process-row {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 #reader {
   width: 100%;
@@ -759,11 +751,7 @@ header .status {
   margin-top: 20px;
 }
 
-@media (max-width: 768px) {
-  .scanner-info {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 .card {
   background: white;
@@ -1275,11 +1263,7 @@ tr:hover {
   margin-bottom: 20px;
 }
 
-@media (max-width: 900px) {
-  .settings-layout {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 .modal {
   display: none;
@@ -1379,11 +1363,7 @@ tr:hover {
   gap: 20px;
 }
 
-@media (max-width: 768px) {
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 .text-center {
   text-align: center;
@@ -2148,15 +2128,7 @@ tr:hover {
   gap: 15px;
 }
 
-.btn-menu-mobile {
-  display: none;
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  color: white;
-  cursor: pointer;
-  padding: 5px;
-}
+
 
 .topbar-page-title {
   font-size: 16px;
@@ -2311,180 +2283,11 @@ tr:hover {
   padding: 0 20px;
 }
 
-@media (max-width: 1024px) {
-  .app-layout {
-    flex-direction: column;
-  }
 
-  .sidebar {
-    position: fixed;
-    top: 60px;
-    left: -100%;
-    bottom: 0;
-    z-index: 999;
-    width: 240px;
-    transition: left 0.3s ease;
-  }
 
-  .sidebar.show {
-    left: 0;
-  }
 
-  .btn-menu-mobile {
-    display: block;
-  }
 
-  .sidebar-brand {
-    display: none;
-  }
 
-  .content-area {
-    padding: 15px 0;
-  }
-
-  .container-fluid {
-    padding: 0 12px;
-  }
-}
-
-@media (max-width: 768px) {
-  .card {
-    padding: 15px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-  }
-
-  .card h2 {
-    font-size: 16px;
-    margin-bottom: 15px;
-  }
-
-  .stat-widget-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .login-box {
-    flex-direction: column;
-    max-width: 400px;
-    margin: 20px;
-    border-radius: 20px;
-  }
-
-  .login-brand-group {
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 20px;
-  }
-
-  .login-brand-text {
-    text-align: center;
-  }
-
-  .login-logo {
-    width: 60px;
-  }
-
-  .login-brand {
-    font-size: 18px;
-  }
-
-  .login-subbrand {
-    font-size: 11px;
-  }
-
-  .analog-clock {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 10px;
-  }
-
-  .clock-face .number {
-    font-size: 11px;
-    padding-top: 1px;
-  }
-
-  .hour-hand {
-    height: 25px;
-  }
-
-  .min-hand {
-    height: 35px;
-  }
-
-  .second-hand {
-    height: 40px;
-  }
-
-  .login-date {
-    font-size: 12px;
-    margin-bottom: 10px;
-  }
-
-  .login-left {
-    padding: 25px 20px 15px;
-  }
-
-  .login-right {
-    padding: 25px 20px;
-  }
-
-  .login-welcome {
-    font-size: 20px;
-  }
-
-  .login-instruction {
-    font-size: 13px;
-    margin-bottom: 20px;
-  }
-
-  .login-actions {
-    justify-content: center;
-    margin-top: 20px;
-  }
-
-  .btn-login-submit {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .stat-widget-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .filter-actions {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .filter-actions button {
-    flex: 1;
-    justify-content: center;
-  }
-
-  .stats-pastel-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .print-actions-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .table-header-luxury {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .table-actions {
-    width: 100%;
-  }
-
-  .table-actions button {
-    flex: 1;
-    justify-content: center;
-  }
-}
 
 /* Seamless Marquee */
 .seamless-marquee-container {
@@ -2511,7 +2314,7 @@ tr:hover {
 }
 
 /* Utility Classes */
-.d-none { display: none !important; }
+.d-none { display: none; }
 .topbar-separator { opacity: 0.5; margin: 0 8px; font-weight: 400; }
 
 /* Table Columns Configuration */
