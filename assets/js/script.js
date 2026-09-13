@@ -1274,12 +1274,22 @@ function selectivePrintMembers() {
     return;
   }
   
-  showConfirm(`Cetak ${selectedForPrint.members.length} kartu anggota yang terpilih?`, () => {
-    const selected = selectedForPrint.members.map(kode => 
-      allMembers.find(m => m['KODE'] === kode)
-    ).filter(m => m);
-    
+  const selected = selectedForPrint.members.map(kode => 
+    allMembers.find(m => m['KODE'] === kode)
+  ).filter(m => m);
+  
+  const alreadyPrinted = selected.filter(m => m['STATUS CETAK'] === 'DICETAK').length;
+  
+  let msg = `Cetak ${selected.length} kartu anggota yang terpilih?`;
+  if (alreadyPrinted > 0) {
+    msg = `Dari ${selected.length} kartu, ${alreadyPrinted} di antaranya sudah pernah dicetak. Yakin ingin mencetak ulang?`;
+  }
+  
+  showConfirm(msg, () => {
     printSelectedMembers(selected);
+    apiCall('updateStatusCetak', { type: 'anggota', kodeList: JSON.stringify(selectedForPrint.members) })
+      .then(() => loadAllMembers())
+      .catch(err => console.error('Gagal update status cetak:', err));
   });
 }
 
@@ -1289,12 +1299,22 @@ function selectivePrintBooks() {
     return;
   }
   
-  showConfirm(`Cetak ${selectedForPrint.books.length} label buku yang terpilih?`, () => {
-    const selected = selectedForPrint.books.map(kode => 
-      allBooks.find(b => b['KODE BUKU'] === kode)
-    ).filter(b => b);
-    
+  const selected = selectedForPrint.books.map(kode => 
+    allBooks.find(b => b['KODE BUKU'] === kode)
+  ).filter(b => b);
+  
+  const alreadyPrinted = selected.filter(b => b['STATUS CETAK'] === 'DICETAK').length;
+  
+  let msg = `Cetak ${selected.length} label buku yang terpilih?`;
+  if (alreadyPrinted > 0) {
+    msg = `Dari ${selected.length} label, ${alreadyPrinted} di antaranya sudah pernah dicetak. Yakin ingin mencetak ulang?`;
+  }
+  
+  showConfirm(msg, () => {
     printSelectedBooks(selected);
+    apiCall('updateStatusCetak', { type: 'buku', kodeList: JSON.stringify(selectedForPrint.books) })
+      .then(() => loadAllBooks())
+      .catch(err => console.error('Gagal update status cetak:', err));
   });
 }
 
@@ -1506,8 +1526,9 @@ function printMemberCard(kodeAnggota) {
     return;
   }
 
-  const memberTransactions = allTransactions.filter(t => t['Kode Anggota'] == kodeAnggota);
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(kodeAnggota)}`;
+  const doPrint = () => {
+    const memberTransactions = allTransactions.filter(t => t['Kode Anggota'] == kodeAnggota);
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(kodeAnggota)}`;
   const logoUrl = new URL('assets/img/logo.webp', window.location.href).href;
 
   let html = '<html><head><meta charset="UTF-8"><style>' +
@@ -1572,18 +1593,52 @@ function printMemberCard(kodeAnggota) {
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => { printWindow.print(); }, 1000);
+  setTimeout(() => { 
+    printWindow.print(); 
+    apiCall('updateStatusCetak', { type: 'anggota', kodeList: JSON.stringify([kodeAnggota]) })
+      .then(() => loadAllMembers())
+      .catch(err => console.error('Gagal update status cetak:', err));
+  }, 1000);
+  }
+
+  if (member['STATUS CETAK'] === 'DICETAK') {
+    showConfirm(`Kartu anggota ${kodeAnggota} sudah pernah dicetak. Yakin ingin mencetak ulang?`, () => {
+      doPrint();
+    });
+  } else {
+    doPrint();
+  }
 }
 
 function confirmBulkPrintMembers() {
-  showConfirm(`Yakin ingin mencetak ${allMembers.length} kartu anggota?`, () => {
+  const alreadyPrinted = allMembers.filter(m => m['STATUS CETAK'] === 'DICETAK').length;
+  let msg = `Yakin ingin mencetak ${allMembers.length} kartu anggota?`;
+  if (alreadyPrinted > 0) {
+    msg = `Dari ${allMembers.length} kartu, ${alreadyPrinted} di antaranya sudah pernah dicetak. Yakin ingin mencetak ulang semuanya?`;
+  }
+  
+  showConfirm(msg, () => {
     bulkPrintMembers();
+    const kodeList = allMembers.map(m => m['KODE']);
+    apiCall('updateStatusCetak', { type: 'anggota', kodeList: JSON.stringify(kodeList) })
+      .then(() => loadAllMembers())
+      .catch(err => console.error('Gagal update status cetak:', err));
   });
 }
 
 function confirmBulkPrintBooks() {
-  showConfirm(`Yakin ingin mencetak ${allBooks.length} label buku?`, () => {
+  const alreadyPrinted = allBooks.filter(b => b['STATUS CETAK'] === 'DICETAK').length;
+  let msg = `Yakin ingin mencetak ${allBooks.length} label buku?`;
+  if (alreadyPrinted > 0) {
+    msg = `Dari ${allBooks.length} label, ${alreadyPrinted} di antaranya sudah pernah dicetak. Yakin ingin mencetak ulang semuanya?`;
+  }
+  
+  showConfirm(msg, () => {
     bulkPrintBooks();
+    const kodeList = allBooks.map(b => b['KODE BUKU']);
+    apiCall('updateStatusCetak', { type: 'buku', kodeList: JSON.stringify(kodeList) })
+      .then(() => loadAllBooks())
+      .catch(err => console.error('Gagal update status cetak:', err));
   });
 }
 
@@ -1721,7 +1776,8 @@ function printBookLabel(kodeBuku) {
     return;
   }
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(kodeBuku)}`;
+  const doPrint = () => {
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(kodeBuku)}`;
 
   let html = '<html><head><meta charset="UTF-8"><style>' +
     '* {box-sizing: border-box; margin: 0; padding: 0;}' +
@@ -1759,7 +1815,21 @@ function printBookLabel(kodeBuku) {
   printWindow.document.write(html);
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => { printWindow.print(); }, 1000);
+  setTimeout(() => { 
+    printWindow.print(); 
+    apiCall('updateStatusCetak', { type: 'buku', kodeList: JSON.stringify([kodeBuku]) })
+      .then(() => loadAllBooks())
+      .catch(err => console.error('Gagal update status cetak:', err));
+  }, 1000);
+  }
+
+  if (book['STATUS CETAK'] === 'DICETAK') {
+    showConfirm(`Label buku ${kodeBuku} sudah pernah dicetak. Yakin ingin mencetak ulang?`, () => {
+      doPrint();
+    });
+  } else {
+    doPrint();
+  }
 }
 
 function bulkPrintBooks() {
@@ -2400,4 +2470,143 @@ function submitRombel(event) {
       showAlert(`Gagal: ${err}`, 'error');
     });
   });
+}
+
+// =============================================================================
+// RESET DATA FUNCTION
+// =============================================================================
+
+function handleResetData() {
+  // First confirmation with SweetAlert2
+  Swal.fire({
+    title: '<i class="fas fa-exclamation-triangle" style="color: #EF4444;"></i> Reset & Rapikan Data',
+    html: `
+      <div style="text-align: left; font-size: 0.92rem; line-height: 1.8; color: #475569;">
+        <p style="margin-bottom: 12px;">Proses ini akan:</p>
+        <div style="background: #F8FAFC; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <i class="fas fa-users" style="color: #667eea; width: 16px;"></i>
+            <span>Sortir & reset kode <strong>semua anggota</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <i class="fas fa-book" style="color: #8B5CF6; width: 16px;"></i>
+            <span>Sortir & reset kode <strong>semua buku</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <i class="fas fa-exchange-alt" style="color: #10B981; width: 16px;"></i>
+            <span>Update referensi di <strong>transaksi & kunjungan</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-print" style="color: #F59E0B; width: 16px;"></i>
+            <span>Reset <strong>status cetak</strong> semua data</span>
+          </div>
+        </div>
+        <p style="color: #EF4444; font-weight: 600; margin: 0;">⚠️ Tindakan ini tidak dapat dibatalkan!</p>
+      </div>
+    `,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '<i class="fas fa-check"></i> Ya, Lanjutkan Reset',
+    cancelButtonText: '<i class="fas fa-times"></i> Batal',
+    confirmButtonColor: '#EF4444',
+    cancelButtonColor: '#6b7280',
+    focusCancel: true,
+    customClass: {
+      popup: 'swal-wide'
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Second confirmation: type to confirm
+      Swal.fire({
+        title: 'Konfirmasi Akhir',
+        html: `
+          <p style="font-size: 0.92rem; color: #64748b; margin-bottom: 15px;">
+            Ketik <strong style="color: #EF4444;">RESET</strong> untuk mengkonfirmasi:
+          </p>
+          <input type="text" id="resetConfirmInput" class="swal2-input" placeholder="Ketik RESET di sini" style="text-transform: uppercase; font-weight: 600; letter-spacing: 2px;">
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-sync-alt"></i> Proses Reset Sekarang',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#EF4444',
+        cancelButtonColor: '#6b7280',
+        focusCancel: true,
+        preConfirm: () => {
+          const inputVal = document.getElementById('resetConfirmInput').value.trim().toUpperCase();
+          if (inputVal !== 'RESET') {
+            Swal.showValidationMessage('Ketik RESET untuk melanjutkan');
+            return false;
+          }
+          return true;
+        }
+      }).then((result2) => {
+        if (result2.isConfirmed) {
+          executeResetData();
+        }
+      });
+    }
+  });
+}
+
+function executeResetData() {
+  showLoading('Sedang mereset & merapikan data...\nProses ini mungkin membutuhkan beberapa saat.');
+  
+  const btnReset = document.getElementById('btnResetData');
+  if (btnReset) btnReset.disabled = true;
+  
+  apiCall('resetData', {})
+    .then(data => {
+      hideLoading();
+      if (btnReset) btnReset.disabled = false;
+      
+      // Show success with details
+      Swal.fire({
+        title: '<i class="fas fa-check-circle" style="color: #10B981;"></i> Reset Berhasil!',
+        html: `
+          <div style="text-align: left; font-size: 0.92rem; line-height: 1.8; color: #475569;">
+            <div style="background: linear-gradient(135deg, #ECFDF5, #D1FAE5); padding: 16px; border-radius: 10px; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <i class="fas fa-users" style="color: #059669;"></i>
+                <strong>${data.anggotaCount || 0} anggota</strong> berhasil diurutkan
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <i class="fas fa-book" style="color: #059669;"></i>
+                <strong>${data.bukuCount || 0} buku</strong> berhasil diurutkan
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <i class="fas fa-code" style="color: #059669;"></i>
+                <strong>${data.anggotaChanges || 0} kode anggota</strong> diperbarui
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-code" style="color: #059669;"></i>
+                <strong>${data.bukuChanges || 0} kode buku</strong> diperbarui
+              </div>
+            </div>
+            <p style="margin: 0; color: #64748b; font-size: 0.85rem;">
+              <i class="fas fa-info-circle"></i> 
+              Semua referensi di transaksi dan kunjungan telah diperbarui secara otomatis.
+            </p>
+          </div>
+        `,
+        icon: 'success',
+        confirmButtonText: 'Selesai',
+        confirmButtonColor: '#667eea'
+      });
+      
+      // Reload all data to reflect changes
+      loadAllData();
+    })
+    .catch(err => {
+      hideLoading();
+      if (btnReset) btnReset.disabled = false;
+      
+      Swal.fire({
+        title: 'Gagal Reset Data',
+        text: err,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#667eea'
+      });
+    });
 }

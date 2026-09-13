@@ -44,6 +44,8 @@ function doPost(e) {
         return updateAnggota(params);
       case "bulkUpdateKeterangan":
         return bulkUpdateKeterangan(params);
+      case "resetData":
+        return resetData();
       
       // Book operations
       case "getBuku":
@@ -858,9 +860,12 @@ function bulkUpdateKeterangan(params) {
 
 function updateStatusCetak(params) {
   const type = params.type; // 'anggota' or 'buku'
-  const kodeListStr = params.kodeList || '[]';
   let kodeList = [];
-  try { kodeList = JSON.parse(kodeListStr); } catch(e) { kodeList = [params.kode]; }
+  if (params.kodeList) {
+    try { kodeList = JSON.parse(params.kodeList); } catch(e) { }
+  } else if (params.kode) {
+    kodeList = [params.kode];
+  }
   
   const sheetName = type === 'anggota' ? SHEET_ANGGOTA : SHEET_BANK_BUKU;
   const colIndex = type === 'anggota' ? 6 : 10;
@@ -881,4 +886,253 @@ function updateStatusCetak(params) {
   });
   
   return response(true, { message: `Berhasil mengupdate status cetak untuk ${updatedCount} data` });
+}
+
+// =============================================================================
+// RESET DATA FUNCTION
+// =============================================================================
+
+/**
+ * Reset & reorganize data in ANGGOTA and BANK BUKU sheets:
+ * 1. Sort ANGGOTA by TIPE (Siswa > Gukar > Other) then NAMA alphabetically
+ * 2. Reassign KODE anggota sequentially (S-001, S-002, G-001, O-001, etc.)
+ * 3. Sort BANK BUKU by KATEGORI then KODE RAK then JUDUL BUKU alphabetically
+ * 4. Reassign KODE BUKU sequentially (DA-1A-001, DA-1A-002, etc.)
+ * 5. Update all references in TRANSAKSI and KUNJUNGAN sheets
+ * 6. Clear STATUS CETAK for both sheets
+ */
+function resetData() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // =========================================================================
+    // STEP 1: RESET ANGGOTA
+    // =========================================================================
+    const sheetAnggota = ss.getSheetByName(SHEET_ANGGOTA);
+    const lastRowAnggota = sheetAnggota.getLastRow();
+    
+    if (lastRowAnggota <= 1) {
+      return response(false, null, "Tidak ada data anggota untuk direset");
+    }
+    
+    // Read all anggota data
+    const anggotaHeaders = sheetAnggota.getRange(1, 1, 1, sheetAnggota.getLastColumn()).getValues()[0];
+    const anggotaData = sheetAnggota.getRange(2, 1, lastRowAnggota - 1, sheetAnggota.getLastColumn()).getValues();
+    
+    // Build anggota objects with old kode
+    const anggotaList = anggotaData
+      .filter(row => String(row[0]).trim() !== '') // skip empty rows
+      .map(row => {
+        const obj = {};
+        anggotaHeaders.forEach((h, i) => obj[h] = row[i]);
+        obj._oldKode = String(row[0]).trim();
+        return obj;
+      });
+    
+    // Define tipe sort order
+    const tipeOrder = { 'Siswa': 1, 'Gukar': 2, 'Other': 3 };
+    
+    // Sort: by TIPE order, then KETERANGAN (rombel/kelas), then NAMA alphabetically
+    // This ensures students are grouped by class (Kelas 1 A, Kelas 1 B, etc.)
+    anggotaList.sort((a, b) => {
+      const tipeA = tipeOrder[a['TIPE']] || 99;
+      const tipeB = tipeOrder[b['TIPE']] || 99;
+      if (tipeA !== tipeB) return tipeA - tipeB;
+      
+      // Sort by KETERANGAN (rombel) first within same tipe
+      const ketA = String(a['KETERANGAN'] || '').toLowerCase();
+      const ketB = String(b['KETERANGAN'] || '').toLowerCase();
+      if (ketA !== ketB) return ketA.localeCompare(ketB);
+      
+      // Then by NAMA alphabetically within same keterangan
+      return String(a['NAMA'] || '').localeCompare(String(b['NAMA'] || ''));
+    });
+    
+    // Reassign codes sequentially per tipe
+    const tipeCounters = {};
+    const anggotaCodeMap = {}; // oldCode -> newCode mapping
+    
+    anggotaList.forEach(a => {
+      const tipe = String(a['TIPE'] || '').trim();
+      const initial = tipe ? tipe.charAt(0).toUpperCase() : 'A';
+      
+      if (!tipeCounters[initial]) tipeCounters[initial] = 0;
+      tipeCounters[initial]++;
+      
+      const newKode = initial + '-' + String(tipeCounters[initial]).padStart(3, '0');
+      anggotaCodeMap[a._oldKode] = newKode;
+      a['KODE'] = newKode;
+      a['STATUS CETAK'] = ''; // Clear print status
+    });
+    
+    // Clear old anggota data and write sorted data
+    if (lastRowAnggota > 1) {
+      sheetAnggota.getRange(2, 1, lastRowAnggota - 1, sheetAnggota.getLastColumn()).clearContent();
+    }
+    
+    // Write sorted anggota data
+    anggotaList.forEach((a, index) => {
+      const rowNum = index + 2;
+      anggotaHeaders.forEach((header, colIndex) => {
+        sheetAnggota.getRange(rowNum, colIndex + 1).setValue(a[header] !== undefined ? a[header] : '');
+      });
+    });
+    
+    // =========================================================================
+    // STEP 2: RESET BANK BUKU
+    // =========================================================================
+    const sheetBuku = ss.getSheetByName(SHEET_BANK_BUKU);
+    const lastRowBuku = sheetBuku.getLastRow();
+    
+    if (lastRowBuku <= 1) {
+      // Still return success if anggota was reset but no books
+      return response(true, {
+        message: "Reset data anggota berhasil. Tidak ada data buku untuk direset.",
+        anggotaCount: anggotaList.length,
+        bukuCount: 0
+      });
+    }
+    
+    const bukuHeaders = sheetBuku.getRange(1, 1, 1, sheetBuku.getLastColumn()).getValues()[0];
+    const bukuData = sheetBuku.getRange(2, 1, lastRowBuku - 1, sheetBuku.getLastColumn()).getValues();
+    
+    // Build buku objects with old kode
+    const bukuList = bukuData
+      .filter(row => String(row[0]).trim() !== '') // skip empty rows
+      .map(row => {
+        const obj = {};
+        bukuHeaders.forEach((h, i) => obj[h] = row[i]);
+        obj._oldKode = String(row[0]).trim();
+        return obj;
+      });
+    
+    // Sort: by KATEGORI, then KODE RAK, then JUDUL BUKU alphabetically
+    bukuList.sort((a, b) => {
+      const katA = String(a['KATEGORI'] || '').toLowerCase();
+      const katB = String(b['KATEGORI'] || '').toLowerCase();
+      if (katA !== katB) return katA.localeCompare(katB);
+      
+      const rakA = String(a['KODE RAK'] || '').toLowerCase();
+      const rakB = String(b['KODE RAK'] || '').toLowerCase();
+      if (rakA !== rakB) return rakA.localeCompare(rakB);
+      
+      return String(a['JUDUL BUKU'] || '').localeCompare(String(b['JUDUL BUKU'] || ''));
+    });
+    
+    // Reassign book codes sequentially per category+rak combination
+    const bukuCodeMap = {}; // oldCode -> newCode mapping
+    const bukuCounters = {}; // key: "categoryAbbr-kodeRak" -> counter
+    
+    bukuList.forEach(b => {
+      const kategori = String(b['KATEGORI'] || '').trim();
+      const kodeRak = String(b['KODE RAK'] || '').trim();
+      
+      // Derive category abbreviation (same logic as addBuku)
+      let categoryAbbr = '';
+      if (kategori) {
+        const words = kategori.trim().split(' ');
+        if (words.length === 1) {
+          categoryAbbr = kategori.substring(0, 2).toUpperCase();
+        } else {
+          categoryAbbr = (words[0][0] + words[1][0]).toUpperCase();
+        }
+      }
+      if (!categoryAbbr) categoryAbbr = 'BK';
+      
+      // Remove hyphens from kode rak for the code prefix
+      const kodeRakClean = kodeRak.replace(/-/g, '');
+      const counterKey = categoryAbbr + '-' + kodeRakClean;
+      
+      if (!bukuCounters[counterKey]) bukuCounters[counterKey] = 0;
+      bukuCounters[counterKey]++;
+      
+      const newKode = counterKey + '-' + String(bukuCounters[counterKey]).padStart(3, '0');
+      bukuCodeMap[b._oldKode] = newKode;
+      b['KODE BUKU'] = newKode;
+      b['STATUS CETAK'] = ''; // Clear print status
+    });
+    
+    // Clear old buku data and write sorted data
+    if (lastRowBuku > 1) {
+      sheetBuku.getRange(2, 1, lastRowBuku - 1, sheetBuku.getLastColumn()).clearContent();
+    }
+    
+    // Write sorted buku data
+    bukuList.forEach((b, index) => {
+      const rowNum = index + 2;
+      bukuHeaders.forEach((header, colIndex) => {
+        sheetBuku.getRange(rowNum, colIndex + 1).setValue(b[header] !== undefined ? b[header] : '');
+      });
+    });
+    
+    // =========================================================================
+    // STEP 3: UPDATE REFERENCES IN TRANSAKSI
+    // =========================================================================
+    const sheetTransaksi = ss.getSheetByName(SHEET_TRANSAKSI);
+    const lastRowTransaksi = sheetTransaksi.getLastRow();
+    
+    if (lastRowTransaksi > 1) {
+      const transaksiData = sheetTransaksi.getRange(2, 1, lastRowTransaksi - 1, sheetTransaksi.getLastColumn()).getValues();
+      
+      transaksiData.forEach((row, index) => {
+        const rowNum = index + 2;
+        const oldKodeAnggota = String(row[2]).trim(); // Column 3: Kode Anggota
+        const oldKodeBuku = String(row[3]).trim();    // Column 4: Kode Buku
+        
+        // Update anggota code reference
+        if (anggotaCodeMap[oldKodeAnggota]) {
+          sheetTransaksi.getRange(rowNum, 3).setValue(anggotaCodeMap[oldKodeAnggota]);
+        }
+        
+        // Update buku code reference
+        if (bukuCodeMap[oldKodeBuku]) {
+          sheetTransaksi.getRange(rowNum, 4).setValue(bukuCodeMap[oldKodeBuku]);
+        }
+      });
+    }
+    
+    // =========================================================================
+    // STEP 4: UPDATE REFERENCES IN KUNJUNGAN
+    // =========================================================================
+    const sheetKunjungan = ss.getSheetByName(SHEET_KUNJUNGAN);
+    const lastRowKunjungan = sheetKunjungan.getLastRow();
+    
+    if (lastRowKunjungan > 1) {
+      const kunjunganData = sheetKunjungan.getRange(2, 1, lastRowKunjungan - 1, sheetKunjungan.getLastColumn()).getValues();
+      
+      kunjunganData.forEach((row, index) => {
+        const rowNum = index + 2;
+        const oldKodeAnggota = String(row[1]).trim(); // Column 2: Kode Anggota
+        
+        // Update anggota code reference
+        if (anggotaCodeMap[oldKodeAnggota]) {
+          sheetKunjungan.getRange(rowNum, 2).setValue(anggotaCodeMap[oldKodeAnggota]);
+        }
+      });
+    }
+    
+    // Build summary of code changes for logging
+    const anggotaChanges = Object.entries(anggotaCodeMap)
+      .filter(([oldK, newK]) => oldK !== newK)
+      .map(([oldK, newK]) => oldK + ' → ' + newK);
+    
+    const bukuChanges = Object.entries(bukuCodeMap)
+      .filter(([oldK, newK]) => oldK !== newK)
+      .map(([oldK, newK]) => oldK + ' → ' + newK);
+    
+    Logger.log("Reset Data - Anggota changes: " + JSON.stringify(anggotaChanges));
+    Logger.log("Reset Data - Buku changes: " + JSON.stringify(bukuChanges));
+    
+    return response(true, {
+      message: `Reset data berhasil! ${anggotaList.length} anggota dan ${bukuList.length} buku telah diurutkan dan dikode ulang.`,
+      anggotaCount: anggotaList.length,
+      bukuCount: bukuList.length,
+      anggotaChanges: anggotaChanges.length,
+      bukuChanges: bukuChanges.length
+    });
+    
+  } catch (error) {
+    Logger.log("Reset Data Error: " + error.toString());
+    return response(false, null, "Gagal reset data: " + error.toString());
+  }
 }

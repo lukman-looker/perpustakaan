@@ -753,6 +753,32 @@
                 </button>
               </form>
             </div>
+
+            <div class="card settings-card">
+              <h3 class="settings-title"><i class="fas fa-sync-alt" style="color: #EF4444;"></i> Reset & Rapikan Data</h3>
+              <div style="margin-bottom: 18px; font-size: 0.92rem; color: #64748b; line-height: 1.7;">
+                <p style="margin-bottom: 10px;">Fitur ini akan melakukan:</p>
+                <ul style="padding-left: 20px; margin: 0;">
+                  <li><strong>Sortir data anggota</strong> berdasarkan Tipe (Siswa → Gukar → Other), lalu nama A-Z</li>
+                  <li><strong>Reset kode anggota</strong> menjadi urutan baru (S-001, S-002, G-001, dst.)</li>
+                  <li><strong>Sortir data buku</strong> berdasarkan Kategori, Kode Rak, lalu Judul A-Z</li>
+                  <li><strong>Reset kode buku</strong> menjadi urutan baru (DA-1A-001, DA-1A-002, dst.)</li>
+                  <li><strong>Update referensi</strong> di semua transaksi dan kunjungan secara otomatis</li>
+                  <li><strong>Reset status cetak</strong> semua kartu anggota dan label buku</li>
+                </ul>
+              </div>
+              <div style="padding: 14px; background: linear-gradient(135deg, #FEF3C7, #FDE68A); border-radius: 10px; margin-bottom: 18px; border-left: 4px solid #F59E0B;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <i class="fas fa-exclamation-triangle" style="color: #D97706; font-size: 1.2rem;"></i>
+                  <span style="font-size: 0.88rem; color: #92400E; font-weight: 500;">
+                    Perhatian: Proses ini akan mengubah semua kode anggota dan buku. Pastikan tidak ada proses lain yang sedang berjalan.
+                  </span>
+                </div>
+              </div>
+              <button type="button" class="btn-danger" onclick="handleResetData()" id="btnResetData" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 600; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-sync-alt"></i> Reset & Rapikan Data
+              </button>
+            </div>
           </div>
         </div>
       </div>
