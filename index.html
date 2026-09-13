@@ -179,111 +179,117 @@
       <!-- TAB: SCANNER -->
       <div id="scanner" class="tab-content active">
         <div class="scanner-process-row">
-          <div class="scanner-section">
-            <div class="table-header-luxury">
-              <h2><i class="fas fa-qrcode"></i> QR Scanner</h2>
+          
+          <!-- LEFT COLUMN (Scanner & Transaksi) -->
+          <div class="card" style="margin-bottom: 0;">
+            <div class="table-header-luxury" style="margin-bottom: 15px;">
+              <h2><i class="fas fa-qrcode"></i> Scanner & Transaksi</h2>
             </div>
-            <div class="scanner-frame">
-              <div class="corner corner-top-left"></div>
-              <div class="corner corner-top-right"></div>
-              <div class="corner corner-bottom-left"></div>
-              <div class="corner corner-bottom-right"></div>
-
-              <div class="scan-area">
-                <div class="scan-line" id="scanLine"></div>
+            
+            <div class="scanner-section" style="box-shadow: none; padding: 0; background: transparent; margin-bottom: 20px;">
+              <div class="scanner-frame" style="margin-top: 0;">
+                <div class="corner corner-top-left"></div>
+                <div class="corner corner-top-right"></div>
+                <div class="corner corner-bottom-left"></div>
+                <div class="corner corner-bottom-right"></div>
+  
+                <div class="scan-area">
+                  <div class="scan-line" id="scanLine"></div>
+                </div>
+                <canvas id="qrCanvas" width="240" height="240"></canvas>
+  
+                <div id="reader" class="scanner-active"></div>
+                <div class="scanner-status" id="scannerStatus">
+                  <span class="status-light" id="statusLight"></span>
+                  <span class="status-text" id="statusText">Siap Scanning</span>
+                </div>
               </div>
-              <canvas id="qrCanvas" width="240" height="240"></canvas>
-
-              <div id="reader" class="scanner-active"></div>
-              <div class="scanner-status" id="scannerStatus">
-                <span class="status-light" id="statusLight"></span>
-                <span class="status-text" id="statusText">Siap Scanning</span>
+  
+              <div class="button-group" style="justify-content: center; margin-top: 15px;">
+                <button class="btn-danger btn-sm" onclick="toggleScanner()" style="border-radius: 20px; padding: 6px 15px;">
+                  <i class="fas fa-stop-circle"></i> Hentikan Scanner
+                </button>
               </div>
             </div>
-
-            <div class="button-group">
-              <button class="btn-danger btn-sm" onclick="toggleScanner()">
-                <i class="fas fa-stop-circle"></i> Hentikan Scanner
-              </button>
-            </div>
-          </div>
-
-          <!-- TRANSACTION FORM -->
-          <div class="card">
-            <div class="table-header-luxury">
-              <h2><i class="fas fa-exchange-alt"></i> Proses Transaksi</h2>
-            </div>
-
-            <div class="form-group">
-              <label class="detail-label" for="lamaPinjam"><i class="fas fa-calendar"></i> Lama Pinjam (hari)</label>
-              <input type="number" id="lamaPinjam" class="form-control" value="7" min="1" max="30" style="width: 100%;">
-            </div>
-
-            <div class="button-group">
-              <button class="btn-success" onclick="prosesPinjam()">
-                <i class="fas fa-download"></i> PINJAM BUKU
-              </button>
-              <button class="btn-primary" onclick="prosesKembali()">
-                <i class="fas fa-upload"></i> KEMBALI BUKU
-              </button>
-              <button class="btn-secondary" onclick="resetScanner()">
-                <i class="fas fa-redo"></i> Reset
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="scanner-info">
-          <!-- MEMBER INFO -->
-          <div class="card">
-            <div class="table-header-luxury">
-              <h2><i class="fas fa-user"></i> Data Anggota</h2>
-            </div>
-            <div id="memberInfo">
-              <div class="detail-item">
-                <span class="detail-label">Kode</span>
-                <span class="detail-value">-</span>
+  
+            <!-- TRANSACTION FORM -->
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <div class="form-group" style="margin-top: 0; display: flex; align-items: center; gap: 10px;">
+                <label class="detail-label" for="lamaPinjam" style="margin: 0; white-space: nowrap;"><i class="fas fa-calendar"></i> Lama Pinjam (hari):</label>
+                <input type="number" id="lamaPinjam" class="form-control" value="7" min="1" max="30" style="width: 80px; padding: 6px; height: auto;">
               </div>
-              <div class="detail-item">
-                <span class="detail-label">Nama</span>
-                <span class="detail-value">-</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Jenis Kelamin</span>
-                <span class="detail-value">-</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Tipe</span>
-                <span class="detail-value">-</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Keterangan</span>
-                <span class="detail-value">-</span>
+  
+              <div class="button-group" style="margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn-success" onclick="prosesPinjam()" style="flex: 1; padding: 10px 5px; font-size: 13px;">
+                  <i class="fas fa-download"></i> PINJAM
+                </button>
+                <button class="btn-primary" onclick="prosesKembali()" style="flex: 1; padding: 10px 5px; font-size: 13px;">
+                  <i class="fas fa-upload"></i> KEMBALI
+                </button>
+                <button class="btn-secondary" onclick="resetScanner()" style="padding: 10px 15px; font-size: 13px;">
+                  <i class="fas fa-redo"></i> Reset
+                </button>
               </div>
             </div>
           </div>
-
-          <!-- BOOK INFO -->
-          <div class="card">
-            <div class="table-header-luxury">
-              <h2><i class="fas fa-book-open"></i> Data Buku</h2>
+          
+          <!-- RIGHT COLUMN (Detail Data) -->
+          <div class="card" style="margin-bottom: 0;">
+            <div class="table-header-luxury" style="margin-bottom: 15px;">
+              <h2><i class="fas fa-info-circle"></i> Detail Data</h2>
             </div>
-            <div id="bookInfo">
-              <div class="detail-item">
-                <span class="detail-label">Kode Buku</span>
-                <span class="detail-value">-</span>
+            
+            <!-- MEMBER INFO -->
+            <div style="margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <h3 style="font-size: 0.95rem; color: #3B82F6; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700; text-transform: uppercase;">
+                <i class="fas fa-user"></i> Data Anggota
+              </h3>
+              <div id="memberInfo">
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">
+                  <span class="detail-label" style="margin: 0;">Kode</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">
+                  <span class="detail-label" style="margin: 0;">Nama</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">
+                  <span class="detail-label" style="margin: 0;">Jenis Kelamin</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">
+                  <span class="detail-label" style="margin: 0;">Tipe</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 0;">
+                  <span class="detail-label" style="margin: 0;">Keterangan</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
               </div>
-              <div class="detail-item">
-                <span class="detail-label">Judul Buku</span>
-                <span class="detail-value">-</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Pengarang</span>
-                <span class="detail-value">-</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Stok Tersedia</span>
-                <span class="detail-value">-</span>
+            </div>
+  
+            <!-- BOOK INFO -->
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <h3 style="font-size: 0.95rem; color: #3B82F6; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700; text-transform: uppercase;">
+                <i class="fas fa-book-open"></i> Data Buku
+              </h3>
+              <div id="bookInfo">
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">
+                  <span class="detail-label" style="margin: 0;">Kode Buku</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">
+                  <span class="detail-label" style="margin: 0;">Judul Buku</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px;">
+                  <span class="detail-label" style="margin: 0;">Pengarang</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
+                <div class="detail-item" style="display: flex; justify-content: space-between; margin-bottom: 0;">
+                  <span class="detail-label" style="margin: 0;">Stok Tersedia</span>
+                  <span class="detail-value" style="font-weight: 600; text-align: right;">-</span>
+                </div>
               </div>
             </div>
           </div>
