@@ -36,7 +36,7 @@ function handleLogin(event) {
   event.preventDefault();
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
-  
+
   apiCall('login', { username, password })
     .then(data => {
       currentSession = data.sessionToken;
@@ -55,10 +55,10 @@ function handleLogin(event) {
 function updateGreeting() {
   const greetingEl = document.getElementById('dynamicGreeting');
   if (!greetingEl) return;
-  
+
   const hour = new Date().getHours();
   let greeting = "Selamat malam,";
-  
+
   if (hour >= 4 && hour < 10) {
     greeting = "Selamat pagi,";
   } else if (hour >= 10 && hour < 15) {
@@ -66,17 +66,17 @@ function updateGreeting() {
   } else if (hour >= 15 && hour < 18) {
     greeting = "Selamat sore,";
   }
-  
+
   greetingEl.textContent = greeting;
 }
 
 function startClock() {
   const clockEl = document.getElementById('liveClock');
   if (!clockEl) return;
-  
+
   const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
   const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-  
+
   function tick() {
     const now = new Date();
     const dayName = days[now.getDay()];
@@ -108,10 +108,10 @@ function startClock() {
       const secondsDegrees = ((seconds / 60) * 360);
       headerSecHand.style.transform = `rotate(${secondsDegrees}deg)`;
       const mins = now.getMinutes();
-      const minsDegrees = ((mins / 60) * 360) + ((seconds/60)*6);
+      const minsDegrees = ((mins / 60) * 360) + ((seconds / 60) * 6);
       headerMinHand.style.transform = `rotate(${minsDegrees}deg)`;
       const hours = now.getHours();
-      const hoursDegrees = ((hours / 12) * 360) + ((mins/60)*30);
+      const hoursDegrees = ((hours / 12) * 360) + ((mins / 60) * 30);
       headerHourHand.style.transform = `rotate(${hoursDegrees}deg)`;
     }
   }
@@ -125,7 +125,7 @@ function startLoginClock() {
   const minHand = document.getElementById('loginMinHand');
   const secHand = document.getElementById('loginSecHand');
   const dateText = document.getElementById('loginDateText');
-  
+
   if (!hourHand || !minHand || !secHand || !dateText) return;
 
   const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -133,19 +133,19 @@ function startLoginClock() {
 
   function updateClock() {
     const now = new Date();
-    
+
     const seconds = now.getSeconds();
     const secondsDegrees = ((seconds / 60) * 360);
     secHand.style.transform = `rotate(${secondsDegrees}deg)`;
 
     const mins = now.getMinutes();
-    const minsDegrees = ((mins / 60) * 360) + ((seconds/60)*6);
+    const minsDegrees = ((mins / 60) * 360) + ((seconds / 60) * 6);
     minHand.style.transform = `rotate(${minsDegrees}deg)`;
 
     const hours = now.getHours();
-    const hoursDegrees = ((hours / 12) * 360) + ((mins/60)*30);
+    const hoursDegrees = ((hours / 12) * 360) + ((mins / 60) * 30);
     hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
-    
+
     const dayName = days[now.getDay()];
     const date = now.getDate();
     const monthName = months[now.getMonth()];
@@ -174,16 +174,16 @@ function togglePassword() {
 function showDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboardScreen').classList.remove('dashboard-hidden');
-  
+
   updateGreeting();
-  
+
   currentSession = localStorage.getItem('sessionToken');
   currentAdminId = localStorage.getItem('adminId');
-  
+
   // Display admin info in header
   const namaLengkap = localStorage.getItem('adminNama');
   document.getElementById('adminNameHeader').textContent = namaLengkap;
-  
+
   // Initialize dashboard
   initializeScanner();
   loadAllData();
@@ -205,7 +205,7 @@ function loadAdminProfile() {
       document.getElementById('adminUsername').textContent = data.username;
       document.getElementById('adminNama').textContent = data.namaLengkap;
       document.getElementById('adminEmail').textContent = data.email;
-      
+
       if (data.fotoUrl && data.fotoUrl.trim() !== '') {
         const photoPreview = document.getElementById('adminPhotoPreview');
         const headerPhoto = document.getElementById('headerAdminPhoto');
@@ -215,9 +215,9 @@ function loadAdminProfile() {
           `https://drive.google.com/thumbnail?id=${extractFileId(data.fotoUrl)}&sz=w200`,
           `https://drive.google.com/uc?export=view&id=${extractFileId(data.fotoUrl)}`
         ].filter(url => url && url.trim() !== '');
-        
+
         let urlIndex = 0;
-        
+
         function tryLoadProfilePhoto() {
           if (urlIndex >= urls.length) {
             document.getElementById('adminPhotoPreview').style.display = 'none';
@@ -225,15 +225,15 @@ function loadAdminProfile() {
             headerPhoto.style.display = 'none';
             return;
           }
-          
+
           const currentUrl = urls[urlIndex];
-          
+
           photoPreview.src = currentUrl;
-          photoPreview.onerror = function() {
+          photoPreview.onerror = function () {
             urlIndex++;
             tryLoadProfilePhoto();
           };
-          photoPreview.onload = function() {
+          photoPreview.onload = function () {
             document.getElementById('adminPhotoPreview').style.display = 'block';
             document.getElementById('adminPhotoPlaceholder').style.display = 'none';
             // Also set header photo
@@ -241,10 +241,10 @@ function loadAdminProfile() {
             headerPhoto.style.display = 'block';
           };
         }
-        
+
         tryLoadProfilePhoto();
       }
-      
+
       document.getElementById('updateNamaLengkap').value = data.namaLengkap;
       document.getElementById('updateEmail').value = data.email;
     })
@@ -270,17 +270,17 @@ function handleChangePassword(event) {
   const oldPassword = document.getElementById('oldPassword').value;
   const newPassword = document.getElementById('newPassword').value;
   const confirmPassword = document.getElementById('confirmPassword').value;
-  
+
   if (newPassword !== confirmPassword) {
     showAlert('Password baru tidak cocok', 'error');
     return;
   }
-  
+
   if (newPassword.length < 6) {
     showAlert('Password minimal 6 karakter', 'warning');
     return;
   }
-  
+
   showLoading('Mengubah password...');
   apiCall('updateAdminPassword', {
     adminId: currentAdminId,
@@ -302,7 +302,7 @@ function handleUpdateProfile(event) {
   event.preventDefault();
   const namaLengkap = document.getElementById('updateNamaLengkap').value;
   const email = document.getElementById('updateEmail').value;
-  
+
   showLoading('Menyimpan perubahan...');
   apiCall('updateAdminProfile', {
     adminId: currentAdminId,
@@ -325,19 +325,19 @@ function handleUpdateProfile(event) {
 function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  
+
   // Validate file type
   if (!file.type.startsWith('image/')) {
     showAlert('File harus berupa gambar', 'error');
     return;
   }
-  
+
   // Validate file size (max 5MB)
   if (file.size > 5 * 1024 * 1024) {
     showAlert('Ukuran file terlalu besar (max 5MB)', 'error');
     return;
   }
-  
+
   showLoading('Mengupload foto...');
   uploadPhotoToDrive(file);
 }
@@ -345,9 +345,9 @@ function handlePhotoUpload(event) {
 function uploadPhotoToDrive(file) {
   // Convert file to base64
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = function (e) {
     const base64 = e.target.result.split(',')[1];
-    
+
     apiCall('uploadAdminPhoto', {
       adminId: currentAdminId,
       fileName: `admin_${currentAdminId}_${Date.now()}.jpg`,
@@ -356,37 +356,37 @@ function uploadPhotoToDrive(file) {
     })
       .then(data => {
         hideLoading();
-        
+
         if (!data.fotoUrl && !data.publicUrl) {
           showAlert('Foto URL tidak valid', 'error');
           return;
         }
-        
+
         // Try multiple URL formats for maximum compatibility
         const urls = [
           data.fotoUrl,                    // Download URL (primary)
           data.publicUrl,                  // Thumbnail URL (fallback)
           `https://drive.google.com/uc?export=view&id=${data.fileId}` // Alternative
         ].filter(url => url); // Remove any undefined/null values
-        
+
         const photoPreview = document.getElementById('adminPhotoPreview');
         let urlIndex = 0;
-        
+
         function tryLoadPhoto() {
           if (urlIndex >= urls.length) {
             showAlert('Foto diupload ke Drive tapi tidak bisa ditampilkan. Cek di folder: My Drive > Perpustakaan > admin', 'warning');
             document.getElementById('adminPhotoPreview').style.display = 'none';
             return;
           }
-          
+
           const currentUrl = urls[urlIndex];
-          
+
           photoPreview.src = currentUrl;
-          photoPreview.onerror = function() {
+          photoPreview.onerror = function () {
             urlIndex++;
             tryLoadPhoto();
           };
-          photoPreview.onload = function() {
+          photoPreview.onload = function () {
             showAlert('Foto berhasil diupload', 'success');
             document.getElementById('adminPhotoPlaceholder').style.display = 'none';
             document.getElementById('adminPhotoPreview').style.display = 'block';
@@ -396,7 +396,7 @@ function uploadPhotoToDrive(file) {
             headerPhoto.style.display = 'block';
           };
         }
-        
+
         photoPreview.style.display = 'block';
         tryLoadPhoto();
         document.getElementById('photoUpload').value = '';
@@ -410,10 +410,10 @@ function uploadPhotoToDrive(file) {
 }
 
 // =============================================================================
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', function () {
   startClock();
   startLoginClock();
-  
+
   // Check if user is already logged in
   const session = localStorage.getItem('sessionToken');
   if (session) {
@@ -466,13 +466,13 @@ function showAlert(message, type = 'info', autoClose = true, timer = 2000) {
       toast.addEventListener('mouseleave', Swal.resumeTimer);
     }
   };
-  
+
   if (autoClose) {
     config.timer = timer;
   } else {
     config.showConfirmButton = true;
   }
-  
+
   Swal.fire(config);
 }
 
@@ -501,6 +501,7 @@ function showConfirm(message, onConfirm, onCancel = null) {
 // Initialization moved to handleLogin() and showDashboard()
 
 function initializeScanner() {
+  if (scanner) return;
   try {
     scanner = new Html5Qrcode("reader");
     scanner.start(
@@ -521,7 +522,8 @@ function initializeScanner() {
   }
 }
 
-const scanBeep = new Audio('assets/audio/scanner-beep.mp3');
+const scanSound = new Audio('assets/audio/scanner-correct.mp3');
+const scanWrongSound = new Audio('assets/audio/scanner-wrong.mp3');
 
 // --- TEXT-TO-SPEECH ---
 function bunyikanTeks(teks) {
@@ -546,33 +548,63 @@ function bunyikanTeks(teks) {
 }
 
 if (window.speechSynthesis) {
-  window.speechSynthesis.onvoiceschanged = () => {};
+  window.speechSynthesis.onvoiceschanged = () => { };
 }
 // ----------------------
 
+let sedangMemproses = false; // ✅ Tambah variabel pelindung di luar fungsi (bisa taruh di dekat let allMembers = [];)
+let lastScannedCode = null;
+let lastScanTimer = null;
+
 function processQRCode(kode) {
-  // Putar suara beep
-  scanBeep.currentTime = 0;
-  scanBeep.play().catch(e => console.log('Autoplay audio diblokir browser:', e));
+  if (sedangMemproses) return; // ✅ Blokir kalau masih berjalan
+
+  // ✅ Blokir kode yang sama jika di-scan ulang dalam waktu 4 detik
+  if (kode === lastScannedCode) return;
+
+  sedangMemproses = true;
+  lastScannedCode = kode;
+
+  // ✅ Reset lastScannedCode setelah 4 detik (agar bisa di-scan lagi jika perlu)
+  if (lastScanTimer) clearTimeout(lastScanTimer);
+  lastScanTimer = setTimeout(() => { lastScannedCode = null; }, 4000);
+
+  const member = allMembers.find(m => m['KODE'] === kode);
+  const book = allBooks.find(b => b['KODE BUKU'] === kode);
+
+  if (member || book) {
+    // Putar suara benar
+    scanSound.pause();
+    scanSound.currentTime = 0;
+    scanSound.volume = 0.1; // ✅ Diturunkan agar TTS terdengar lebih jelas
+    scanSound.play().catch(e => console.log('Autoplay audio diblokir browser:', e));
+  } else {
+    // Putar suara salah
+    scanWrongSound.pause();
+    scanWrongSound.currentTime = 0;
+    scanWrongSound.volume = 0.1; // ✅ Diturunkan agar TTS terdengar lebih jelas
+    scanWrongSound.play().catch(e => console.log('Autoplay audio diblokir browser:', e));
+  }
 
   // Check if code exists in members first
-  const member = allMembers.find(m => m['KODE'] === kode);
   if (member) {
-    bunyikanTeks(`Berhasil scan Data Anggota atas nama ${member['NAMA']}`);
+    setTimeout(() => { bunyikanTeks(`Berhasil scan Data Anggota, atas nama ${member['NAMA']}`); }, 300);
     fetchMemberData(kode);
+    setTimeout(() => { sedangMemproses = false; }, 800); // ✅ Buka kunci sebentar setelah selesai
     return;
   }
-  
+
   // Check if code exists in books
-  const book = allBooks.find(b => b['KODE BUKU'] === kode);
   if (book) {
-    bunyikanTeks(`Berhasil scan Data Buku dengan judul ${book['JUDUL BUKU']}`);
+    setTimeout(() => { bunyikanTeks(`Berhasil scan Data Buku, dengan judul ${book['JUDUL BUKU']}`); }, 300);
     fetchBookData(kode);
+    setTimeout(() => { sedangMemproses = false; }, 800); // ✅ Buka kunci
     return;
   }
-  
+
   // Code not found in either list
   showAlert(`Kode tidak ditemukan: ${kode}`, 'error');
+  setTimeout(() => { sedangMemproses = false; }, 800); // ✅ Buka kunci
 }
 
 // =============================================================================
@@ -583,7 +615,7 @@ function apiCall(action, params) {
   return new Promise((resolve, reject) => {
     const payload = new FormData();
     payload.append('action', action);
-    
+
     Object.keys(params).forEach(key => {
       payload.append(key, params[key]);
     });
@@ -635,7 +667,7 @@ function fetchMemberData(kode) {
 
 function displayMemberInfo(member) {
   const memberInfo = document.getElementById('memberInfo');
-  
+
   if (!member) {
     memberInfo.innerHTML = `
       <div class="detail-item">
@@ -681,34 +713,34 @@ function loadAllMembers() {
 
 function displayAnggotaTable(members) {
   const tbody = document.getElementById('anggotaTable');
-  
+
   if (!members || members.length === 0) {
     tbody.innerHTML = '<tr><td colspan="8" class="text-center">Tidak ada data anggota</td></tr>';
     return;
   }
-  
+
   const total = members.length;
   const itemsPerPage = 15;
-  
+
   if (typeof window.currentPageAnggota === 'undefined') window.currentPageAnggota = 1;
   const totalPages = Math.ceil(total / itemsPerPage);
-  
+
   if (window.currentPageAnggota > totalPages && totalPages > 0) window.currentPageAnggota = totalPages;
   if (window.currentPageAnggota < 1) window.currentPageAnggota = 1;
-  
+
   const startIndex = (window.currentPageAnggota - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  
+
   let displayedMembers = members;
   if (!window.showAllAnggota && total > itemsPerPage) {
     displayedMembers = members.slice(startIndex, endIndex);
   }
 
   tbody.innerHTML = displayedMembers.map(m => {
-    let statusCetak = m['STATUS CETAK'] === 'DICETAK' 
-      ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>` 
+    let statusCetak = m['STATUS CETAK'] === 'DICETAK'
+      ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>`
       : `<button class="btn-sm btn-secondary" onclick="markAsPrinted('anggota', '${m['KODE']}')"><i class="fas fa-print"></i> Tandai</button>`;
-    
+
     return `
     <tr onclick="toggleRowCheckbox(event, this, 'member-checkbox')" style="cursor: pointer;" class="clickable-row">
       <td><input type="checkbox" class="member-checkbox" value="${m['KODE']}" onchange="updateMemberSelection()"></td>
@@ -725,12 +757,12 @@ function displayAnggotaTable(members) {
       </td>
     </tr>
   `}).join('');
-  
+
   if (total > itemsPerPage) {
     if (!window.showAllAnggota) {
       const prevDisabled = window.currentPageAnggota === 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '';
       const nextDisabled = window.currentPageAnggota === totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '';
-      
+
       tbody.innerHTML += `
         <tr>
           <td colspan="8" style="padding: 12px 15px; background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
@@ -772,7 +804,7 @@ function toggleRowCheckbox(event, rowElement, checkboxClass) {
   if (tagName === 'button' || tagName === 'input' || tagName === 'a' || event.target.closest('button')) {
     return;
   }
-  
+
   const checkbox = rowElement.querySelector('.' + checkboxClass);
   if (checkbox) {
     checkbox.checked = !checkbox.checked;
@@ -795,12 +827,12 @@ function deleteAnggota(kode) {
 function bulkDeleteMembers() {
   const checkboxes = document.querySelectorAll('.member-checkbox:checked');
   const kodeList = Array.from(checkboxes).map(cb => cb.value);
-  
+
   if (kodeList.length === 0) {
     showAlert('Pilih minimal 1 anggota untuk dihapus', 'warning');
     return;
   }
-  
+
   showConfirm(`Yakin ingin menghapus ${kodeList.length} anggota terpilih?`, () => {
     apiCall('deleteData', { type: 'anggota', kodeList: JSON.stringify(kodeList) })
       .then(res => {
@@ -817,9 +849,9 @@ function filterAnggotaTable() {
   const searchText = document.getElementById('searchAnggotaInput').value.toLowerCase();
   const filtered = allMembers.filter(m => {
     return (m['KODE'] && m['KODE'].toLowerCase().includes(searchText)) ||
-           (m['NAMA'] && m['NAMA'].toLowerCase().includes(searchText)) ||
-           (m['TIPE'] && m['TIPE'].toLowerCase().includes(searchText)) ||
-           (m['KETERANGAN'] && m['KETERANGAN'].toLowerCase().includes(searchText));
+      (m['NAMA'] && m['NAMA'].toLowerCase().includes(searchText)) ||
+      (m['TIPE'] && m['TIPE'].toLowerCase().includes(searchText)) ||
+      (m['KETERANGAN'] && m['KETERANGAN'].toLowerCase().includes(searchText));
   });
   displayAnggotaTable(filtered);
 }
@@ -844,29 +876,29 @@ function editAnggota(kode) {
     document.getElementById('formJenisKelamin').value = member['JENIS KELAMIN'] || '';
     document.getElementById('formTipeAnggota').value = member['TIPE'] || '';
     document.getElementById('formKeteranganAnggota').value = member['KETERANGAN'] || '';
-    
+
     const btnHapus = document.getElementById('btnHapusAnggotaModal');
     btnHapus.style.display = 'inline-block';
-    btnHapus.onclick = function() {
+    btnHapus.onclick = function () {
       closeModal('anggotaModal');
       deleteAnggota(kode);
     };
-    
+
     openModal('anggotaModal');
   }
 }
 
 function saveAnggota(event) {
   event.preventDefault();
-  
+
   const kode = document.getElementById('formKodeAnggota').value.trim();
   const isNew = !allMembers.find(m => m['KODE'].trim() == kode);
-  
+
   const action = isNew ? 'addAnggota' : 'updateAnggota';
   const message = isNew ? 'Menambah anggota...' : 'Mengupdate anggota...';
-  
+
   showLoading(message);
-  
+
   apiCall(action, {
     kode: kode,
     nama: document.getElementById('formNamaAnggota').value.trim(),
@@ -906,7 +938,7 @@ function fetchBookData(kode) {
 
 function displayBookInfo(book) {
   const bookInfo = document.getElementById('bookInfo');
-  
+
   if (!book) {
     bookInfo.innerHTML = `
       <div class="detail-item">
@@ -948,7 +980,7 @@ function loadAllBooks() {
 
 function displayBukuTable(books) {
   const tbody = document.getElementById('bukuTable');
-  
+
   if (!books || books.length === 0) {
     tbody.innerHTML = '<tr><td colspan="9" class="text-center">Tidak ada data buku</td></tr>';
     return;
@@ -956,26 +988,26 @@ function displayBukuTable(books) {
 
   const total = books.length;
   const itemsPerPage = 15;
-  
+
   if (typeof window.currentPageBooks === 'undefined') window.currentPageBooks = 1;
   const totalPages = Math.ceil(total / itemsPerPage);
-  
+
   if (window.currentPageBooks > totalPages && totalPages > 0) window.currentPageBooks = totalPages;
   if (window.currentPageBooks < 1) window.currentPageBooks = 1;
-  
+
   const startIndex = (window.currentPageBooks - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  
+
   let displayedBooks = books;
   if (!window.showAllBooks && total > itemsPerPage) {
     displayedBooks = books.slice(startIndex, endIndex);
   }
 
   tbody.innerHTML = displayedBooks.map(b => {
-    let statusCetak = b['STATUS CETAK'] === 'DICETAK' 
-      ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>` 
+    let statusCetak = b['STATUS CETAK'] === 'DICETAK'
+      ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>`
       : `<button class="btn-sm btn-secondary" onclick="markAsPrinted('buku', '${b['KODE BUKU']}')"><i class="fas fa-print"></i> Tandai</button>`;
-      
+
     return `
     <tr onclick="toggleRowCheckbox(event, this, 'book-checkbox')" style="cursor: pointer;" class="clickable-row">
       <td><input type="checkbox" class="book-checkbox" value="${b['KODE BUKU']}" onchange="updateBookSelection()"></td>
@@ -997,12 +1029,12 @@ function displayBukuTable(books) {
       </td>
     </tr>
   `}).join('');
-  
+
   if (total > itemsPerPage) {
     if (!window.showAllBooks) {
       const prevDisabled = window.currentPageBooks === 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '';
       const nextDisabled = window.currentPageBooks === totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '';
-      
+
       tbody.innerHTML += `
         <tr>
           <td colspan="9" style="padding: 12px 15px; background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
@@ -1052,12 +1084,12 @@ function deleteBuku(kode) {
 function bulkDeleteBooks() {
   const checkboxes = document.querySelectorAll('.book-checkbox:checked');
   const kodeList = Array.from(checkboxes).map(cb => cb.value);
-  
+
   if (kodeList.length === 0) {
     showAlert('Pilih minimal 1 buku untuk dihapus', 'warning');
     return;
   }
-  
+
   showConfirm(`Yakin ingin menghapus ${kodeList.length} buku terpilih?`, () => {
     apiCall('deleteData', { type: 'buku', kodeList: JSON.stringify(kodeList) })
       .then(res => {
@@ -1074,9 +1106,9 @@ function filterBukuTable() {
   const searchText = document.getElementById('searchBukuInput').value.toLowerCase();
   const filtered = allBooks.filter(b => {
     return (b['KODE BUKU'] && b['KODE BUKU'].toLowerCase().includes(searchText)) ||
-           (b['JUDUL BUKU'] && b['JUDUL BUKU'].toLowerCase().includes(searchText)) ||
-           (b['PENGARANG'] && b['PENGARANG'].toLowerCase().includes(searchText)) ||
-           (b['KATEGORI'] && b['KATEGORI'].toLowerCase().includes(searchText));
+      (b['JUDUL BUKU'] && b['JUDUL BUKU'].toLowerCase().includes(searchText)) ||
+      (b['PENGARANG'] && b['PENGARANG'].toLowerCase().includes(searchText)) ||
+      (b['KATEGORI'] && b['KATEGORI'].toLowerCase().includes(searchText));
   });
   displayBukuTable(filtered);
 }
@@ -1107,29 +1139,29 @@ function editBuku(kode) {
     document.getElementById('formTahunTerbit').value = book['TAHUN'] || '';
     document.getElementById('formKategori').value = book['KATEGORI'] || '';
     document.getElementById('formStok').value = book['STOK TERSEDIA'] || '0';
-    
+
     const btnHapus = document.getElementById('btnHapusBukuModal');
     btnHapus.style.display = 'inline-block';
-    btnHapus.onclick = function() {
+    btnHapus.onclick = function () {
       closeModal('bukuModal');
       deleteBuku(kode);
     };
-    
+
     openModal('bukuModal');
   }
 }
 
 function saveBuku(event) {
   event.preventDefault();
-  
+
   const kode = document.getElementById('formKodeBuku').value.trim();
   const isNew = !allBooks.find(b => b['KODE BUKU'].trim() == kode);
-  
+
   const action = isNew ? 'addBuku' : 'updateBuku';
   const message = isNew ? 'Menambah buku...' : 'Mengupdate buku...';
-  
+
   showLoading(message);
-  
+
   apiCall(action, {
     kode: kode,
     kodeRak: document.getElementById('formKodeRak').value.trim(),
@@ -1173,7 +1205,7 @@ function prosesPinjam() {
   }
 
   const lamaPinjam = parseInt(document.getElementById('lamaPinjam').value) || 7;
-  
+
   showLoading('Memproses peminjaman...');
 
   apiCall('pinjamBuku', {
@@ -1202,7 +1234,7 @@ function prosesKembali() {
   }
 
   // Find active loan for this member
-  const activeLoan = allTransactions.find(t => 
+  const activeLoan = allTransactions.find(t =>
     t['Kode Anggota'] == currentMember.kode && t['Status'] == 'DIPINJAM'
   );
 
@@ -1227,7 +1259,7 @@ function prosesKembali() {
 
 function confirmReturn() {
   if (!currentTransaction) return;
-  
+
   showLoading('Memproses pengembalian...');
 
   apiCall('kembaliBuku', {
@@ -1259,14 +1291,14 @@ function loadTransaksi() {
 
 function displayTransaksiTable(transactions) {
   const tbody = document.getElementById('transaksiTable');
-  
+
   if (!transactions || transactions.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" class="text-center">Tidak ada transaksi</td></tr>';
     return;
   }
 
   tbody.innerHTML = transactions.map(t => {
-    const statusBadge = t['Status'] === 'DIPINJAM' 
+    const statusBadge = t['Status'] === 'DIPINJAM'
       ? `<span class="status-badge badge-dipinjam">DIPINJAM</span>`
       : `<span class="status-badge badge-kembali">KEMBALI</span>`;
 
@@ -1308,12 +1340,12 @@ function filterTransaksi() {
 function exportTransaksi() {
   const data = allTransactions;
   let html = '<table border="1"><tr>';
-  
+
   // Headers
   ['No Transaksi', 'Tgl Pinjam', 'Kode Anggota', 'Kode Buku', 'Jatuh Tempo', 'Tgl Kembali', 'Status'].forEach(h => {
     html += `<th>${h}</th>`;
   });
-  
+
   html += '</tr>';
 
   // Data
@@ -1352,7 +1384,7 @@ function loadOverdue() {
 
 function displayOverdueTable(overdue) {
   const tbody = document.getElementById('overdueTable');
-  
+
   if (!overdue || overdue.length === 0) {
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada buku overdue</td></tr>';
     return;
@@ -1421,7 +1453,7 @@ function switchPrintMode(mode) {
   // Hide all modes
   document.getElementById('member-search-mode').style.display = 'none';
   document.getElementById('book-search-mode').style.display = 'none';
-  
+
   // Show selected mode
   document.getElementById(mode + '-mode').style.display = 'block';
 }
@@ -1429,7 +1461,7 @@ function switchPrintMode(mode) {
 function switchToSelectiveMode(type) {
   selectivePrintMode = type;
   const selectedTab = type === 'member' ? 'anggota' : 'buku';
-  
+
   // Switch to that tab
   document.querySelectorAll('.tab-content').forEach(tab => {
     tab.classList.remove('active');
@@ -1439,7 +1471,7 @@ function switchToSelectiveMode(type) {
     btn.classList.remove('active');
   });
   event.target.classList.add('active');
-  
+
   showAlert(`Pilih ${type === 'member' ? 'anggota' : 'buku'} yang ingin dicetak dengan checkbox`, 'info');
 }
 
@@ -1462,7 +1494,7 @@ function toggleSelectAllBooks(checked) {
 function updateMemberSelection() {
   const checkboxes = document.querySelectorAll('.member-checkbox:checked');
   selectedForPrint.members = Array.from(checkboxes).map(cb => cb.value);
-  
+
   if (selectedForPrint.members.length > 0) {
     showAlert(`${selectedForPrint.members.length} anggota terpilih`, 'info', true, 1500);
   }
@@ -1471,7 +1503,7 @@ function updateMemberSelection() {
 function updateBookSelection() {
   const checkboxes = document.querySelectorAll('.book-checkbox:checked');
   selectedForPrint.books = Array.from(checkboxes).map(cb => cb.value);
-  
+
   if (selectedForPrint.books.length > 0) {
     showAlert(`${selectedForPrint.books.length} buku terpilih`, 'info', true, 1500);
   }
@@ -1483,7 +1515,7 @@ function openBulkActions(type) {
     showAlert('Pilih minimal 1 data terlebih dahulu', 'warning');
     return;
   }
-  
+
   Swal.fire({
     title: 'Aksi Data Terpilih',
     html: `
@@ -1508,18 +1540,18 @@ function selectivePrintMembers() {
     showAlert('Pilih minimal 1 anggota untuk dicetak', 'warning');
     return;
   }
-  
-  const selected = selectedForPrint.members.map(kode => 
+
+  const selected = selectedForPrint.members.map(kode =>
     allMembers.find(m => m['KODE'] === kode)
   ).filter(m => m);
-  
+
   const alreadyPrinted = selected.filter(m => m['STATUS CETAK'] === 'DICETAK').length;
-  
+
   let msg = `Cetak ${selected.length} kartu anggota yang terpilih?`;
   if (alreadyPrinted > 0) {
     msg = `Dari ${selected.length} kartu, ${alreadyPrinted} di antaranya sudah pernah dicetak. Yakin ingin mencetak ulang?`;
   }
-  
+
   showConfirm(msg, () => {
     printSelectedMembers(selected);
     apiCall('updateStatusCetak', { type: 'anggota', kodeList: JSON.stringify(selectedForPrint.members) })
@@ -1533,18 +1565,18 @@ function selectivePrintBooks() {
     showAlert('Pilih minimal 1 buku untuk dicetak', 'warning');
     return;
   }
-  
-  const selected = selectedForPrint.books.map(kode => 
+
+  const selected = selectedForPrint.books.map(kode =>
     allBooks.find(b => b['KODE BUKU'] === kode)
   ).filter(b => b);
-  
+
   const alreadyPrinted = selected.filter(b => b['STATUS CETAK'] === 'DICETAK').length;
-  
+
   let msg = `Cetak ${selected.length} label buku yang terpilih?`;
   if (alreadyPrinted > 0) {
     msg = `Dari ${selected.length} label, ${alreadyPrinted} di antaranya sudah pernah dicetak. Yakin ingin mencetak ulang?`;
   }
-  
+
   showConfirm(msg, () => {
     printSelectedBooks(selected);
     apiCall('updateStatusCetak', { type: 'buku', kodeList: JSON.stringify(selectedForPrint.books) })
@@ -1555,7 +1587,7 @@ function selectivePrintBooks() {
 
 function printSelectedMembers(members) {
   if (members.length === 0) return;
-  
+
   let html = '<html><head><meta charset="UTF-8"><style>' +
     '* {box-sizing: border-box; margin: 0; padding: 0;}' +
     '@page {size: landscape; margin: 10mm;}' +
@@ -1642,13 +1674,13 @@ function printSelectedMembers(members) {
   printWindow.document.close();
   printWindow.focus();
   setTimeout(() => { printWindow.print(); }, 1000);
-  
+
   showAlert('Data siap dicetak', 'success');
 }
 
 function printSelectedBooks(books) {
   if (books.length === 0) return;
-  
+
   let html = '<html><head><meta charset="UTF-8"><style>' +
     '* {box-sizing: border-box; margin: 0; padding: 0;}' +
     '@page {size: portrait; margin: 10mm;}' +
@@ -1714,19 +1746,19 @@ function printSelectedBooks(books) {
   printWindow.document.close();
   printWindow.focus();
   setTimeout(() => { printWindow.print(); }, 1000);
-  
+
   showAlert('Data siap dicetak', 'success');
 }
 
 function searchMember() {
   const searchText = document.getElementById('memberSearchInput').value.trim().toUpperCase();
-  
+
   if (!searchText) {
     showAlert('Masukkan kode atau nama anggota', 'warning');
     return;
   }
 
-  const results = allMembers.filter(m => 
+  const results = allMembers.filter(m =>
     m['KODE'].includes(searchText) || m['NAMA'].toUpperCase().includes(searchText)
   );
 
@@ -1764,76 +1796,76 @@ function printMemberCard(kodeAnggota) {
   const doPrint = () => {
     const memberTransactions = allTransactions.filter(t => t['Kode Anggota'] == kodeAnggota);
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(kodeAnggota)}`;
-  const logoUrl = new URL('assets/img/logo.webp', window.location.href).href;
+    const logoUrl = new URL('assets/img/logo.webp', window.location.href).href;
 
-  let html = '<html><head><meta charset="UTF-8"><style>' +
-    '* {box-sizing: border-box; margin: 0; padding: 0;}' +
-    '@page {size: landscape; margin: 10mm;}' +
-    'body {font-family: "Courier New", Courier, monospace; background: white; font-size: 12px;}' +
-    '.wrapper {display: grid; grid-template-columns: 1fr 1fr; gap: 15px;}' +
-    '.card-anggota {width: 100%; min-height: 95vh; border: 1px solid #333; background: white; padding: 20px; display: flex; flex-direction: column; page-break-inside: avoid;}' +
-    '.school-header {text-align: center; padding-bottom: 10px; border-bottom: 2px solid #333; font-weight: bold; line-height: 1.5; margin-bottom: 20px;}' +
-    '.school-title {font-size: 16px;}' +
-    '.school-name {font-size: 14px;}' +
-    '.school-tag {font-size: 11px;}' +
-    '.header-card {display: flex; margin-bottom: 20px; align-items: flex-start;}' +
-    '.info-left {flex: 2; padding-right: 15px;}' +
-    '.info-right {flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;}' +
-    '.detail-table {border-collapse: collapse; font-size: 13px; margin-bottom: 10px;}' +
-    '.detail-table td {padding: 3px 4px; vertical-align: top;}' +
-    '.detail-table td:first-child {width: 110px; text-align: left;}' +
-    '.detail-table td:nth-child(2) {width: 8px; text-align: center;}' +
-    '.detail-table td:nth-child(3) {text-align: left;}' +
-    '.table-transaksi {width: 100%; border-collapse: collapse; flex-grow: 1;}' +
-    '.table-transaksi th, .table-transaksi td {border: 1px solid #333; padding: 6px; text-align: center; font-size: 11px;}' +
-    '.table-transaksi td:nth-child(2) {font-size: 9px; white-space: nowrap;}' +
-    '.table-transaksi th {background-color: #f7f7f7; font-weight: bold;}' +
-    '.qr-code-img {width: 80px; height: 80px; border: 1px solid #333;}' +
-    '.qr-code-text {margin-top: 5px; font-weight: bold; font-size: 10px; text-align: center;}' +
-    '@media print {body {margin: 0; padding: 0; background: white;} @page {margin: 10mm;}}' +
-    '</style></head><body>' +
-    '<div class="wrapper">' +
-    '<div class="card-anggota">' +
-    '<div class="school-header">' +
-    '<div style="display: flex; align-items: center; justify-content: center; gap: 15px;">' +
-    '<img src="' + logoUrl + '" style="width: 50px; height: 50px; object-fit: contain;">' +
-    '<div>' +
-    '<div class="school-title">KARTU ANGGOTA PERPUSTAKAAN</div>' +
-    '<div class="school-name">SD MUHAMMADIYAH 1 SEDATI</div>' +
-    '<div class="school-tag">Islamic Modern School</div>' +
-    '</div></div></div>' +
-    '<div class="header-card">' +
-    '<div class="info-left">' +
-    '<table class="detail-table"><tr><td>Kode Anggota</td><td>:</td><td>' + member['KODE'] + '</td></tr>' +
-    '<tr><td>Nama</td><td>:</td><td>' + member['NAMA'] + '</td></tr>' +
-    '<tr><td>Tipe</td><td>:</td><td>' + member['TIPE'] + '</td></tr>' +
-    '<tr><td>Keterangan</td><td>:</td><td>' + member['KETERANGAN'] + '</td></tr></table>' +
-    '</div>' +
-    '<div class="info-right">' +
-    '<img src="' + qrUrl + '" class="qr-code-img"><div class="qr-code-text">' + kodeAnggota + '</div>' +
-    '</div>' +
-    '</div>' +
-    '<table class="table-transaksi"><thead><tr><th style="width: 6%;">No</th><th style="width: 28%;">No Transaksi</th><th style="width: 16%;">Kode Buku</th><th style="width: 25%;">Jatuh Tempo</th><th style="width: 25%;">Tgl Kembali</th></tr></thead><tbody>'
+    let html = '<html><head><meta charset="UTF-8"><style>' +
+      '* {box-sizing: border-box; margin: 0; padding: 0;}' +
+      '@page {size: landscape; margin: 10mm;}' +
+      'body {font-family: "Courier New", Courier, monospace; background: white; font-size: 12px;}' +
+      '.wrapper {display: grid; grid-template-columns: 1fr 1fr; gap: 15px;}' +
+      '.card-anggota {width: 100%; min-height: 95vh; border: 1px solid #333; background: white; padding: 20px; display: flex; flex-direction: column; page-break-inside: avoid;}' +
+      '.school-header {text-align: center; padding-bottom: 10px; border-bottom: 2px solid #333; font-weight: bold; line-height: 1.5; margin-bottom: 20px;}' +
+      '.school-title {font-size: 16px;}' +
+      '.school-name {font-size: 14px;}' +
+      '.school-tag {font-size: 11px;}' +
+      '.header-card {display: flex; margin-bottom: 20px; align-items: flex-start;}' +
+      '.info-left {flex: 2; padding-right: 15px;}' +
+      '.info-right {flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;}' +
+      '.detail-table {border-collapse: collapse; font-size: 13px; margin-bottom: 10px;}' +
+      '.detail-table td {padding: 3px 4px; vertical-align: top;}' +
+      '.detail-table td:first-child {width: 110px; text-align: left;}' +
+      '.detail-table td:nth-child(2) {width: 8px; text-align: center;}' +
+      '.detail-table td:nth-child(3) {text-align: left;}' +
+      '.table-transaksi {width: 100%; border-collapse: collapse; flex-grow: 1;}' +
+      '.table-transaksi th, .table-transaksi td {border: 1px solid #333; padding: 6px; text-align: center; font-size: 11px;}' +
+      '.table-transaksi td:nth-child(2) {font-size: 9px; white-space: nowrap;}' +
+      '.table-transaksi th {background-color: #f7f7f7; font-weight: bold;}' +
+      '.qr-code-img {width: 80px; height: 80px; border: 1px solid #333;}' +
+      '.qr-code-text {margin-top: 5px; font-weight: bold; font-size: 10px; text-align: center;}' +
+      '@media print {body {margin: 0; padding: 0; background: white;} @page {margin: 10mm;}}' +
+      '</style></head><body>' +
+      '<div class="wrapper">' +
+      '<div class="card-anggota">' +
+      '<div class="school-header">' +
+      '<div style="display: flex; align-items: center; justify-content: center; gap: 15px;">' +
+      '<img src="' + logoUrl + '" style="width: 50px; height: 50px; object-fit: contain;">' +
+      '<div>' +
+      '<div class="school-title">KARTU ANGGOTA PERPUSTAKAAN</div>' +
+      '<div class="school-name">SD MUHAMMADIYAH 1 SEDATI</div>' +
+      '<div class="school-tag">Islamic Modern School</div>' +
+      '</div></div></div>' +
+      '<div class="header-card">' +
+      '<div class="info-left">' +
+      '<table class="detail-table"><tr><td>Kode Anggota</td><td>:</td><td>' + member['KODE'] + '</td></tr>' +
+      '<tr><td>Nama</td><td>:</td><td>' + member['NAMA'] + '</td></tr>' +
+      '<tr><td>Tipe</td><td>:</td><td>' + member['TIPE'] + '</td></tr>' +
+      '<tr><td>Keterangan</td><td>:</td><td>' + member['KETERANGAN'] + '</td></tr></table>' +
+      '</div>' +
+      '<div class="info-right">' +
+      '<img src="' + qrUrl + '" class="qr-code-img"><div class="qr-code-text">' + kodeAnggota + '</div>' +
+      '</div>' +
+      '</div>' +
+      '<table class="table-transaksi"><thead><tr><th style="width: 6%;">No</th><th style="width: 28%;">No Transaksi</th><th style="width: 16%;">Kode Buku</th><th style="width: 25%;">Jatuh Tempo</th><th style="width: 25%;">Tgl Kembali</th></tr></thead><tbody>'
 
-  for (let i = 0; i < 15; i++) {
-    const trx = memberTransactions[i];
-    html += '<tr><td>' + (i + 1) + '</td><td>' + (trx ? trx['No Transaksi'] : '') + '</td><td>' + (trx ? trx['Kode Buku'] : '') + '</td><td>' + (trx ? formatDate(trx['Jatuh Tempo']) : '') + '</td><td>' + (trx ? formatDate(trx['Tgl Kembali']) : '') + '</td></tr>';
-  }
+    for (let i = 0; i < 15; i++) {
+      const trx = memberTransactions[i];
+      html += '<tr><td>' + (i + 1) + '</td><td>' + (trx ? trx['No Transaksi'] : '') + '</td><td>' + (trx ? trx['Kode Buku'] : '') + '</td><td>' + (trx ? formatDate(trx['Jatuh Tempo']) : '') + '</td><td>' + (trx ? formatDate(trx['Tgl Kembali']) : '') + '</td></tr>';
+    }
 
-  html += '</tbody></table>' +
-    '</div>' +
-    '</div></body></html>';
+    html += '</tbody></table>' +
+      '</div>' +
+      '</div></body></html>';
 
-  const printWindow = window.open('', 'Print Member Card');
-  printWindow.document.write(html);
-  printWindow.document.close();
-  printWindow.focus();
-  setTimeout(() => { 
-    printWindow.print(); 
-    apiCall('updateStatusCetak', { type: 'anggota', kodeList: JSON.stringify([kodeAnggota]) })
-      .then(() => loadAllMembers())
-      .catch(err => console.error('Gagal update status cetak:', err));
-  }, 1000);
+    const printWindow = window.open('', 'Print Member Card');
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      apiCall('updateStatusCetak', { type: 'anggota', kodeList: JSON.stringify([kodeAnggota]) })
+        .then(() => loadAllMembers())
+        .catch(err => console.error('Gagal update status cetak:', err));
+    }, 1000);
   }
 
   if (member['STATUS CETAK'] === 'DICETAK') {
@@ -1851,7 +1883,7 @@ function confirmBulkPrintMembers() {
   if (alreadyPrinted > 0) {
     msg = `Dari ${allMembers.length} kartu, ${alreadyPrinted} di antaranya sudah pernah dicetak. Yakin ingin mencetak ulang semuanya?`;
   }
-  
+
   showConfirm(msg, () => {
     bulkPrintMembers();
     const kodeList = allMembers.map(m => m['KODE']);
@@ -1867,7 +1899,7 @@ function confirmBulkPrintBooks() {
   if (alreadyPrinted > 0) {
     msg = `Dari ${allBooks.length} label, ${alreadyPrinted} di antaranya sudah pernah dicetak. Yakin ingin mencetak ulang semuanya?`;
   }
-  
+
   showConfirm(msg, () => {
     bulkPrintBooks();
     const kodeList = allBooks.map(b => b['KODE BUKU']);
@@ -1970,13 +2002,13 @@ function bulkPrintMembers() {
 
 function searchBook() {
   const searchText = document.getElementById('bookSearchInput').value.trim().toUpperCase();
-  
+
   if (!searchText) {
     showAlert('Masukkan kode atau judul buku', 'warning');
     return;
   }
 
-  const results = allBooks.filter(b => 
+  const results = allBooks.filter(b =>
     b['KODE BUKU'].includes(searchText) || b['JUDUL BUKU'].toUpperCase().includes(searchText)
   );
 
@@ -2014,48 +2046,48 @@ function printBookLabel(kodeBuku) {
   const doPrint = () => {
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=${encodeURIComponent(kodeBuku)}`;
 
-  let html = '<html><head><meta charset="UTF-8"><style>' +
-    '* {box-sizing: border-box; margin: 0; padding: 0;}' +
-    '@page {size: portrait; margin: 10mm;}' +
-    'body {font-family: "Courier New", Courier, monospace; background: white; font-size: 12px;}' +
-    '.container-buku {display: grid; grid-template-columns: 1fr 1fr; gap: 12px;}' +
-    '.label-buku {border: 1px solid #333; background: white; padding: 15px; display: flex; align-items: flex-start; min-height: 120px; page-break-inside: avoid;}' +
-    '.buku-info {flex: 2; font-size: 12px;}' +
-    '.buku-qr {flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;}' +
-    '.detail-table {width: 100%; border-collapse: collapse; margin: 2px 0;}' +
-    '.detail-table td {padding: 2px 4px; font-size: 12px; vertical-align: top;}' +
-    '.detail-table td:first-child {width: 85px; text-align: left;}' +
-    '.detail-table td:nth-child(2) {width: 8px; text-align: center;}' +
-    '.detail-table td:nth-child(3) {text-align: left;}' +
-    '.kode-buku-text {margin-top: 3px; font-weight: bold; font-size: 10px; text-align: center;}' +
-    '@media print {body {margin: 0; padding: 0; background: white;} @page {margin: 10mm;}}' +
-    '</style></head><body>' +
-    '<div class="container-buku">' +
-    '<div class="label-buku">' +
-    '<div class="buku-info">' +
-    '<table class="detail-table"><tr><td>Judul</td><td>:</td><td><strong>' + book['JUDUL BUKU'] + '</strong></td></tr>' +
-    '<tr><td>Pengarang</td><td>:</td><td>' + book['PENGARANG'] + '</td></tr>' +
-    '<tr><td>Penerbit</td><td>:</td><td>' + book['PENERBIT'] + ' (' + book['TAHUN'] + ')</td></tr>' +
-    '<tr><td>Kategori</td><td>:</td><td>' + book['KATEGORI'] + '</td></tr>' +
-    '<tr><td>Rak</td><td>:</td><td>' + book['KODE RAK'] + '</td></tr></table>' +
-    '</div>' +
-    '<div class="buku-qr">' +
-    '<img src="' + qrUrl + '" style="width: 70px; height: 70px; border: 1px solid #333;">' +
-    '<div class="kode-buku-text">' + kodeBuku + '</div>' +
-    '</div>' +
-    '</div>' +
-    '</div></body></html>';
+    let html = '<html><head><meta charset="UTF-8"><style>' +
+      '* {box-sizing: border-box; margin: 0; padding: 0;}' +
+      '@page {size: portrait; margin: 10mm;}' +
+      'body {font-family: "Courier New", Courier, monospace; background: white; font-size: 12px;}' +
+      '.container-buku {display: grid; grid-template-columns: 1fr 1fr; gap: 12px;}' +
+      '.label-buku {border: 1px solid #333; background: white; padding: 15px; display: flex; align-items: flex-start; min-height: 120px; page-break-inside: avoid;}' +
+      '.buku-info {flex: 2; font-size: 12px;}' +
+      '.buku-qr {flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;}' +
+      '.detail-table {width: 100%; border-collapse: collapse; margin: 2px 0;}' +
+      '.detail-table td {padding: 2px 4px; font-size: 12px; vertical-align: top;}' +
+      '.detail-table td:first-child {width: 85px; text-align: left;}' +
+      '.detail-table td:nth-child(2) {width: 8px; text-align: center;}' +
+      '.detail-table td:nth-child(3) {text-align: left;}' +
+      '.kode-buku-text {margin-top: 3px; font-weight: bold; font-size: 10px; text-align: center;}' +
+      '@media print {body {margin: 0; padding: 0; background: white;} @page {margin: 10mm;}}' +
+      '</style></head><body>' +
+      '<div class="container-buku">' +
+      '<div class="label-buku">' +
+      '<div class="buku-info">' +
+      '<table class="detail-table"><tr><td>Judul</td><td>:</td><td><strong>' + book['JUDUL BUKU'] + '</strong></td></tr>' +
+      '<tr><td>Pengarang</td><td>:</td><td>' + book['PENGARANG'] + '</td></tr>' +
+      '<tr><td>Penerbit</td><td>:</td><td>' + book['PENERBIT'] + ' (' + book['TAHUN'] + ')</td></tr>' +
+      '<tr><td>Kategori</td><td>:</td><td>' + book['KATEGORI'] + '</td></tr>' +
+      '<tr><td>Rak</td><td>:</td><td>' + book['KODE RAK'] + '</td></tr></table>' +
+      '</div>' +
+      '<div class="buku-qr">' +
+      '<img src="' + qrUrl + '" style="width: 70px; height: 70px; border: 1px solid #333;">' +
+      '<div class="kode-buku-text">' + kodeBuku + '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div></body></html>';
 
-  const printWindow = window.open('', 'Print Book Label');
-  printWindow.document.write(html);
-  printWindow.document.close();
-  printWindow.focus();
-  setTimeout(() => { 
-    printWindow.print(); 
-    apiCall('updateStatusCetak', { type: 'buku', kodeList: JSON.stringify([kodeBuku]) })
-      .then(() => loadAllBooks())
-      .catch(err => console.error('Gagal update status cetak:', err));
-  }, 1000);
+    const printWindow = window.open('', 'Print Book Label');
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      apiCall('updateStatusCetak', { type: 'buku', kodeList: JSON.stringify([kodeBuku]) })
+        .then(() => loadAllBooks())
+        .catch(err => console.error('Gagal update status cetak:', err));
+    }, 1000);
   }
 
   if (book['STATUS CETAK'] === 'DICETAK') {
@@ -2160,7 +2192,7 @@ function switchTab(tabName) {
   event.target.classList.add('active');
 
   // Load data based on tab
-  switch(tabName) {
+  switch (tabName) {
     case 'anggota':
       loadAllMembers();
       break;
@@ -2197,7 +2229,7 @@ function toggleScanner() {
   const statusText = document.getElementById('statusText');
   const statusLight = document.getElementById('statusLight');
   const readerElement = document.getElementById('reader');
-  
+
   if (scannerActive) {
     // Scanner ON - Recreate scanner if it was destroyed
     btn.classList.remove('btn-danger');
@@ -2211,7 +2243,7 @@ function toggleScanner() {
     readerElement.classList.add('scanner-active');
     const qrCanvas = document.getElementById('qrCanvas');
     if (qrCanvas) qrCanvas.style.display = 'none';
-    
+
     // Recreate scanner
     if (!scanner || !scanner.isScanning) {
       initializeScanner();
@@ -2229,7 +2261,7 @@ function toggleScanner() {
     readerElement.classList.add('scanner-inactive');
     const qrCanvas = document.getElementById('qrCanvas');
     if (qrCanvas) qrCanvas.style.display = 'block';
-    
+
     // Destroy scanner
     if (scanner) {
       scanner.stop().then(() => {
@@ -2303,7 +2335,7 @@ function viewTransaction(noTransaksi) {
 
 function loadAllData() {
   showLoading('Memuat data...');
-  
+
   Promise.all([
     loadAllMembers(),
     loadAllBooks(),
@@ -2341,7 +2373,7 @@ function loadKunjungan() {
 
 function displayKunjunganTable(kunjungan) {
   const tbody = document.getElementById('kunjunganTable');
-  
+
   if (!kunjungan || kunjungan.length === 0) {
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada data kunjungan</td></tr>';
     return;
@@ -2355,7 +2387,7 @@ function displayKunjunganTable(kunjungan) {
     const nama = member ? member['NAMA'] : '-';
     const tipe = member ? member['TIPE'] : '-';
     const keterangan = member ? member['KETERANGAN'] : '-';
-    
+
     return `
       <tr>
         <td>${index + 1}</td>
@@ -2433,7 +2465,7 @@ function logMemberVisit(kodeAnggota) {
 }
 
 // Close modal when clicking outside
-window.addEventListener('click', function(event) {
+window.addEventListener('click', function (event) {
   if (event.target.classList.contains('modal')) {
     event.target.style.display = 'none';
   }
@@ -2443,15 +2475,15 @@ window.addEventListener('click', function(event) {
 function initQRAnimation() {
   const canvas = document.getElementById('qrCanvas');
   if (!canvas) return;
-  
+
   const ctx = canvas.getContext('2d');
-  const gridSize = 25; 
+  const gridSize = 25;
   const cellSize = canvas.width / gridSize;
 
   let qrMatrix = [];
   let blackPixels = [];
   let revealedIndex = 0;
-  let animState = 'forming'; 
+  let animState = 'forming';
 
   function generateQRMatrix() {
     qrMatrix = Array(gridSize).fill(0).map(() => Array(gridSize).fill(0));
@@ -2529,9 +2561,9 @@ function initQRAnimation() {
       draw(0);
       animState = 'waiting';
       setTimeout(() => {
-        generateQRMatrix(); 
+        generateQRMatrix();
         animState = 'forming';
-      }, 500); 
+      }, 500);
     }
 
     requestAnimationFrame(updateAnimation);
@@ -2551,16 +2583,16 @@ document.addEventListener('DOMContentLoaded', () => {
 let barcodeBuffer = '';
 let barcodeTimeout = null;
 
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
   // Abaikan event jika user sedang mengetik di dalam form input, textarea, dll.
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
     return;
   }
-  
+
   // Tangkap karakter biasa (huruf/angka/simbol)
   if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
     barcodeBuffer += e.key;
-    
+
     // Scanner tembak mengetik sangat cepat (10-20ms per karakter).
     // Jika lebih dari 50ms tidak ada ketikan, anggap itu manusia dan reset buffer.
     clearTimeout(barcodeTimeout);
@@ -2568,25 +2600,25 @@ document.addEventListener('keydown', function(e) {
       barcodeBuffer = '';
     }, 50);
   }
-  
+
   // Jika tombol Enter ditekan dan buffer memiliki isi
   if (e.key === 'Enter' && barcodeBuffer.length > 0) {
     e.preventDefault();
     const scannedCode = barcodeBuffer.trim();
-    
+
     // Reset buffer
     barcodeBuffer = '';
     clearTimeout(barcodeTimeout);
-    
+
     if (scannedCode) {
       console.log('Input terdeteksi dari Hardware Scanner:', scannedCode);
-      
+
       // Secara otomatis pindah ke tab Scanner agar transisinya terlihat
       const scannerBtn = document.querySelector('.tab-btn[onclick="switchTab(\'scanner\')"]');
       if (scannerBtn && !scannerBtn.classList.contains('active')) {
-         scannerBtn.click();
+        scannerBtn.click();
       }
-      
+
       // Proses kode QR/Barcode yang ditangkap
       processQRCode(scannedCode);
     }
@@ -2618,7 +2650,7 @@ function calculateTopKunjungan(kunjunganData) {
 
   const sortedKodes = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 5);
   const tbody = document.getElementById('topKunjunganTable');
-  
+
   if (sortedKodes.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada kunjungan</td></tr>';
     return;
@@ -2667,7 +2699,7 @@ function filterRombelTable() {
   const searchText = document.getElementById('searchRombelInput').value.toLowerCase();
   const filtered = allMembers.filter(m => {
     return (m['NAMA'] && m['NAMA'].toLowerCase().includes(searchText)) ||
-           (m['KETERANGAN'] && m['KETERANGAN'].toLowerCase().includes(searchText));
+      (m['KETERANGAN'] && m['KETERANGAN'].toLowerCase().includes(searchText));
   });
   renderRombelTable(filtered);
 }
@@ -2690,20 +2722,20 @@ function submitRombel(event) {
 
   showConfirm(`Yakin ingin menaikkan/mengubah kelas ${kodeList.length} siswa menjadi ${keteranganBaru}?`, () => {
     showLoading('Memproses kenaikan kelas...');
-    apiCall('bulkUpdateKeterangan', { 
+    apiCall('bulkUpdateKeterangan', {
       kodeList: JSON.stringify(kodeList),
-      keteranganBaru: keteranganBaru 
+      keteranganBaru: keteranganBaru
     })
-    .then(res => {
-      hideLoading();
-      showAlert(res.message, 'success');
-      closeModal('rombelModal');
-      loadAllMembers();
-    })
-    .catch(err => {
-      hideLoading();
-      showAlert(`Gagal: ${err}`, 'error');
-    });
+      .then(res => {
+        hideLoading();
+        showAlert(res.message, 'success');
+        closeModal('rombelModal');
+        loadAllMembers();
+      })
+      .catch(err => {
+        hideLoading();
+        showAlert(`Gagal: ${err}`, 'error');
+      });
   });
 }
 
@@ -2786,15 +2818,15 @@ function handleResetData() {
 
 function executeResetData() {
   showLoading('Sedang mereset & merapikan data...\nProses ini mungkin membutuhkan beberapa saat.');
-  
+
   const btnReset = document.getElementById('btnResetData');
   if (btnReset) btnReset.disabled = true;
-  
+
   apiCall('resetData', {})
     .then(data => {
       hideLoading();
       if (btnReset) btnReset.disabled = false;
-      
+
       // Show success with details
       Swal.fire({
         title: '<i class="fas fa-check-circle" style="color: #10B981;"></i> Reset Berhasil!',
@@ -2828,14 +2860,14 @@ function executeResetData() {
         confirmButtonText: 'Selesai',
         confirmButtonColor: '#667eea'
       });
-      
+
       // Reload all data to reflect changes
       loadAllData();
     })
     .catch(err => {
       hideLoading();
       if (btnReset) btnReset.disabled = false;
-      
+
       Swal.fire({
         title: 'Gagal Reset Data',
         text: err,
@@ -2844,4 +2876,9 @@ function executeResetData() {
         confirmButtonColor: '#667eea'
       });
     });
+}
+
+// NEW SIDEBAR MOBILE MENU
+function toggleMobileMenu() {
+  document.getElementById('mainSidebar').classList.toggle('show');
 }
