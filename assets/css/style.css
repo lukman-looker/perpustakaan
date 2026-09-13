@@ -2008,16 +2008,16 @@ tr:hover {
 }
 
 .sidebar-brand {
-  padding: 20px 20px 18px;
+  padding: 15px 8px 15px 5px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-logo {
-  width: 42px;
-  height: 42px;
+  width: 80px;
+  height: 80px;
   flex-shrink: 0;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
@@ -2039,6 +2039,7 @@ tr:hover {
 .sidebar-subtitle {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
 }
 
 .status-badge-sidebar {
@@ -2060,11 +2061,11 @@ tr:hover {
 }
 
 .sidebar-nav {
-  padding: 12px 10px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  overflow-y: auto;
+  overflow-y: hidden;
   flex: 1;
 }
 
@@ -2081,8 +2082,8 @@ tr:hover {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 10px;
+  padding: 9px 12px;
   border-radius: 8px;
   color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
@@ -2162,78 +2163,85 @@ tr:hover {
   gap: 18px;
 }
 
-.topbar .header-clock {
-  color: rgba(255, 255, 255, 0.9);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 12px 12px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.topbar .header-analog-clock {
-  width: 54px;
-  height: 54px;
-  border-width: 2px;
+.sidebar-clock {
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-analog-clock {
+  width: 75px;
+  height: 75px;
+  border-width: 3px;
   border-color: rgba(255, 255, 255, 0.4);
   margin: 0;
   background: rgba(255, 255, 255, 0.1);
 }
 
-.topbar .header-analog-clock .clock-face {
+.sidebar-analog-clock .clock-face {
   transform: translateY(0);
 }
 
-.topbar .header-analog-clock .clock-face .number {
+.sidebar-analog-clock .clock-face .number {
   color: rgba(255, 255, 255, 0.85);
-  font-size: 7px;
-  padding-top: 1px;
+  font-size: 10px;
+  padding-top: 2px;
 }
 
-.topbar .header-analog-clock .hour-hand {
-  height: 10px;
+.sidebar-analog-clock .hour-hand {
+  height: 18px;
+  width: 3px;
+  margin-left: -1.5px;
+  background: white;
+}
+
+.sidebar-analog-clock .min-hand {
+  height: 25px;
   width: 2px;
   margin-left: -1px;
   background: white;
 }
 
-.topbar .header-analog-clock .min-hand {
-  height: 15px;
+.sidebar-analog-clock .second-hand {
+  height: 32px;
   width: 1.5px;
   margin-left: -0.75px;
-  background: white;
-}
-
-.topbar .header-analog-clock .second-hand {
-  height: 18px;
-  width: 1px;
-  margin-left: -0.5px;
   background: #fcd34d;
 }
 
-.topbar .header-analog-clock .clock-center {
-  width: 4px;
-  height: 4px;
+.sidebar-analog-clock .clock-center {
+  width: 6px;
+  height: 6px;
   background: white;
 }
 
-.topbar .header-date-container {
+.sidebar-date-container {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
+  text-align: center;
 }
 
-.topbar .header-day-text {
+.sidebar-day-text {
   color: white;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
 }
 
-.topbar .header-date-text {
+.sidebar-date-text {
   color: rgba(255, 255, 255, 0.75);
-  font-size: 11px;
+  font-size: 12px;
 }
 
-.topbar .header-digital-text {
+.header-digital-text {
   color: rgba(255, 255, 255, 0.9);
 }
 

@@ -2189,7 +2189,28 @@ function switchTab(tabName) {
 
   // Show selected tab
   document.getElementById(tabName).classList.add('active');
-  event.target.classList.add('active');
+  if (window.event && window.event.currentTarget) {
+    window.event.currentTarget.classList.add('active');
+  } else if (window.event && window.event.target) {
+    window.event.target.closest('.tab-btn')?.classList.add('active');
+  }
+
+  // Update breadcrumb
+  const titleMap = {
+    'scanner': 'Scanner & Transaksi',
+    'statistik': 'Statistik Perpustakaan',
+    'transaksi': 'Data Transaksi',
+    'overdued': 'Data Keterlambatan',
+    'anggota': 'Data Anggota',
+    'buku': 'Data Buku',
+    'qrgen': 'Cetak Label & Kartu',
+    'kunjungan': 'Data Kunjungan',
+    'admin': 'Pengaturan Admin'
+  };
+  const subtitleEl = document.getElementById('topbarSubtitle');
+  if (subtitleEl) {
+    subtitleEl.innerText = titleMap[tabName] || 'Overview';
+  }
 
   // Load data based on tab
   switch (tabName) {
