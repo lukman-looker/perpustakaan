@@ -683,11 +683,16 @@ function displayAnggotaTable(members) {
   const tbody = document.getElementById('anggotaTable');
   
   if (!members || members.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center">Tidak ada data anggota</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">Tidak ada data anggota</td></tr>';
     return;
   }
 
-  tbody.innerHTML = members.map(m => `
+  tbody.innerHTML = members.map(m => {
+    let statusCetak = m['STATUS CETAK'] === 'DICETAK' 
+      ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>` 
+      : `<button class="btn-sm btn-secondary" onclick="markAsPrinted('anggota', '${m['KODE']}')"><i class="fas fa-print"></i> Tandai</button>`;
+    
+    return `
     <tr>
       <td><input type="checkbox" class="member-checkbox" value="${m['KODE']}" onchange="updateMemberSelection()"></td>
       <td>${m['KODE'] || '-'}</td>
@@ -695,13 +700,25 @@ function displayAnggotaTable(members) {
       <td>${m['JENIS KELAMIN'] || '-'}</td>
       <td>${m['TIPE'] || '-'}</td>
       <td>${m['KETERANGAN'] || '-'}</td>
+      <td>${statusCetak}</td>
       <td>
         <button class="btn-sm btn-secondary" onclick="editAnggota('${m['KODE']}')">
           <i class="fas fa-edit"></i>
         </button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
+}
+
+function filterAnggotaTable() {
+  const searchText = document.getElementById('searchAnggotaInput').value.toLowerCase();
+  const filtered = allMembers.filter(m => {
+    return (m['KODE'] && m['KODE'].toLowerCase().includes(searchText)) ||
+           (m['NAMA'] && m['NAMA'].toLowerCase().includes(searchText)) ||
+           (m['TIPE'] && m['TIPE'].toLowerCase().includes(searchText)) ||
+           (m['KETERANGAN'] && m['KETERANGAN'].toLowerCase().includes(searchText));
+  });
+  displayAnggotaTable(filtered);
 }
 
 function openAddAnggotaModal() {
@@ -821,11 +838,16 @@ function displayBukuTable(books) {
   const tbody = document.getElementById('bukuTable');
   
   if (!books || books.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center">Tidak ada data buku</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center">Tidak ada data buku</td></tr>';
     return;
   }
 
-  tbody.innerHTML = books.map(b => `
+  tbody.innerHTML = books.map(b => {
+    let statusCetak = b['STATUS CETAK'] === 'DICETAK' 
+      ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>` 
+      : `<button class="btn-sm btn-secondary" onclick="markAsPrinted('buku', '${b['KODE BUKU']}')"><i class="fas fa-print"></i> Tandai</button>`;
+      
+    return `
     <tr>
       <td><input type="checkbox" class="book-checkbox" value="${b['KODE BUKU']}" onchange="updateBookSelection()"></td>
       <td>${b['KODE BUKU'] || '-'}</td>
@@ -838,13 +860,25 @@ function displayBukuTable(books) {
         </span>
       </td>
       <td>${b['KODE RAK'] || '-'}</td>
+      <td>${statusCetak}</td>
       <td>
         <button class="btn-sm btn-secondary" onclick="editBuku('${b['KODE BUKU']}')">
           <i class="fas fa-edit"></i>
         </button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
+}
+
+function filterBukuTable() {
+  const searchText = document.getElementById('searchBukuInput').value.toLowerCase();
+  const filtered = allBooks.filter(b => {
+    return (b['KODE BUKU'] && b['KODE BUKU'].toLowerCase().includes(searchText)) ||
+           (b['JUDUL BUKU'] && b['JUDUL BUKU'].toLowerCase().includes(searchText)) ||
+           (b['PENGARANG'] && b['PENGARANG'].toLowerCase().includes(searchText)) ||
+           (b['KATEGORI'] && b['KATEGORI'].toLowerCase().includes(searchText));
+  });
+  displayBukuTable(filtered);
 }
 
 function openAddBukuModal() {
@@ -1995,6 +2029,7 @@ function loadKunjungan() {
       allKunjungan = Array.isArray(data) ? data : [];
       displayKunjunganTable(allKunjungan);
       updateKunjunganStats(allKunjungan);
+      calculateTopKunjungan(allKunjungan);
     })
     .catch(err => showAlert(`Gagal load kunjungan: ${err}`, 'error'));
 }
@@ -2252,3 +2287,117 @@ document.addEventListener('keydown', function(e) {
     }
   }
 });
+
+// =============================================================================
+// NEW FEATURES LOGIC (ROMBEL, STATUS CETAK, TOP KUNJUNGAN)
+// =============================================================================
+
+function markAsPrinted(type, kode) {
+  showConfirm(`Tandai ${kode} sebagai sudah dicetak?`, () => {
+    apiCall('updateStatusCetak', { type: type, kode: kode })
+      .then(res => {
+        showAlert(res.message, 'success');
+        if (type === 'anggota') loadAllMembers();
+        else loadAllBooks();
+      })
+      .catch(err => showAlert(`Gagal mengupdate status: ${err}`, 'error'));
+  });
+}
+
+function calculateTopKunjungan(kunjunganData) {
+  const counts = {};
+  kunjunganData.forEach(k => {
+    const kode = k['Kode Anggota'];
+    if (kode) counts[kode] = (counts[kode] || 0) + 1;
+  });
+
+  const sortedKodes = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).slice(0, 5);
+  const tbody = document.getElementById('topKunjunganTable');
+  
+  if (sortedKodes.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada kunjungan</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = sortedKodes.map((kode, index) => {
+    const member = allMembers.find(m => m['KODE'] === kode) || {};
+    return `
+      <tr>
+        <td><span class="badge badge-kembali" style="background-color:#F59E0B; color:white; padding:4px 8px; border-radius:4px;">#${index + 1}</span></td>
+        <td>${kode}</td>
+        <td>${member['NAMA'] || '-'}</td>
+        <td>${member['TIPE'] || '-'}</td>
+        <td><strong>${counts[kode]}</strong> kali</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ROMBEL LOGIC
+function openRombelModal() {
+  document.getElementById('searchRombelInput').value = '';
+  document.getElementById('formKeteranganBaru').value = '';
+  document.getElementById('selectAllRombel').checked = false;
+  renderRombelTable(allMembers);
+  openModal('rombelModal');
+}
+
+function renderRombelTable(members) {
+  const tbody = document.getElementById('rombelTable');
+  if (!members || members.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center">Tidak ada siswa</td></tr>';
+    return;
+  }
+  tbody.innerHTML = members.map(m => `
+    <tr>
+      <td><input type="checkbox" class="rombel-checkbox" value="${m['KODE']}"></td>
+      <td>${m['KODE']}</td>
+      <td>${m['NAMA']}</td>
+      <td>${m['KETERANGAN'] || '-'}</td>
+    </tr>
+  `).join('');
+}
+
+function filterRombelTable() {
+  const searchText = document.getElementById('searchRombelInput').value.toLowerCase();
+  const filtered = allMembers.filter(m => {
+    return (m['NAMA'] && m['NAMA'].toLowerCase().includes(searchText)) ||
+           (m['KETERANGAN'] && m['KETERANGAN'].toLowerCase().includes(searchText));
+  });
+  renderRombelTable(filtered);
+}
+
+function toggleSelectAllRombel(checked) {
+  const checkboxes = document.querySelectorAll('.rombel-checkbox');
+  checkboxes.forEach(cb => cb.checked = checked);
+}
+
+function submitRombel(event) {
+  event.preventDefault();
+  const checkboxes = document.querySelectorAll('.rombel-checkbox:checked');
+  const kodeList = Array.from(checkboxes).map(cb => cb.value);
+  const keteranganBaru = document.getElementById('formKeteranganBaru').value;
+
+  if (kodeList.length === 0) {
+    showAlert('Pilih minimal 1 siswa', 'warning');
+    return;
+  }
+
+  showConfirm(`Yakin ingin menaikkan/mengubah kelas ${kodeList.length} siswa menjadi ${keteranganBaru}?`, () => {
+    showLoading('Memproses kenaikan kelas...');
+    apiCall('bulkUpdateKeterangan', { 
+      kodeList: JSON.stringify(kodeList),
+      keteranganBaru: keteranganBaru 
+    })
+    .then(res => {
+      hideLoading();
+      showAlert(res.message, 'success');
+      closeModal('rombelModal');
+      loadAllMembers();
+    })
+    .catch(err => {
+      hideLoading();
+      showAlert(`Gagal: ${err}`, 'error');
+    });
+  });
+}

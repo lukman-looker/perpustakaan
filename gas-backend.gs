@@ -42,6 +42,8 @@ function doPost(e) {
         return addAnggota(params);
       case "updateAnggota":
         return updateAnggota(params);
+      case "bulkUpdateKeterangan":
+        return bulkUpdateKeterangan(params);
       
       // Book operations
       case "getBuku":
@@ -52,6 +54,8 @@ function doPost(e) {
         return addBuku(params);
       case "updateBuku":
         return updateBuku(params);
+      case "updateStatusCetak":
+        return updateStatusCetak(params);
       
       // Transaction operations
       case "pinjamBuku":
@@ -435,14 +439,32 @@ function addAnggota(params) {
   const sheet = getSheet(SHEET_ANGGOTA);
   const newRow = sheet.getLastRow() + 1;
   
-  // Column order: KODE | NAMA | JENIS KELAMIN | TIPE | KETERANGAN
-  sheet.getRange(newRow, 1).setValue(params.kode);
+  let kode = params.kode;
+  if (!kode) {
+    const tipeInitial = params.tipe ? params.tipe.charAt(0).toUpperCase() : 'A';
+    const allData = getAllDataFromSheet(SHEET_ANGGOTA);
+    let maxNum = 0;
+    allData.forEach(row => {
+      const k = row['KODE'];
+      if (k && k.startsWith(tipeInitial + '-')) {
+        const numPart = parseInt(k.substring(tipeInitial.length + 1));
+        if (!isNaN(numPart) && numPart > maxNum) {
+          maxNum = numPart;
+        }
+      }
+    });
+    kode = tipeInitial + '-' + String(maxNum + 1).padStart(3, '0');
+  }
+  
+  // Column order: KODE | NAMA | JENIS KELAMIN | TIPE | KETERANGAN | STATUS CETAK
+  sheet.getRange(newRow, 1).setValue(kode);
   sheet.getRange(newRow, 2).setValue(params.nama);
   sheet.getRange(newRow, 3).setValue(params.jenisKelamin || '');
   sheet.getRange(newRow, 4).setValue(params.tipe);
   sheet.getRange(newRow, 5).setValue(params.keterangan || '');
+  sheet.getRange(newRow, 6).setValue('');
   
-  return response(true, { message: "Anggota berhasil ditambahkan" });
+  return response(true, { message: "Anggota berhasil ditambahkan", kode: kode });
 }
 
 function updateAnggota(params) {
@@ -495,8 +517,38 @@ function addBuku(params) {
   const sheet = getSheet(SHEET_BANK_BUKU);
   const newRow = sheet.getLastRow() + 1;
   
-  // Column order: KODE BUKU | KODE RAK | JUDUL BUKU | PENGARANG | PENERBIT | TAHUN | STOK TERSEDIA | STOK TOTAL | KATEGORI
-  sheet.getRange(newRow, 1).setValue(params.kode);
+  let kode = params.kode;
+  if (!kode) {
+    const kategori = params.kategori || '';
+    let categoryAbbr = '';
+    
+    if (kategori.indexOf(' ') === -1) {
+      categoryAbbr = kategori.substring(0, 2).toUpperCase();
+    } else {
+      const words = kategori.split(' ');
+      categoryAbbr = (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+    }
+    if (!categoryAbbr) categoryAbbr = 'BK';
+    
+    const allBuku = getAllDataFromSheet(SHEET_BANK_BUKU);
+    let maxNum = 0;
+    allBuku.forEach(row => {
+      const k = row['KODE BUKU'];
+      if (k) {
+        const parts = k.split('-');
+        if (parts.length >= 2) {
+          const numPart = parseInt(parts[parts.length - 1]);
+          if (!isNaN(numPart) && numPart > maxNum) {
+            maxNum = numPart;
+          }
+        }
+      }
+    });
+    kode = categoryAbbr + '-B-' + (maxNum + 1);
+  }
+  
+  // Column order: KODE BUKU | KODE RAK | JUDUL BUKU | PENGARANG | PENERBIT | TAHUN | STOK TERSEDIA | STOK TOTAL | KATEGORI | STATUS CETAK
+  sheet.getRange(newRow, 1).setValue(kode);
   sheet.getRange(newRow, 2).setValue(params.kodeRak || '');
   sheet.getRange(newRow, 3).setValue(params.judul);
   sheet.getRange(newRow, 4).setValue(params.pengarang || '');
@@ -505,8 +557,9 @@ function addBuku(params) {
   sheet.getRange(newRow, 7).setValue(params.stok || 0);
   sheet.getRange(newRow, 8).setValue(params.stok || 0);
   sheet.getRange(newRow, 9).setValue(params.kategori || '');
+  sheet.getRange(newRow, 10).setValue('');
   
-  return response(true, { message: "Buku berhasil ditambahkan" });
+  return response(true, { message: "Buku berhasil ditambahkan", kode: kode });
 }
 
 function updateBuku(params) {
@@ -774,4 +827,54 @@ function generateQRCode(params) {
     qrValue: kode,
     url: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(kode)
   });
+}
+
+function bulkUpdateKeterangan(params) {
+  const kodeListStr = params.kodeList || '[]';
+  const kodeList = JSON.parse(kodeListStr);
+  const keteranganBaru = params.keteranganBaru;
+  
+  const sheet = getSheet(SHEET_ANGGOTA);
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return response(false, null, "Tidak ada data");
+  
+  const data = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  let updatedCount = 0;
+  
+  data.forEach((row, index) => {
+    const kode = String(row[0]).trim();
+    if (kodeList.includes(kode)) {
+      sheet.getRange(index + 2, 5).setValue(keteranganBaru);
+      updatedCount++;
+    }
+  });
+  
+  return response(true, { message: `Berhasil update keterangan untuk ${updatedCount} anggota` });
+}
+
+function updateStatusCetak(params) {
+  const type = params.type; // 'anggota' or 'buku'
+  const kodeListStr = params.kodeList || '[]';
+  let kodeList = [];
+  try { kodeList = JSON.parse(kodeListStr); } catch(e) { kodeList = [params.kode]; }
+  
+  const sheetName = type === 'anggota' ? SHEET_ANGGOTA : SHEET_BANK_BUKU;
+  const colIndex = type === 'anggota' ? 6 : 10;
+  
+  const sheet = getSheet(sheetName);
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return response(false, null, "Tidak ada data");
+  
+  const data = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  let updatedCount = 0;
+  
+  data.forEach((row, index) => {
+    const kode = String(row[0]).trim();
+    if (kodeList.includes(kode)) {
+      sheet.getRange(index + 2, colIndex).setValue('DICETAK');
+      updatedCount++;
+    }
+  });
+  
+  return response(true, { message: `Berhasil mengupdate status cetak untuk ${updatedCount} data` });
 }

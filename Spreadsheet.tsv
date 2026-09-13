@@ -1,5 +1,5 @@
 SHEET = ANGGOTA
-KODE	NAMA	JENIS KELAMIN	TIPE	KETERANGAN
+KODE	NAMA	JENIS KELAMIN	TIPE	KETERANGAN	STATUS CETAK
 S-001	Adam Rasyid Albani	Laki-Laki	Siswa	Kelas 1 A
 S-002	Anisa Nur Cahyani	Perempuan	Siswa	Kelas 1 A
 G-001	Dhani Harsyahyadi, S.H.I	Laki-Laki	Gukar	Kepala Sekolah
@@ -8,7 +8,7 @@ O-001	Wulandari Andriani	Perempuan	Other	Wali Murid
 
 
 SHEET = BANK BUKU
-KODE BUKU	KODE RAK	JUDUL BUKU	PENGARANG	PENERBIT	TAHUN	STOK TERSEDIA	STOK TOTAL	KATEGORI
+KODE BUKU	KODE RAK	JUDUL BUKU	PENGARANG	PENERBIT	TAHUN	STOK TERSEDIA	STOK TOTAL	KATEGORI	STATUS CETAK
 DA-1A-001	1-A	Pawai binatang	Nyoman Sri Utami	Usaid Prioritas	2015	3	5	Dongeng Anak
 DA-1A-002	1-A	Tujuh Putri	Ari Damawan	Gramedia	2014	2	4	Dongeng Anak
 NV-1B-001	1-B	Silih Berganti	Rizka Dewantara	Indigo	2020	1	2	Novel

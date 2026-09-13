@@ -419,9 +419,18 @@
           <button class="btn-primary" onclick="openAddAnggotaModal()">
             <i class="fas fa-plus-circle"></i> Tambah Anggota
           </button>
+          <button class="btn-success" onclick="openRombelModal()">
+            <i class="fas fa-layer-group"></i> Naik Kelas Serentak
+          </button>
           <button class="btn-warning" onclick="selectivePrintMembers()">
             <i class="fas fa-print"></i> Cetak yang Dipilih
           </button>
+        </div>
+      </div>
+
+      <div class="filter-bar-modern mt-10" style="margin-top: 15px;">
+        <div class="filter-item flex-grow-1">
+          <input type="text" id="searchAnggotaInput" class="form-control" placeholder="Cari Kode, Nama, Tipe, Keterangan..." onkeyup="filterAnggotaTable()">
         </div>
       </div>
 
@@ -435,6 +444,7 @@
               <th>Jenis Kelamin</th>
               <th>Tipe</th>
               <th>Keterangan</th>
+              <th>Status Cetak</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -461,6 +471,12 @@
         </div>
       </div>
 
+      <div class="filter-bar-modern mt-10" style="margin-top: 15px;">
+        <div class="filter-item flex-grow-1">
+          <input type="text" id="searchBukuInput" class="form-control" placeholder="Cari Kode, Judul, Pengarang, Kategori..." onkeyup="filterBukuTable()">
+        </div>
+      </div>
+
       <div class="table-container mt-20">
         <table>
           <thead>
@@ -472,6 +488,7 @@
               <th>Kategori</th>
               <th>Stok</th>
               <th>Rak</th>
+              <th>Status Cetak</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -601,7 +618,28 @@
         </div>
       </div>
 
-      <div class="table-container">
+      <!-- TOP PENGUNJUNG -->
+      <div class="card mt-20" style="background: #f8fafc; border: 1px solid #e2e8f0; box-shadow: none;">
+        <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: #1e293b;"><i class="fas fa-trophy" style="color: #f59e0b;"></i> Top 5 Pengunjung Teraktif</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Peringkat</th>
+                <th>Kode Anggota</th>
+                <th>Nama Anggota</th>
+                <th>Tipe</th>
+                <th>Jumlah Kunjungan</th>
+              </tr>
+            </thead>
+            <tbody id="topKunjunganTable">
+              <tr><td colspan="5" class="text-center">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-container mt-20">
         <table>
           <thead>
           <tr>
@@ -711,8 +749,8 @@
     
     <form id="anggotaForm" onsubmit="saveAnggota(event)">
       <div class="form-group">
-        <label>Kode</label>
-        <input type="text" id="formKodeAnggota">
+        <label>Kode (Dibuat otomatis jika dikosongkan)</label>
+        <input type="text" id="formKodeAnggota" placeholder="Otomatis (S-001, dll)">
       </div>
       <div class="form-group">
         <label>Nama</label>
@@ -762,8 +800,8 @@
     
     <form id="bukuForm" onsubmit="saveBuku(event)">
       <div class="form-group">
-        <label>Kode Buku</label>
-        <input type="text" id="formKodeBuku">
+        <label>Kode Buku (Dibuat otomatis jika dikosongkan)</label>
+        <input type="text" id="formKodeBuku" placeholder="Otomatis (DA-B-240)">
       </div>
       <div class="form-group">
         <label>Kode Rak</label>
@@ -799,6 +837,58 @@
           <i class="fas fa-save"></i> Simpan
         </button>
         <button type="button" class="btn-secondary" onclick="closeModal('bukuModal')">
+          <i class="fas fa-times"></i> Batal
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: NAIK KELAS SERENTAK (ROMBEL) -->
+<div id="rombelModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Naik Kelas Serentak</h2>
+      <button class="modal-close" onclick="closeModal('rombelModal')"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div style="margin-bottom: 15px; font-size: 0.9rem; color: #64748b;">
+      Gunakan fitur ini untuk menaikkan kelas beberapa siswa secara bersamaan. Cari siswa, pilih, lalu tentukan kelas baru.
+    </div>
+
+    <div class="filter-bar-modern" style="margin-bottom: 15px;">
+      <div class="filter-item flex-grow-1">
+        <input type="text" id="searchRombelInput" class="form-control" placeholder="Cari nama atau kelas lama..." onkeyup="filterRombelTable()">
+      </div>
+    </div>
+
+    <div class="table-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAllRombel" onchange="toggleSelectAllRombel(this.checked)"></th>
+            <th>Kode</th>
+            <th>Nama</th>
+            <th>Kelas Saat Ini</th>
+          </tr>
+        </thead>
+        <tbody id="rombelTable">
+          <!-- Data dimuat via JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <form id="rombelForm" onsubmit="submitRombel(event)">
+      <div class="form-group">
+        <label>Kelas Baru (Keterangan)</label>
+        <input type="text" id="formKeteranganBaru" required placeholder="Contoh: Kelas 2 A">
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn-success">
+          <i class="fas fa-save"></i> Proses Kenaikan Kelas
+        </button>
+        <button type="button" class="btn-secondary" onclick="closeModal('rombelModal')">
           <i class="fas fa-times"></i> Batal
         </button>
       </div>
