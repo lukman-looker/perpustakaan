@@ -686,14 +686,31 @@ function displayAnggotaTable(members) {
     tbody.innerHTML = '<tr><td colspan="8" class="text-center">Tidak ada data anggota</td></tr>';
     return;
   }
+  
+  const total = members.length;
+  const itemsPerPage = 15;
+  
+  if (typeof window.currentPageAnggota === 'undefined') window.currentPageAnggota = 1;
+  const totalPages = Math.ceil(total / itemsPerPage);
+  
+  if (window.currentPageAnggota > totalPages && totalPages > 0) window.currentPageAnggota = totalPages;
+  if (window.currentPageAnggota < 1) window.currentPageAnggota = 1;
+  
+  const startIndex = (window.currentPageAnggota - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  
+  let displayedMembers = members;
+  if (!window.showAllAnggota && total > itemsPerPage) {
+    displayedMembers = members.slice(startIndex, endIndex);
+  }
 
-  tbody.innerHTML = members.map(m => {
+  tbody.innerHTML = displayedMembers.map(m => {
     let statusCetak = m['STATUS CETAK'] === 'DICETAK' 
       ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>` 
       : `<button class="btn-sm btn-secondary" onclick="markAsPrinted('anggota', '${m['KODE']}')"><i class="fas fa-print"></i> Tandai</button>`;
     
     return `
-    <tr>
+    <tr onclick="toggleRowCheckbox(event, this, 'member-checkbox')" style="cursor: pointer;" class="clickable-row">
       <td><input type="checkbox" class="member-checkbox" value="${m['KODE']}" onchange="updateMemberSelection()"></td>
       <td>${m['KODE'] || '-'}</td>
       <td>${m['NAMA'] || '-'}</td>
@@ -708,6 +725,60 @@ function displayAnggotaTable(members) {
       </td>
     </tr>
   `}).join('');
+  
+  if (total > itemsPerPage) {
+    if (!window.showAllAnggota) {
+      const prevDisabled = window.currentPageAnggota === 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '';
+      const nextDisabled = window.currentPageAnggota === totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '';
+      
+      tbody.innerHTML += `
+        <tr>
+          <td colspan="8" style="padding: 12px 15px; background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
+              <div style="display: flex; align-items: center; flex-wrap: nowrap;">
+                <button class="btn-sm btn-secondary" onclick="window.currentPageAnggota--; filterAnggotaTable();" ${prevDisabled} style="margin:0;">
+                  <i class="fas fa-chevron-left"></i> Prev
+                </button>
+                <span style="margin: 0 15px; font-weight: 500; color: #475569; font-size: 0.9rem; white-space: nowrap;">Hal ${window.currentPageAnggota} dari ${totalPages}</span>
+                <button class="btn-sm btn-secondary" onclick="window.currentPageAnggota++; filterAnggotaTable();" ${nextDisabled} style="margin:0;">
+                  Next <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <button class="btn-sm btn-primary" onclick="window.showAllAnggota = true; filterAnggotaTable();" style="margin:0;">
+                <i class="fas fa-list"></i> Tampilkan Semua
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    } else {
+      tbody.innerHTML += `
+        <tr>
+          <td colspan="8" class="text-center" style="padding: 15px; background: #f8fafc;">
+            <span style="color: #64748b; font-size: 0.9rem; margin-right: 15px;">Menampilkan semua ${total} anggota.</span>
+            <button class="btn-sm btn-secondary" onclick="window.showAllAnggota = false; filterAnggotaTable();">
+              <i class="fas fa-compress-arrows-alt"></i> Tampilkan Halaman
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+  }
+}
+
+function toggleRowCheckbox(event, rowElement, checkboxClass) {
+  // Cegah trigger jika yang diklik adalah button, a (link), atau input itu sendiri
+  const tagName = event.target.tagName.toLowerCase();
+  if (tagName === 'button' || tagName === 'input' || tagName === 'a' || event.target.closest('button')) {
+    return;
+  }
+  
+  const checkbox = rowElement.querySelector('.' + checkboxClass);
+  if (checkbox) {
+    checkbox.checked = !checkbox.checked;
+    if (checkboxClass === 'member-checkbox') updateMemberSelection();
+    else if (checkboxClass === 'book-checkbox') updateBookSelection();
+  }
 }
 
 function deleteAnggota(kode) {
@@ -883,13 +954,30 @@ function displayBukuTable(books) {
     return;
   }
 
-  tbody.innerHTML = books.map(b => {
+  const total = books.length;
+  const itemsPerPage = 15;
+  
+  if (typeof window.currentPageBooks === 'undefined') window.currentPageBooks = 1;
+  const totalPages = Math.ceil(total / itemsPerPage);
+  
+  if (window.currentPageBooks > totalPages && totalPages > 0) window.currentPageBooks = totalPages;
+  if (window.currentPageBooks < 1) window.currentPageBooks = 1;
+  
+  const startIndex = (window.currentPageBooks - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  
+  let displayedBooks = books;
+  if (!window.showAllBooks && total > itemsPerPage) {
+    displayedBooks = books.slice(startIndex, endIndex);
+  }
+
+  tbody.innerHTML = displayedBooks.map(b => {
     let statusCetak = b['STATUS CETAK'] === 'DICETAK' 
       ? `<span class="badge badge-kembali" style="background-color:#10B981; color:white; padding:4px 8px; border-radius:4px; font-size:0.8rem;"><i class="fas fa-check"></i> Dicetak</span>` 
       : `<button class="btn-sm btn-secondary" onclick="markAsPrinted('buku', '${b['KODE BUKU']}')"><i class="fas fa-print"></i> Tandai</button>`;
       
     return `
-    <tr>
+    <tr onclick="toggleRowCheckbox(event, this, 'book-checkbox')" style="cursor: pointer;" class="clickable-row">
       <td><input type="checkbox" class="book-checkbox" value="${b['KODE BUKU']}" onchange="updateBookSelection()"></td>
       <td>${b['KODE BUKU'] || '-'}</td>
       <td>${b['JUDUL BUKU'] || '-'}</td>
@@ -909,6 +997,45 @@ function displayBukuTable(books) {
       </td>
     </tr>
   `}).join('');
+  
+  if (total > itemsPerPage) {
+    if (!window.showAllBooks) {
+      const prevDisabled = window.currentPageBooks === 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '';
+      const nextDisabled = window.currentPageBooks === totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '';
+      
+      tbody.innerHTML += `
+        <tr>
+          <td colspan="9" style="padding: 12px 15px; background: #f8fafc; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
+              <div style="display: flex; align-items: center; flex-wrap: nowrap;">
+                <button class="btn-sm btn-secondary" onclick="window.currentPageBooks--; filterBukuTable();" ${prevDisabled} style="margin:0;">
+                  <i class="fas fa-chevron-left"></i> Prev
+                </button>
+                <span style="margin: 0 15px; font-weight: 500; color: #475569; font-size: 0.9rem; white-space: nowrap;">Hal ${window.currentPageBooks} dari ${totalPages}</span>
+                <button class="btn-sm btn-secondary" onclick="window.currentPageBooks++; filterBukuTable();" ${nextDisabled} style="margin:0;">
+                  Next <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <button class="btn-sm btn-primary" onclick="window.showAllBooks = true; filterBukuTable();" style="margin:0;">
+                <i class="fas fa-list"></i> Tampilkan Semua
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    } else {
+      tbody.innerHTML += `
+        <tr>
+          <td colspan="9" class="text-center" style="padding: 15px; background: #f8fafc;">
+            <span style="color: #64748b; font-size: 0.9rem; margin-right: 15px;">Menampilkan semua ${total} buku.</span>
+            <button class="btn-sm btn-secondary" onclick="window.showAllBooks = false; filterBukuTable();">
+              <i class="fas fa-compress-arrows-alt"></i> Tampilkan Halaman
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+  }
 }
 
 function deleteBuku(kode) {
@@ -1361,11 +1488,11 @@ function openBulkActions(type) {
     title: 'Aksi Data Terpilih',
     html: `
       <p style="margin-bottom: 20px;">Terdapat <strong>${selectedList.length}</strong> data yang dipilih. Apa yang ingin Anda lakukan?</p>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button class="swal2-confirm swal2-styled" style="background-color: #F59E0B; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;" onclick="Swal.close(); ${type === 'anggota' ? 'selectivePrintMembers()' : 'selectivePrintBooks()'}">
+      <div style="display: flex; flex-direction: row; gap: 10px; justify-content: center;">
+        <button class="swal2-confirm swal2-styled" style="background-color: #F59E0B; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 15px;" onclick="Swal.close(); ${type === 'anggota' ? 'selectivePrintMembers()' : 'selectivePrintBooks()'}">
           <i class="fas fa-print"></i> Cetak yang Dipilih
         </button>
-        <button class="swal2-confirm swal2-styled" style="background-color: #EF4444; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;" onclick="Swal.close(); ${type === 'anggota' ? 'bulkDeleteMembers()' : 'bulkDeleteBooks()'}">
+        <button class="swal2-confirm swal2-styled" style="background-color: #EF4444; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 15px;" onclick="Swal.close(); ${type === 'anggota' ? 'bulkDeleteMembers()' : 'bulkDeleteBooks()'}">
           <i class="fas fa-trash-alt"></i> Hapus yang Dipilih
         </button>
       </div>
