@@ -1053,6 +1053,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  table-layout: fixed;
 }
 
 th {
@@ -1068,6 +1069,8 @@ td {
   padding: 12px 10px;
   border-bottom: 1px solid #f1f5f9;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #334155;
 }
 
@@ -2487,7 +2490,8 @@ tr:hover {
 .seamless-marquee-container {
   overflow: hidden;
   white-space: nowrap;
-  display: inline-block;
+  display: block;
+  width: 100%;
   vertical-align: bottom;
 }
 
