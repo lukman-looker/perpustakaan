@@ -3,7 +3,6 @@
 
 <head>
   <meta charset="UTF-8">
-
   <title>Dashboard Perpustakaan - Sistem Manajemen</title>
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
@@ -55,7 +54,7 @@
       <div class="login-right">
         <h3 class="login-welcome">Selamat Datang!</h3>
         <p class="login-instruction">Silakan masuk ke akun Anda</p>
-        <form id="loginForm" >
+        <form id="loginForm">
           <div class="form-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Masukkan username" required autofocus>
@@ -141,8 +140,8 @@
       <div class="main-wrapper">
         <header class="topbar">
           <div class="topbar-left">
-            <h1 class="topbar-page-title" id="topbarPageTitle">Dashboard <span class="topbar-separator">&gt;</span> <span id="topbarSubtitle">Scanner &amp;
-                Sirkulasi</span></h1>
+            <h1 class="topbar-page-title" id="topbarPageTitle">Dashboard <span class="topbar-separator">&gt;</span>
+              <span id="topbarSubtitle">Scanner &amp; Sirkulasi</span></h1>
           </div>
           <div class="topbar-right">
             <div class="admin-profile-card">
@@ -307,7 +306,7 @@
                 <div class="filter-bar-modern">
                   <div class="filter-item">
                     <label>Filter Status</label>
-                    <select id="filterStatus" class="form-control min-w-150" >
+                    <select id="filterStatus" class="form-control min-w-150">
                       <option value="">Semua</option>
                       <option value="DIPINJAM">Dipinjam</option>
                       <option value="KEMBALI">Kembali</option>
@@ -315,8 +314,7 @@
                   </div>
                   <div class="filter-item flex-grow-1">
                     <label>Cari Kode Anggota</label>
-                    <input type="text" id="filterAnggota" class="form-control" placeholder="S-001"
-                      >
+                    <input type="text" id="filterAnggota" class="form-control" placeholder="S-001">
                   </div>
                   <div class="filter-actions">
                     <button class="btn-secondary" data-action="loadTransaksi">
@@ -389,15 +387,14 @@
                 <div class="filter-bar-modern mt-10 mb-15">
                   <div class="filter-item flex-grow-1">
                     <input type="text" id="searchAnggotaInput" class="form-control"
-                      placeholder="Cari Kode, Nama, Tipe, Keterangan..." >
+                      placeholder="Cari Kode, Nama, Tipe, Keterangan...">
                   </div>
                 </div>
                 <div class="table-container mt-20">
                   <table>
                     <thead>
                       <tr>
-                        <th class="col-checkbox"><input type="checkbox" id="selectAllMembers"
-                            ></th>
+                        <th class="col-checkbox"><input type="checkbox" id="selectAllMembers"></th>
                         <th class="col-kode">Kode</th>
                         <th class="col-nama">Nama</th>
                         <th class="col-jk">Jenis Kelamin</th>
@@ -430,14 +427,14 @@
                 <div class="filter-bar-modern mt-10 mb-15">
                   <div class="filter-item flex-grow-1">
                     <input type="text" id="searchBukuInput" class="form-control"
-                      placeholder="Cari Kode, Judul, Pengarang, Kategori..." >
+                      placeholder="Cari Kode, Judul, Pengarang, Kategori...">
                   </div>
                 </div>
                 <div class="table-container mt-20">
                   <table>
                     <thead>
                       <tr>
-                        <th class="col-checkbox"><input type="checkbox" id="selectAllBooks" >
+                        <th class="col-checkbox"><input type="checkbox" id="selectAllBooks">
                         </th>
                         <th class="col-kode-buku">Kode</th>
                         <th class="col-judul">Judul</th>
@@ -618,12 +615,10 @@
                       <div id="adminPhotoPlaceholder" class="photo-placeholder">
                         <i class="fas fa-user-circle"></i>
                       </div>
-                      <button class="btn-upload-photo" data-action="triggerPhotoUpload"
-                        title="Ubah Foto">
+                      <button class="btn-upload-photo" data-action="triggerPhotoUpload" title="Ubah Foto">
                         <i class="fas fa-camera"></i>
                       </button>
-                      <input type="file" id="photoUpload" accept="image/*" class="d-none"
-                        >
+                      <input type="file" id="photoUpload" accept="image/*" class="d-none">
                     </div>
                     <div class="profile-details-list">
                       <div class="detail-item">
@@ -644,7 +639,7 @@
                 <div class="settings-main">
                   <div class="card settings-card">
                     <h3 class="settings-title"><i class="fas fa-user-edit"></i> Ubah Informasi Profil</h3>
-                    <form id="updateProfileForm"  class="settings-form">
+                    <form id="updateProfileForm" class="settings-form">
                       <div class="form-group">
                         <label>Nama Lengkap</label>
                         <input type="text" id="updateNamaLengkap" class="form-control" required>
@@ -659,7 +654,7 @@
                   </div>
                   <div class="card settings-card">
                     <h3 class="settings-title"><i class="fas fa-lock"></i> Ubah Password</h3>
-                    <form id="changePasswordForm"  class="settings-form">
+                    <form id="changePasswordForm" class="settings-form">
                       <div class="form-group">
                         <label>Password Lama</label>
                         <input type="password" id="oldPassword" class="form-control" required>
@@ -710,9 +705,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Tambah/Edit Anggota</h2>
-        <button class="modal-close" data-action="closeModal" data-modal="anggotaModal"><i class="fas fa-times"></i></button>
+        <button class="modal-close" data-action="closeModal" data-modal="anggotaModal"><i
+            class="fas fa-times"></i></button>
       </div>
-      <form id="anggotaForm" >
+      <form id="anggotaForm">
         <div class="form-group">
           <label>Kode</label>
           <input type="text" id="formKodeAnggota" placeholder="Sebaiknya dikosongkan (dibuat otomatis oleh sistem)">
@@ -757,9 +753,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Tambah/Edit Buku</h2>
-        <button class="modal-close" data-action="closeModal" data-modal="bukuModal"><i class="fas fa-times"></i></button>
+        <button class="modal-close" data-action="closeModal" data-modal="bukuModal"><i
+            class="fas fa-times"></i></button>
       </div>
-      <form id="bukuForm" >
+      <form id="bukuForm">
         <div class="form-group">
           <label>Kode Buku</label>
           <input type="text" id="formKodeBuku" placeholder="Sebaiknya dikosongkan (dibuat otomatis oleh sistem)">
@@ -807,7 +804,8 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Naik Kelas Serentak</h2>
-        <button class="modal-close" data-action="closeModal" data-modal="rombelModal"><i class="fas fa-times"></i></button>
+        <button class="modal-close" data-action="closeModal" data-modal="rombelModal"><i
+            class="fas fa-times"></i></button>
       </div>
       <div class="text-sm text-muted mb-15"> Gunakan fitur ini untuk menaikkan kelas beberapa siswa secara bersamaan.
         Cari siswa, pilih, lalu tentukan kelas baru. </div>
@@ -820,7 +818,7 @@
         <table>
           <thead>
             <tr>
-              <th><input type="checkbox" id="selectAllRombel" ></th>
+              <th><input type="checkbox" id="selectAllRombel"></th>
               <th>Kode</th>
               <th>Nama</th>
               <th>Kelas Saat Ini</th>
@@ -830,7 +828,7 @@
           </tbody>
         </table>
       </div>
-      <form id="rombelForm" >
+      <form id="rombelForm">
         <div class="form-group">
           <label>Kelas Baru (Keterangan)</label>
           <input type="text" id="formKeteranganBaru" required placeholder="Contoh: Kelas 2 A">
@@ -848,7 +846,8 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Kembalikan Buku</h2>
-        <button class="modal-close" data-action="closeModal" data-modal="returnModal"><i class="fas fa-times"></i></button>
+        <button class="modal-close" data-action="closeModal" data-modal="returnModal"><i
+            class="fas fa-times"></i></button>
       </div>
       <div id="returnInfo" class="form-container-light mb-20 bg-gray">
       </div>
