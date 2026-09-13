@@ -8,6 +8,20 @@
 // =============================================================================
 // URL_GAS is loaded from config.js
 
+function formatLongText(text, maxLen = 20, maxWidth = '150px') {
+  if (!text) return '-';
+  const str = String(text);
+  if (str.length > maxLen) {
+    const duration = Math.max(6, str.length * 0.25); // kecepatan stabil
+    return `<div class="seamless-marquee-container" style="max-width: ${maxWidth};">
+              <div class="seamless-marquee-content" style="animation-duration: ${duration}s;">
+                <span>${str}</span><span>${str}</span>
+              </div>
+            </div>`;
+  }
+  return str;
+}
+
 // Session & Auth variables
 let currentSession = null;
 let currentAdminId = null;
@@ -745,10 +759,10 @@ function displayAnggotaTable(members) {
     <tr onclick="toggleRowCheckbox(event, this, 'member-checkbox')" style="cursor: pointer;" class="clickable-row">
       <td><input type="checkbox" class="member-checkbox" value="${m['KODE']}" onchange="updateMemberSelection()"></td>
       <td>${m['KODE'] || '-'}</td>
-      <td>${m['NAMA'] || '-'}</td>
+      <td>${formatLongText(m['NAMA'], 20, '150px')}</td>
       <td>${m['JENIS KELAMIN'] || '-'}</td>
       <td>${m['TIPE'] || '-'}</td>
-      <td>${m['KETERANGAN'] || '-'}</td>
+      <td>${formatLongText(m['KETERANGAN'], 20, '150px')}</td>
       <td>${statusCetak}</td>
       <td>
         <button class="btn-sm btn-secondary" onclick="editAnggota('${m['KODE']}')">
@@ -1012,9 +1026,9 @@ function displayBukuTable(books) {
     <tr onclick="toggleRowCheckbox(event, this, 'book-checkbox')" style="cursor: pointer;" class="clickable-row">
       <td><input type="checkbox" class="book-checkbox" value="${b['KODE BUKU']}" onchange="updateBookSelection()"></td>
       <td>${b['KODE BUKU'] || '-'}</td>
-      <td>${b['JUDUL BUKU'] || '-'}</td>
-      <td>${b['PENGARANG'] || '-'}</td>
-      <td>${b['KATEGORI'] || '-'}</td>
+      <td>${formatLongText(b['JUDUL BUKU'], 25, '180px')}</td>
+      <td>${formatLongText(b['PENGARANG'], 20, '150px')}</td>
+      <td>${formatLongText(b['KATEGORI'], 15, '120px')}</td>
       <td>
         <span class="${b['STOK TERSEDIA'] > 0 ? 'stok-available' : 'stok-unavailable'}">
           ${b['STOK TERSEDIA'] || 0}

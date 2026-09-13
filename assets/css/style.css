@@ -1067,6 +1067,7 @@ th {
 td {
   padding: 12px 10px;
   border-bottom: 1px solid #f1f5f9;
+  white-space: nowrap;
   color: #334155;
 }
 
@@ -2480,4 +2481,28 @@ tr:hover {
     flex: 1;
     justify-content: center;
   }
+}
+
+/* Seamless Marquee */
+.seamless-marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.seamless-marquee-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: seamless-scroll 6s linear infinite;
+}
+
+.seamless-marquee-content span {
+  display: inline-block;
+  padding-right: 30px;
+}
+
+@keyframes seamless-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
