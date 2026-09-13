@@ -795,10 +795,10 @@ header .status {
 /* ============================================================================= */
 .card {
   background: white;
-  padding: 25px;
-  border-radius: 16px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04);
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
 .card h2 {
@@ -985,9 +985,9 @@ select,
 textarea,
 .form-control {
   width: 100%;
-  padding: 14px 16px;
+  padding: 10px 14px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 10px;
   background: #f8fafc;
   font-family: inherit;
   font-size: 14px;
@@ -1115,7 +1115,7 @@ table {
 
 th {
   background: #f8fafc;
-  padding: 16px 12px;
+  padding: 12px 10px;
   text-align: left;
   font-weight: 600;
   color: #475569;
@@ -1123,7 +1123,7 @@ th {
 }
 
 td {
-  padding: 16px 12px;
+  padding: 12px 10px;
   border-bottom: 1px solid #f1f5f9;
   color: #334155;
 }
@@ -1497,12 +1497,12 @@ tr:hover {
 .filter-bar-modern {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 10px;
   align-items: flex-end;
   background: #f8fafc;
-  padding: 20px;
-  border-radius: 16px;
-  margin-bottom: 25px;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
   border: 1px solid #f1f5f9;
 }
 
@@ -1652,8 +1652,8 @@ tr:hover {
   align-items: center;
   flex-wrap: wrap;
   gap: 15px;
-  padding-bottom: 20px;
-  margin-bottom: 25px;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
   border-bottom: 1px solid #f1f5f9;
 }
 
